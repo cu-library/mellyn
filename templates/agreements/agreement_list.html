@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}List of Agreements - Mellyn{% endblock %}
+
+{% block content %}
+    {% load bleach_tags %}
+    <h2>Agreements</h2>
+    <ul>
+        {% for agreement in agreements %}
+            <li><h3>{{ agreement.title }}</h3>{{ agreement.body | bleach }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
