@@ -1,0 +1,166 @@
+/* Import fonts */
+@import url('fonts/inter/inter.css');
+
+html {
+	font-family: 'Inter', sans-serif;
+}
+
+@supports (font-variation-settings: normal) {
+	html {
+		font-family: 'Inter var', sans-serif;
+	}
+}
+
+body {
+	background: white;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+h1 {
+	font-weight: 300;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+p {
+	line-height: 1.5;
+	font-weight: 300;
+}
+
+#skip {
+	display: flex;
+	justify-content: center;
+	height: 0px;
+}
+
+#skip a {
+	position:absolute;
+	left:-10000px;
+	top:auto;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+	color: white;
+}
+
+#skip a:focus {
+	position:static;
+	padding: 5px 10px;
+	width: auto;
+	height: 2em;
+	line-height: 2em;
+	background: #222;
+	border-radius: 0 0 5px 5px;
+	z-index: 1;
+}
+
+body > header {
+	border-bottom: 1px solid #eee;
+	border-top: 3px solid #bf112b;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0px 10px;
+}
+
+#branding {
+	display: flex;
+	align-items: center;
+	min-height: 60px;
+}
+
+#branding h1 {
+	margin: 0;
+}
+
+#branding > img {
+	padding-right: 10px;
+}
+
+body > header > nav ul {
+	list-style: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0px;
+	margin: 0px;
+}
+
+body > header > nav ul li {
+	padding-right: 10px;
+}
+
+body > header > nav ul li:last-child {
+	padding-right: 0px;
+}
+
+body > header > nav a {
+	padding: 10px;
+	font-size: 110%;
+	border-radius: 5px;
+	display: block;
+}
+
+body > header > nav a:hover {
+	color: #bf112b;
+	transition-property: color;
+	transition-duration: 0.1s;
+}
+
+@media (max-width: 520px) {
+	body > header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	#branding {
+		justify-content: center;
+		border-bottom: 1px solid #eee;
+	}
+
+	body > header > nav ul {
+		flex-direction: column;
+		align-items: center;
+		justify-content: space-around;
+		padding: 10px 0px;
+	}
+
+	body > header > nav ul li {
+		padding-right: 0px;
+	}
+}
+
+body > main {
+	flex: 1;
+	max-width: 1000px;
+	width: 100%;
+	margin: 0 auto;
+	padding: 0px 10px;
+}
+
+body > main a {
+	text-decoration: underline;
+	color: inherit;
+}
+
+body > footer {
+	background-color: #222;
+	color: #bababa;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 70px;
+}
+
+body > footer a {
+	color: #ededed;
+}
+
+body > footer a:hover {
+	color: white;
+}

@@ -1,10 +1,34 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>{% block title %}Mellyn - Speak, Friends, and Enter{% endblock %}</title>
+    <title>{% block sitetitle %}Sign - Resource Access - MacOdrum Library{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
   </head>
   <body>
-    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="skip"><a href="#main">Skip to main content</a></div>
+    <header>
+      <div id="branding">
+        <img src="{% static 'images/logo.png' %}" alt="Carleton University Logo">
+        <h1>{% block title %}Sign{% endblock %}</h1>
+      </div>
+      <nav role="navigation">
+        <ul>
+          <li><a href="https://library.carleton.ca">Return&nbsp;to&nbsp;the&nbsp;Library&nbsp;Website</a></li>
+          <li><a href="/login">Login</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main id="main">
+      {% block main %}{% endblock %}
+    </main>
+    <footer>
+      {% block footer %}A service of the&nbsp;<a href="https://library.carleton.ca">Carleton University Library</a>.{% endblock %}
+    </footer>
   </body>
+  <!-- Mellyn - Speak, Friends, and Enter! A project by Kevin Bowrin -->
 </html>
