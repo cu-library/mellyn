@@ -1,6 +1,6 @@
 asgiref==3.2.3
 astroid==2.3.3
-bleach==3.1.1
+bleach==3.1.2
 coverage==5.0.4
 Django==3.0.4
 django-bleach==0.6.1
