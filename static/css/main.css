@@ -11,6 +11,10 @@ html {
 	}
 }
 
+* {
+	box-sizing: border-box;
+}
+
 body {
 	background: white;
 	min-height: 100vh;
@@ -140,6 +144,7 @@ body > main {
 	max-width: 1000px;
 	margin: 0 auto;
 	padding: 0px 20px;
+	width: 100%;
 }
 
 body > main a {

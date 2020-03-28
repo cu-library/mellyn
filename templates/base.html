@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>{% block sitetitle %}Sign - Resource Access - MacOdrum Library{% endblock %}</title>
+    <title>Sign - {% block sitetitle %}Resource Access - MacOdrum Library{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
@@ -12,10 +12,10 @@
   <body>
     <div id="skip"><a href="#main">Skip to main content</a></div>
     <header>
-      <div id="branding">
+      <a id="branding" href="/" title="Return to Sign homepage">
         <img src="{% static 'images/logo.png' %}" alt="Carleton University Logo">
         <h1>{% block title %}Sign{% endblock %}</h1>
-      </div>
+      </a>
       <nav role="navigation">
         <ul>
           <li><a href="https://library.carleton.ca">Return&nbsp;to&nbsp;the&nbsp;Library&nbsp;Website</a></li>

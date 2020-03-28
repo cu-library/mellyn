@@ -25,6 +25,8 @@ SECRET_KEY = '5c*1dww-hx-_j66^r2$yuz_&eb!fk07=q@h72ihoz3f(mlrmco'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+APPEND_SLASH = True
+
 ALLOWED_HOSTS = ['workshop']
 
 

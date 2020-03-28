@@ -12,3 +12,8 @@ class AgreementList(generic.ListView):
     """A view of all the agreements in the database"""
     model = Agreement
     context_object_name = 'agreements'
+
+class AgreementCreate(generic.edit.CreateView):
+    """A view to create an Agreement"""
+    model = Agreement
+    fields = '__all__'

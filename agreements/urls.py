@@ -9,5 +9,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [  # pylint: disable=invalid-name
-    path('', views.AgreementList.as_view(), name='agreements_list'),
+    path('agreements/', views.AgreementList.as_view(), name='agreements_list'),
+    path('agreements/create/', views.AgreementCreate.as_view(), name='agreements_create'),
 ]

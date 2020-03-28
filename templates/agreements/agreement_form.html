@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Create a new areement{% endblock %}
+
+{% block title %}Create a new agreement{% endblock %}
+
+{% block main %}
+    <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+    </form>
+{% endblock %}
+
+
+
+
