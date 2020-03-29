@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Delete {{ agreement.title }}{% endblock %}
+
+{% block main %}
+    <form method="post">{% csrf_token %}
+        <p>Are you sure you want to delete "{{ agreement.title }}"?</p>
+        <input type="submit" value="Confirm">
+    </form>
+{% endblock %}
+
+
+
+

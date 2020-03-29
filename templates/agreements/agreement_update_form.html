@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 
-{% block sitetitle %}Create a new areement{% endblock %}
-
-{% block title %}Create a new agreement{% endblock %}
+{% block sitetitle %}Update {{ agreement.title }}{% endblock %}
 
 {% block main %}
     <form method="post">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Save">
     </form>
+    <a href="{% url 'agreements_delete' agreement.slug %}">Delete this agreement</a>
 {% endblock %}
 
 

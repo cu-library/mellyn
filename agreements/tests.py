@@ -31,9 +31,26 @@ class AgreementTestCase(TestCase):
 
     def test_redirect_url_https(self):
         """Check that redirect urls always use the https scheme."""
-        with self.assertRaisesRegex(ValidationError, "Enter a valid URL"):
-            self.test_agreement.redirect_url = "http://example.com"
+        with self.assertRaisesRegex(ValidationError, 'Enter a valid URL'):
+            self.test_agreement.redirect_url = 'http://example.com'
             self.test_agreement.full_clean()
+
+    def test_slug_value_create(self):
+        """Check that the slug value can't be 'create'"""
+        with self.assertRaisesRegex(ValidationError, "The slug cannot be 'create'."):
+            self.test_agreement.slug = 'create'
+            self.test_agreement.full_clean()
+
+    def test_slug_can_contain_create(self):
+        """Check that the slug can contain the string 'create'"""
+        self.test_agreement.slug = '123create'
+        self.test_agreement.full_clean()
+
+        self.test_agreement.slug = 'create123'
+        self.test_agreement.full_clean()
+
+        self.test_agreement.slug = '123create123'
+        self.test_agreement.full_clean()
 
 
 class SignatureTestCase(TestCase):
@@ -70,13 +87,13 @@ class SignatureTestCase(TestCase):
     def test_banner_id_validation_min(self):
         """Check that creating a signature with a Banner ID below min fails."""
 
-        with self.assertRaisesRegex(ValidationError, "Incorrect Banner ID Number"):
+        with self.assertRaisesRegex(ValidationError, 'Incorrect Banner ID Number'):
             self.test_sig.banner_id -= 1
             self.test_sig.full_clean()
 
     def test_banner_id_validation_max(self):
         """Check that creating a signature with a Banner ID above max fails."""
 
-        with self.assertRaisesRegex(ValidationError, "Incorrect Banner ID Number"):
+        with self.assertRaisesRegex(ValidationError, 'Incorrect Banner ID Number'):
             self.test_sig.banner_id += 100000000
             self.test_sig.full_clean()

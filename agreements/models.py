@@ -6,18 +6,23 @@ https://docs.djangoproject.com/en/3.0/topics/db/models/
 
 from django.conf import settings
 from django.db import models
-from django.core.validators import URLValidator, MaxValueValidator, MinValueValidator, validate_email
+from django.urls import reverse
+from django.core.validators import RegexValidator, URLValidator, MaxValueValidator, MinValueValidator, \
+                                   validate_email
 from django_bleach.models import BleachField
 
 
 class Agreement(models.Model):
     """Agreements are documents which are signed by patrons to access resources"""
     title = models.CharField(max_length=300, unique=True)
-    slug = models.SlugField(max_length=300, unique=True, help_text='URL-safe identifier for the Agreement.')
+    slug = models.SlugField(max_length=300, unique=True,
+                            validators=[RegexValidator(regex="^create$",
+                                                       message="The slug cannot be 'create'.",
+                                                       inverse_match=True)],
+                            help_text='URL-safe identifier for the Agreement.')
     resource = models.CharField(max_length=300, help_text='What signing this agreement would give a patron access to.')
     resource_slug = models.SlugField(max_length=300, unique=True, help_text='URL-safe identifier for the resource.')
-    body = BleachField(allowed_tags=['h2', 'h3', 'p',
-                                     'a', 'abbr', 'cite', 'code',
+    body = BleachField(allowed_tags=['h3', 'p', 'a', 'abbr', 'cite', 'code',
                                      'small', 'span', 'em', 'strong', 'sub', 'sup',
                                      'u', 'ul', 'ol', 'li'],
                        allowed_attributes={'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title']},
@@ -28,9 +33,16 @@ class Agreement(models.Model):
     created = models.DateField(auto_now=True)
     hidden = models.BooleanField(default=False,
                                  help_text='Hidden agreements do not appear in the list of active agreements.')
-    redirect_url = models.URLField(validators=[URLValidator(schemes=['https'])],
-                                   help_text='URL where patrons will be redirected to after signing the agreement.')
+    redirect_url = models.URLField(validators=[URLValidator(schemes=['https'],
+                                                            message="Enter a valid URL. "
+                                                                    "It must start with 'https://'.")],
+                                   help_text="URL where patrons will be redirected to "
+                                             "after signing the agreement. It must start with 'https://'.")
     redirect_text = models.CharField(max_length=300, help_text='The text of the URL redirect link.')
+
+    def get_absolute_url(self):
+        """Returns the canonical URL for an Agreement"""
+        return reverse('agreements_read', args=[self.slug])
 
 
 class Faculty(models.Model):

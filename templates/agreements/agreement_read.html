@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}{{ agreement.title }}{% endblock %}
+
+{% block main %}
+    {% load bleach_tags %}
+    <h2>{{ agreement.title }}</h2>
+    {{ agreement.body | bleach }}
+    <a href="{% url 'agreements_update' agreement.slug %}">Edit this agreement</a>
+{% endblock %}

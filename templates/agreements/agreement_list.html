@@ -2,14 +2,11 @@
 
 {% block sitetitle %}List of Agreements{% endblock %}
 
-{% block title %}List of Agreements{% endblock %}
-
 {% block main %}
-    {% load bleach_tags %}
     <h2>Agreements</h2>
     <ul>
         {% for agreement in agreements %}
-            <li><h3>{{ agreement.title }}</h3>{{ agreement.body | bleach }}</li>
+            <li><a href="{% url 'agreements_read' agreement.slug %}">{{ agreement.title }}</a></li>
         {% endfor %}
     </ul>
     <a href="{% url 'agreements_create' %}">Create a new agreement</a>
