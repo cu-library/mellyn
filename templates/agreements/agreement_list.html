@@ -6,7 +6,7 @@
     <h2>Agreements</h2>
     <ul>
         {% for agreement in agreements %}
-            <li><a href="{% url 'agreements_read' agreement.slug %}">{{ agreement.title }}</a></li>
+        <li><a href="{% url 'agreements_read' agreement.slug %}">{{ agreement.title }}</a></li>
         {% endfor %}
     </ul>
     <a href="{% url 'agreements_create' %}">Create a new agreement</a>

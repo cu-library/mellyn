@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}List of Departments{% endblock %}
+
+{% block main %}
+    <h2>Departments</h2>
+    <ul>
+        {% for department in departments %}
+        <li><a href="{% url 'departments_read' department.slug %}">{{ department.name }}</a></li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'agreements_create' %}">Create a new department</a>
+{% endblock %}

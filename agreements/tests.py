@@ -11,7 +11,7 @@ from .models import Agreement, Faculty, Department, Signature
 
 
 class AgreementTestCase(TestCase):
-    """Tests for the agreement model."""
+    """Tests for the Agreement model."""
     def setUp(self):
         """Initially, create an Agreement which passes all validation."""
         self.test_agreement = Agreement.objects.create(title='test-one',
@@ -53,8 +53,59 @@ class AgreementTestCase(TestCase):
         self.test_agreement.full_clean()
 
 
+class FacultyTestCase(TestCase):
+    """Tests for the Faculty model."""
+
+    def setUp(self):
+        """Initially, create an Faculty which passes all validation."""
+        self.test_faculty = Faculty.objects.create(name='Test', slug='test')
+
+    def test_slug_value_create(self):
+        """Check that the slug value can't be 'create'"""
+        with self.assertRaisesRegex(ValidationError, "The slug cannot be 'create'."):
+            self.test_faculty.slug = 'create'
+            self.test_faculty.full_clean()
+
+    def test_slug_can_contain_create(self):
+        """Check that the slug can contain the string 'create'"""
+        self.test_faculty.slug = '123create'
+        self.test_faculty.full_clean()
+
+        self.test_faculty.slug = 'create123'
+        self.test_faculty.full_clean()
+
+        self.test_faculty.slug = '123create123'
+        self.test_faculty.full_clean()
+
+
+class DepartmentTestCase(TestCase):
+    """Tests for the Department model."""
+
+    def setUp(self):
+        """Initially, create an Department which passes all validation."""
+        self.test_faculty = Faculty.objects.create(name='Test', slug='test')
+        self.test_department = Department.objects.create(name='Test', faculty=self.test_faculty)
+
+    def test_slug_value_create(self):
+        """Check that the slug value can't be 'create'"""
+        with self.assertRaisesRegex(ValidationError, "The slug cannot be 'create'."):
+            self.test_department.slug = 'create'
+            self.test_department.full_clean()
+
+    def test_slug_can_contain_create(self):
+        """Check that the slug can contain the string 'create'"""
+        self.test_department.slug = '123create'
+        self.test_department.full_clean()
+
+        self.test_department.slug = 'create123'
+        self.test_department.full_clean()
+
+        self.test_department.slug = '123create123'
+        self.test_department.full_clean()
+
+
 class SignatureTestCase(TestCase):
-    """Tests for the signature model."""
+    """Tests for the Signature model."""
     @classmethod
     def setUpTestData(cls):
         """Create a dummy agreement and user for the signatures to reference."""
@@ -70,7 +121,7 @@ class SignatureTestCase(TestCase):
                                                              last_name='test',
                                                              email='test@test.com',
                                                              password='testtesttest')
-        cls.test_faculty = Faculty.objects.create(name='Test')
+        cls.test_faculty = Faculty.objects.create(name='Test', slug='test')
         cls.test_department = Department.objects.create(name='Test', faculty=cls.test_faculty)
 
     def setUp(self):

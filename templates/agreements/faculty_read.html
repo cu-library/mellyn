@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}{{ faculty.name }}{% endblock %}
+
+{% block main %}
+    <h2>{{ faculty.name }}</h2>
+    {% if departments %}
+    <ul>
+        {% for department in departments %}
+        <li><a href="{% url 'departments_read' department.slug %}">{{ department.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>This faculty has no departments. <a href="{% url 'departments_create_under_faculty' faculty.slug%}">Add a department to this faculty</a></p>
+    {% endif %}
+    <a href="{% url 'faculties_update' faculty.slug %}">Edit this faculty</a>
+{% endblock %}

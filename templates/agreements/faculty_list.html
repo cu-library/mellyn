@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}List of Faculties{% endblock %}
+
+{% block main %}
+    <h2>Faculties</h2>
+    <ul>
+        {% for faculty in faculties %}
+        <li><a href="{% url 'faculties_read' faculty.slug %}">{{ faculty.name }}</a></li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'faculties_create' %}">Create a new faculty</a>
+{% endblock %}

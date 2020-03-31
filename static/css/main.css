@@ -41,6 +41,18 @@ p {
 	font-weight: 300;
 }
 
+ul {
+	padding-left: 0;
+}
+
+li {
+	list-style: none;
+}
+
+li:not(:last-child) {
+	margin-bottom: 10px;
+}
+
 #skip {
 	display: flex;
 	justify-content: center;

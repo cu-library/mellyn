@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
-{% block sitetitle %}Create a new agreement{% endblock %}
+{% block sitetitle %}Update {{ department.name }}{% endblock %}
 
 {% block main %}
     <form method="post">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Save">
     </form>
+    <a href="{% url 'departments_delete' department.slug %}">Delete this department</a>
 {% endblock %}
 
 

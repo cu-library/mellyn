@@ -19,7 +19,7 @@ class Agreement(models.Model):
                             validators=[RegexValidator(regex="^create$",
                                                        message="The slug cannot be 'create'.",
                                                        inverse_match=True)],
-                            help_text='URL-safe identifier for the Agreement.')
+                            help_text='URL-safe identifier for the agreement.')
     resource = models.CharField(max_length=300, help_text='What signing this agreement would give a patron access to.')
     resource_slug = models.SlugField(max_length=300, unique=True, help_text='URL-safe identifier for the resource.')
     body = BleachField(allowed_tags=['h3', 'p', 'a', 'abbr', 'cite', 'code',
@@ -47,13 +47,35 @@ class Agreement(models.Model):
 
 class Faculty(models.Model):
     """Faculties of the University"""
-    name = models.CharField(max_length=500)
+    name = models.CharField(max_length=300, unique=True)
+    slug = models.SlugField(max_length=300, unique=True,
+                            validators=[RegexValidator(regex="^create$",
+                                                       message="The slug cannot be 'create'.",
+                                                       inverse_match=True)],
+                            help_text='URL-safe identifier for the faculty.')
+
+    def get_absolute_url(self):
+        """Returns the canonical URL for a Faculty"""
+        return reverse('faculties_read', args=[self.slug])
+
+    def __str__(self):
+        """Returns the string representation of a Faculty"""
+        return self.name
 
 
 class Department(models.Model):
     """Departments of the University, which group patrons. Departments are part of Facilties"""
+    name = models.CharField(max_length=300)
+    slug = models.SlugField(max_length=300, unique=True,
+                            validators=[RegexValidator(regex="^create$",
+                                                       message="The slug cannot be 'create'.",
+                                                       inverse_match=True)],
+                            help_text='URL-safe identifier for the department.')
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
-    name = models.CharField(max_length=500)
+
+    def get_absolute_url(self):
+        """Returns the canonical URL for a Department"""
+        return reverse('departments_read', args=[self.slug])
 
 
 class Signature(models.Model):
