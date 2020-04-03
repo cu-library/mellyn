@@ -3,14 +3,7 @@
 {% block sitetitle %}Create a new faculty{% endblock %}
 
 {% block main %}
-  <h2>Create a new faculty</h2>
-  <form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <div id="actions">
-      <a class="warning" href="{% url 'faculties_list' %}">Cancel</a>
-      <input type="submit" value="Save new faculty">
-    </div>
-  </form>
+  {% include "agreements/base_create_form.html" with name='faculty' form=form csrf_token=csrf_token urlname='faculties_list' %}
 {% endblock %}
 
 

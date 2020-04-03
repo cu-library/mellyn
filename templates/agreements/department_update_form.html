@@ -3,16 +3,5 @@
 {% block sitetitle %}Update {{ department.name }}{% endblock %}
 
 {% block main %}
-  <h2>Update {{ department.name }}</h2>
-  <form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <div id="actions">
-      <a class="warning" href="{% url 'departments_read' department.slug %}">Cancel</a>
-      <input type="submit" value="Update department">
-    </div>
-  </form>
+  {% include "agreements/base_update_form.html" with name=department.name form=form csrf_token=csrf_token urlname='departments_read' urlslug=department.slug %}
 {% endblock %}
-
-
-
-

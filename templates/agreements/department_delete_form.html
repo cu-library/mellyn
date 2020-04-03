@@ -1,14 +1,7 @@
 {% extends "base.html" %}
 
-{% block sitetitle %}Confirm deletion of {{ department.name }}{% endblock %}
+{% block sitetitle %}Delete {{ department.name }}{% endblock %}
 
 {% block main %}
-  <h2>Confirm deletion of {{ department.name }}</h2>
-  <form method="post">{% csrf_token %}
-    <p>Are you sure you want to delete this department?</p>
-    <div id="actions">
-      <a class="warning" href="{% url 'departments_read' department.slug %}">Cancel</a>
-      <input type="submit" value="Confirm department deletion">
-    </div>
-  </form>
+  {% include "agreements/base_delete_form.html" with name=department.name model='department' form=form csrf_token=csrf_token urlname='departments_read' urlslug=department.slug %}
 {% endblock %}

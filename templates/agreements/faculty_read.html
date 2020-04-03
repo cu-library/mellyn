@@ -15,7 +15,7 @@
   {% endif %}
   <div id="actions">
     <a class="bonus" href="{% url 'departments_create_under_faculty' faculty.slug%}">Add a department to this faculty</a>
-    <a class="warning" href="{% url 'faculties_delete' faculty.slug %}">Delete this faculty</a>
-    <a class="ok" href="{% url 'faculties_update' faculty.slug %}">Edit this faculty</a>
+    <a class="ok" href="{% url 'faculties_update' faculty.slug %}">Edit</a>
+    <a class="warning" href="{% url 'faculties_delete' faculty.slug %}">Delete</a>
   </div>
 {% endblock %}

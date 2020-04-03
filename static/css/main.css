@@ -300,8 +300,12 @@ div.agreementcreated {
 	margin: 5px 0px;
 }
 
-div.agreementresource{
+div.agreementresource {
 	margin: 5px 0px;
+}
+
+section.agreementbody {
+	margin-bottom: 10px;
 }
 
 body > footer {

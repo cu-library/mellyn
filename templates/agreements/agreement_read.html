@@ -8,7 +8,7 @@
   <div class="agreementresource">Provides access to {{ agreement.resource }}</div>
   <section class="agreementbody">{{ agreement.body | safe}}</section>
   <div id="actions">
-    <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete this agreement</a>
-    <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit this agreement</a>
+    <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
+    <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>
   </div>
 {% endblock %}

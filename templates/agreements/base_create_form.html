@@ -1,0 +1,8 @@
+  <h2>Create a new {{ name }}</h2>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <div id="actions">
+      <input type="submit" value="Create">
+      <a class="warning" href="{% url urlname %}">Cancel</a>
+    </div>
+  </form>
