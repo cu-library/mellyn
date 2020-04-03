@@ -3,10 +3,14 @@
 {% block sitetitle %}Create a new agreement{% endblock %}
 
 {% block main %}
-    <form method="post">{% csrf_token %}
+  <h2>Create a new agreement</h2>
+  <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Save">
-    </form>
+    <div id="actions">
+      <a class="warning" href="{% url 'agreements_list' %}">Cancel</a>
+      <input type="submit" value="Save new agreement">
+    </div>
+  </form>
 {% endblock %}
 
 

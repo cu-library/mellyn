@@ -1,0 +1,18 @@
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style:  normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("SourceCodePro-Regular.otf.woff2?v=2.030") format("woff2"),
+       url("SourceCodePro-Regular.otf.woff?v=2.030") format("woff");
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style:  normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("SourceCodePro-Light.otf.woff2?v=2.030") format("woff2"),
+       url("SourceCodePro-Light.otf.woff?v=2.030") format("woff");
+}
+

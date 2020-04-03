@@ -1,6 +1,3 @@
-/* Import fonts */
-@import url('fonts/inter/inter.css');
-
 html {
 	font-family: 'Inter', sans-serif;
 }
@@ -11,8 +8,24 @@ html {
 	}
 }
 
+pre, code {
+	font-family: 'Source Code Pro', monospace;
+	font-weight: 300;
+}
+
+:root {
+  --ok-button-background: #c5dcff;
+  --ok-button-hover-background: #a9cbfe;
+  --warning-button-background: #ffcdcd;
+  --warning-button-hover-background: #ffa8a8;
+  --bonus-button-background: #ffc5f6;
+  --bonus-button-hover-background: #ffb8f4;
+  --carleton-red: #bf112b;
+}
+
 * {
 	box-sizing: border-box;
+	font-weight: 400;
 }
 
 body {
@@ -22,35 +35,26 @@ body {
 	flex-direction: column;
 }
 
-h1 {
-	font-weight: 300;
+h1, h2, h3, h4 {
+	font-weight: 500;
 }
 
-h2 {
-	font-weight: 300;
+strong {
+	font-weight: 500;
 }
 
 a {
 	text-decoration: none;
 	color: inherit;
-	font-weight: 300;
 }
 
 p {
 	line-height: 1.5;
-	font-weight: 300;
+	margin: 16px 0px;
 }
 
-ul {
-	padding-left: 0;
-}
-
-li {
-	list-style: none;
-}
-
-li:not(:last-child) {
-	margin-bottom: 10px;
+ul, ol {
+	padding-left: 20px;
 }
 
 #skip {
@@ -66,23 +70,23 @@ li:not(:last-child) {
 	width:1px;
 	height:1px;
 	overflow:hidden;
-	color: white;
 }
 
 #skip a:focus {
 	position:static;
 	padding: 5px 10px;
 	width: auto;
-	height: 2em;
+	height: 2.5em;
 	line-height: 2em;
-	background: #222;
 	border-radius: 0 0 5px 5px;
 	z-index: 1;
+	background: #222;
+	color: white;
 }
 
 body > header {
 	border-bottom: 1px solid #eee;
-	border-top: 3px solid #bf112b;
+	border-top: 3px solid var(--carleton-red);
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -114,6 +118,10 @@ body > header > nav ul {
 
 body > header > nav ul li {
 	padding-right: 10px;
+}
+
+body > header > nav ul li:not(:last-child) {
+	margin-bottom: 0px;
 }
 
 body > header > nav ul li:last-child {
@@ -156,7 +164,7 @@ body > header > nav a:hover {
 	}
 }
 
-body > main {
+#main {
 	flex: 1;
 	max-width: 1000px;
 	margin: 0 auto;
@@ -164,9 +172,136 @@ body > main {
 	width: 100%;
 }
 
-body > main a {
+#main a {
 	text-decoration: underline;
 	color: inherit;
+}
+
+form p {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+form p label {
+  margin-bottom: 5px;
+}
+
+form p input[type=text], form p input[type=url] {
+	font-size: 1.2em;
+	padding: 10px;
+	min-width: 400px;
+}
+
+form p textarea{
+	font-size: 1.2em;
+	padding: 10px;
+	width: 100%;
+}
+
+#id_body {
+	font-family: 'Source Code Pro', monospace;
+	font-weight: 300;
+	font-size: 1em;
+}
+
+form p input[type=checkbox] {
+	transform: scale(1.2);
+}
+
+form p span.helptext {
+	font-size: 0.9em;
+	padding-top: 5px;
+	font-weight: 350;
+}
+
+#actions {
+	max-width: 1000px;
+	margin: 0 auto;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+#actions a, #actions input[type=submit] {
+	padding: 10px 20px;
+	border-radius: 10px;
+	text-decoration: none;
+	border: none;
+	cursor: pointer;
+}
+
+#actions a:not(:last-child), #actions input[type=submit]:not(:last-child) {
+	margin-right: 10px;
+}
+
+@media (max-width: 685px) {
+	#actions {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	#actions a:not(:last-child), #actions input[type=submit]:not(:last-child) {
+		margin-bottom: 10px;
+		margin-right: 0px;
+	}
+}
+
+#actions a.ok, #actions input[type=submit] {
+	background-color: var(--ok-button-background);
+}
+
+#actions a.ok:hover, #actions input[type=submit]:hover {
+	background-color: var(--ok-button-hover-background);
+	transition-property: background-color;
+	transition-duration: 0.1s;
+}
+
+#actions a.warning {
+	background-color: var(--warning-button-background);
+}
+
+#actions a.warning:hover {
+	background-color: var(--warning-button-hover-background);
+	transition-property: background-color;
+	transition-duration: 0.1s;
+}
+
+#actions a.bonus {
+	background-color: var(--bonus-button-background);
+}
+
+#actions a.bonus:hover {
+	background-color: var(--bonus-button-hover-background);
+	transition-property: background-color;
+	transition-duration: 0.1s;
+}
+
+#objectlist {
+	padding-left: 0;
+}
+
+#objectlist h3 {
+	margin-bottom: 10px;
+}
+
+#objectlist li {
+	list-style: none;
+}
+
+#objectlist li {
+	margin-bottom: 25px;
+}
+
+div.agreementcreated {
+	margin: 5px 0px;
+}
+
+div.agreementresource{
+	margin: 5px 0px;
 }
 
 body > footer {

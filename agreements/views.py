@@ -31,6 +31,11 @@ class AgreementCreate(generic.edit.CreateView):
     fields = '__all__'
     template_name_suffix = '_create_form'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].label_suffix = ''
+        return context
+
 
 class AgreementUpdate(generic.edit.UpdateView):
     """A view to update an Agreement"""

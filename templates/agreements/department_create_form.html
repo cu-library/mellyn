@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
-{% block sitetitle %}Create a new Department{% endblock %}
+{% block sitetitle %}Create a new department{% endblock %}
 
 {% block main %}
-    <form method="post">{% csrf_token %}
+  <h2>Create a new department</h2>
+  <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Save">
-    </form>
+    <div id="actions">
+      <a class="warning" href="{% url 'departments_list' %}">Cancel</a>
+      <input type="submit" value="Save new department">
+    </div>
+  </form>
 {% endblock %}
 
 

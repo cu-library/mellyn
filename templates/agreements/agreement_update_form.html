@@ -3,11 +3,14 @@
 {% block sitetitle %}Update {{ agreement.title }}{% endblock %}
 
 {% block main %}
-    <form method="post">{% csrf_token %}
+  <h2>Update {{ agreement.title }}</h2>
+  <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Save">
-    </form>
-    <a href="{% url 'agreements_delete' agreement.slug %}">Delete this agreement</a>
+    <div id="actions">
+      <a class="warning" href="{% url 'agreements_read' agreement.slug %}">Cancel</a>
+      <input type="submit" value="Update agreement">
+    </div>
+  </form>
 {% endblock %}
 
 

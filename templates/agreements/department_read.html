@@ -3,7 +3,10 @@
 {% block sitetitle %}{{ department.name }}{% endblock %}
 
 {% block main %}
-    <h2>{{ department.name }}</h2>
-    <p>Part of <a href="{% url 'faculties_read' department.faculty.slug %}">{{ department.faculty.name }}</a>.</p>
-    <a href="{% url 'departments_update' department.slug %}">Edit this department</a>
+  <h2>{{ department.name }}</h2>
+  <p>Part of <a href="{% url 'faculties_read' department.faculty.slug %}">{{ department.faculty.name }}</a>.</p>
+  <div id="actions">
+    <a class="warning" href="{% url 'departments_delete' department.slug %}">Delete this department</a>
+    <a class="ok" href="{% url 'departments_update' department.slug %}">Edit this department</a>
+  </div>
 {% endblock %}

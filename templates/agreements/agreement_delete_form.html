@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block sitetitle %}Delete {{ agreement.title }}{% endblock %}
+{% block sitetitle %}Confirm deletion of {{ agreement.title }}{% endblock %}
 
 {% block main %}
-    <form method="post">{% csrf_token %}
-        <p>Are you sure you want to delete "{{ agreement.title }}"?</p>
-        <input type="submit" value="Confirm">
-    </form>
+  <h2>Confirm deletion of {{ agreement.title }}</h2>
+  <form method="post">{% csrf_token %}
+    <p>Are you sure you want to delete this agreement?</p>
+    <div id="actions">
+      <a class="warning" href="{% url 'agreements_read' agreement.slug %}">Cancel</a>
+      <input type="submit" value="Confirm agreement deletion">
+    </div>
+  </form>
 {% endblock %}
-
-
-
-

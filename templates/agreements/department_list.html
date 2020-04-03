@@ -1,13 +1,20 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block sitetitle %}List of Departments{% endblock %}
 
 {% block main %}
-    <h2>Departments</h2>
-    <ul>
-        {% for department in departments %}
-        <li><a href="{% url 'departments_read' department.slug %}">{{ department.name }}</a></li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'agreements_create' %}">Create a new department</a>
+  <h2>Departments</h2>
+  {% if departments %}
+  <ul id="objectlist">
+    {% for department in departments %}
+    <li><a href="{% url 'departments_read' department.slug %}">{{ department.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No departments found.</p>
+  {% endif %}
+  <div id="actions">
+    <a class="ok" href="{% url 'departments_create' %}">Create a new department</a>
+  </div>
 {% endblock %}

@@ -3,11 +3,14 @@
 {% block sitetitle %}Update {{ department.name }}{% endblock %}
 
 {% block main %}
-    <form method="post">{% csrf_token %}
+  <h2>Update {{ department.name }}</h2>
+  <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Save">
-    </form>
-    <a href="{% url 'departments_delete' department.slug %}">Delete this department</a>
+    <div id="actions">
+      <a class="warning" href="{% url 'departments_read' department.slug %}">Cancel</a>
+      <input type="submit" value="Update department">
+    </div>
+  </form>
 {% endblock %}
 
 

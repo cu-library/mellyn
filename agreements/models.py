@@ -23,7 +23,7 @@ class Agreement(models.Model):
     resource = models.CharField(max_length=300, help_text='What signing this agreement would give a patron access to.')
     resource_slug = models.SlugField(max_length=300, unique=True, help_text='URL-safe identifier for the resource.')
     body = BleachField(allowed_tags=['h3', 'p', 'a', 'abbr', 'cite', 'code',
-                                     'small', 'span', 'em', 'strong', 'sub', 'sup',
+                                     'small', 'em', 'strong', 'sub', 'sup',
                                      'u', 'ul', 'ol', 'li'],
                        allowed_attributes={'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title']},
                        allowed_protocols=['https', 'mailto'],

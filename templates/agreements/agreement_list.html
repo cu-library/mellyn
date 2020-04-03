@@ -1,13 +1,24 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block sitetitle %}List of Agreements{% endblock %}
+{% block sitetitle %}Agreements{% endblock %}
 
 {% block main %}
-    <h2>Agreements</h2>
-    <ul>
-        {% for agreement in agreements %}
-        <li><a href="{% url 'agreements_read' agreement.slug %}">{{ agreement.title }}</a></li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'agreements_create' %}">Create a new agreement</a>
+  <h2>Agreements</h2>
+  {% if agreements %}
+  <ul id="objectlist">
+    {% for agreement in agreements %}
+    <li>
+      <a href="{% url 'agreements_read' agreement.slug %}"><h3>{{ agreement.title }}</h3></a>
+      <div class="agreementcreated">Created {{ agreement.created | date:"Y-m-d"}}</div>
+      <div class="agreementresource">Provides access to {{ agreement.resource }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No agreements found.</p>
+  {% endif %}
+  <div id="actions">
+    <a class="ok" href="{% url 'agreements_create' %}">Create a new agreement</a>
+  </div>
 {% endblock %}

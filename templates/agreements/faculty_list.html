@@ -1,13 +1,20 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block sitetitle %}List of Faculties{% endblock %}
 
 {% block main %}
-    <h2>Faculties</h2>
-    <ul>
-        {% for faculty in faculties %}
-        <li><a href="{% url 'faculties_read' faculty.slug %}">{{ faculty.name }}</a></li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'faculties_create' %}">Create a new faculty</a>
+  <h2>Faculties</h2>
+  {% if faculties %}
+  <ul id="objectlist">
+    {% for faculty in faculties %}
+    <li><a href="{% url 'faculties_read' faculty.slug %}">{{ faculty.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No faculties found.</p>
+  {% endif %}
+  <div id="actions">
+    <a class="ok" href="{% url 'faculties_create' %}">Create a new faculty</a>
+  </div>
 {% endblock %}

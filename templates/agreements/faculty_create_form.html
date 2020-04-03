@@ -3,10 +3,14 @@
 {% block sitetitle %}Create a new faculty{% endblock %}
 
 {% block main %}
-    <form method="post">{% csrf_token %}
+  <h2>Create a new faculty</h2>
+  <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Save">
-    </form>
+    <div id="actions">
+      <a class="warning" href="{% url 'faculties_list' %}">Cancel</a>
+      <input type="submit" value="Save new faculty">
+    </div>
+  </form>
 {% endblock %}
 
 
