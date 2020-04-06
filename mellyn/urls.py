@@ -18,5 +18,5 @@ from . import views
 
 urlpatterns = [ # pylint: disable=invalid-name
     path('', include('agreements.urls')),
-    path('', views.index),
+    path('', views.index, name='index'),
 ]

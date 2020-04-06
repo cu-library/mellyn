@@ -172,8 +172,8 @@ class TemplatesAndViewsTestCase(TestCase):
 
     model_names = [('Agreement', 'Agreements'), ('Faculty', 'Faculties'), ('Department', 'Departments')]
 
-    def test_common(self):
-        """Check common elements of all the templates for basic CRUD actions a user can perform"""
+    def test_correct_names(self):
+        """Check the names used in all templates for basic CRUD actions a user can perform"""
 
         for singular, plural in self.model_names:
             lowercase_singular = singular.lower()
@@ -197,6 +197,7 @@ class TemplatesAndViewsTestCase(TestCase):
                                 msg_prefix=singular+': ', html=True)
             self.assertContains(response, f'<input type="submit" value="Create">', msg_prefix=singular+': ', html=True)
 
+        # Create the models used in further tests.
         test_agreement = Agreement(title='Test',
                                    slug='test',
                                    resource='test-resource',
@@ -257,3 +258,62 @@ class TemplatesAndViewsTestCase(TestCase):
                                           f'href="{reverse(lowercase_plural+"_read", args=["test"])}">No</a>',
                                 msg_prefix=singular+': ', html=True)
             self.assertContains(response, f'<input type="submit" value="Yes">', msg_prefix=singular+': ', html=True)
+
+    def test_skip_link(self):
+        """Check that the skip link is present on all templates for basic CRUD actions a user can perform"""
+
+        def check_skip_link(response, url_name):
+            # The body element's first child should be the skip link.
+            self.assertContains(response, f'<body>\n    <div id="skip"><a href="#main">Skip to main content</a></div>',
+                                msg_prefix=url_name+': ')
+            # The skip link target should be valid.
+            self.assertContains(response, f'<main id="main">', msg_prefix=url_name+': ')
+
+        response = self.client.get(reverse('index'))
+        check_skip_link(response, 'index')
+
+        for _, plural in self.model_names:
+            lowercase_plural = plural.lower()
+
+            response = self.client.get(reverse(lowercase_plural+'_list'))
+            check_skip_link(response, lowercase_plural+'_list')
+
+            # Visit the create view.
+            response = self.client.get(reverse(lowercase_plural+'_create'))
+            check_skip_link(response, lowercase_plural+'_create')
+
+        # Create the models used in further tests.
+        test_agreement = Agreement(title='Test',
+                                   slug='test',
+                                   resource='test-resource',
+                                   resource_slug='test-resource',
+                                   body='body',
+                                   redirect_url='https://example.com',
+                                   redirect_text='example-redirect')
+        test_agreement.full_clean()
+        test_agreement.save()
+        test_faculty = Faculty(name='Test', slug='test')
+        test_faculty.full_clean()
+        test_faculty.save()
+        test_department = Department(name='Test', slug='test', faculty=test_faculty)
+        test_department.full_clean()
+        test_department.save()
+
+        for _, plural in self.model_names:
+            lowercase_plural = plural.lower()
+
+            # Visit the list view. It should now have content.
+            response = self.client.get(reverse(lowercase_plural+'_list'))
+            check_skip_link(response, lowercase_plural+'_list')
+
+            # Visit the read view.
+            response = self.client.get(reverse(lowercase_plural+'_read', args=['test']))
+            check_skip_link(response, lowercase_plural+'_read')
+
+            # Visit the update view.
+            response = self.client.get(reverse(lowercase_plural+'_update', args=['test']))
+            check_skip_link(response, lowercase_plural+'_update')
+
+            # Visit the delete view.
+            response = self.client.get(reverse(lowercase_plural+'_delete', args=['test']))
+            check_skip_link(response, lowercase_plural+'_delete')
