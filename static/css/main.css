@@ -37,6 +37,7 @@ body {
 
 h1, h2, h3, h4 {
 	font-weight: 500;
+	margin: 16px 0px;
 }
 
 strong {
@@ -216,14 +217,12 @@ form p span.helptext {
 }
 
 #actions {
-	max-width: 1000px;
-	margin: 0 auto;
 	width: 100%;
+	margin: 3px 0px 16px 0px;
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
 	align-items: center;
-	margin-bottom: 16px;
 }
 
 #actions a, #actions input[type=submit] {
@@ -238,15 +237,20 @@ form p span.helptext {
 	margin-right: 10px;
 }
 
-@media (max-width: 685px) {
+@media (max-width: 520px) {
 	#actions {
 		flex-direction: column;
-		align-items: flex-start;
+		align-items: stretch;
+		margin-top: 22px;
 	}
 
-	#actions a:not(:last-child), #actions input[type=submit]:not(:last-child) {
-		margin-bottom: 10px;
+	#actions a, #actions input[type=submit] {
+		text-align: center;
+	}
+
+	#actions a:not(:last-child), #actions input[type="submit"]:not(:last-child) {
 		margin-right: 0px;
+		margin-bottom: 10px;
 	}
 }
 
