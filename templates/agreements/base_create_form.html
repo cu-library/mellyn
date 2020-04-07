@@ -1,5 +1,5 @@
   <h2>Create a new {{ name }}</h2>
-  <form method="post">{% csrf_token %}
+  <form class="create" method="post">{% csrf_token %}
     {{ form.non_field_errors }}
     {% for field in form %}
     <div {% if field.errors %}class="errors"{% endif %}>
