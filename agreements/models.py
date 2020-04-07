@@ -35,7 +35,8 @@ class Agreement(models.Model):
                                  help_text='Hidden agreements do not appear in the list of active agreements.')
     redirect_url = models.URLField(validators=[URLValidator(schemes=['https'],
                                                             message="Enter a valid URL. "
-                                                                    "It must start with 'https://'.")],
+                                                                    "It must start with 'https://'.",
+                                                            code='need_https')],
                                    help_text="URL where patrons will be redirected to "
                                              "after signing the agreement. It must start with 'https://'.")
     redirect_text = models.CharField(max_length=300, help_text='The text of the URL redirect link.')
