@@ -14,6 +14,11 @@ from django_bleach.models import BleachField
 
 class Agreement(models.Model):
     """Agreements are documents which are signed by patrons to access resources"""
+
+    BODY_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
+                         'small', 'em', 'strong', 'sub', 'sup',
+                         'u', 'ul', 'ol', 'li']
+
     title = models.CharField(max_length=300, unique=True)
     slug = models.SlugField(max_length=300, unique=True,
                             validators=[RegexValidator(regex="^create$",
@@ -25,13 +30,13 @@ class Agreement(models.Model):
     resource_slug = models.SlugField(max_length=300, unique=True,
                                      help_text='URL-safe identifier for the resource. '
                                                'It cannot be changed after the agreement is created.')
-    body = BleachField(allowed_tags=['h3', 'p', 'a', 'abbr', 'cite', 'code',
-                                     'small', 'em', 'strong', 'sub', 'sup',
-                                     'u', 'ul', 'ol', 'li'],
+    body = BleachField(allowed_tags=BODY_ALLOWED_TAGS,
                        allowed_attributes={'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title']},
                        allowed_protocols=['https', 'mailto'],
                        strip_tags=False,
-                       strip_comments=True)
+                       strip_comments=True,
+                       help_text=f'HTML content of the Agreement. '
+                                 f'The following tags are allowed: { ", ".join(BODY_ALLOWED_TAGS)}.')
 
     created = models.DateField(auto_now=True)
     hidden = models.BooleanField(default=False,

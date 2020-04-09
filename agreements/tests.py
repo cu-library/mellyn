@@ -252,7 +252,8 @@ class TemplatesandViewsTestCase(TestCase):
                                 msg_prefix=singular+': ', html=True)
             self.assertContains(response, f'<input type="submit" value="Save">', msg_prefix=singular+': ', html=True)
             self.assertContains(response, f'<input type="text" name="slug" value="test" maxlength="300" '
-                                          f'required disabled id="id_slug">', msg_prefix=singular+': ', html=True)
+                                          f'required readonly id="id_slug">',
+                                msg_prefix=singular+': ', html=True)
 
             # Visit the delete view.
             response = self.client.get(reverse(lowercase_plural+'_delete', args=['test']))

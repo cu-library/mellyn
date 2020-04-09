@@ -19,12 +19,12 @@ class RemoveLabelSuffixMixin():  # pylint: disable=too-few-public-methods
         return context
 
 
-class DisableSlugMixin():  # pylint: disable=too-few-public-methods
+class ReadonlySlugMixin():  # pylint: disable=too-few-public-methods
     """Mixin which disables the slug field"""
 
     def get_context_data(self, **kwargs):  # pylint: disable=missing-function-docstring
         context = super().get_context_data(**kwargs)
-        context['form'].fields['slug'].disabled = True
+        context['form'].fields['slug'].widget.attrs['readonly'] = True
         return context
 
 
@@ -50,7 +50,7 @@ class AgreementCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
     template_name_suffix = '_create_form'
 
 
-class AgreementUpdate(RemoveLabelSuffixMixin, DisableSlugMixin, generic.edit.UpdateView):
+class AgreementUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
     """A view to update an Agreement"""
     model = Agreement
     fields = '__all__'
@@ -58,7 +58,7 @@ class AgreementUpdate(RemoveLabelSuffixMixin, DisableSlugMixin, generic.edit.Upd
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['resource_slug'].disabled = True
+        context['form'].fields['resource_slug'].widget.attrs['readonly'] = True
         return context
 
 
@@ -98,7 +98,7 @@ class FacultyCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
     template_name_suffix = '_create_form'
 
 
-class FacultyUpdate(RemoveLabelSuffixMixin, DisableSlugMixin, generic.edit.UpdateView):
+class FacultyUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
     """A view to update a Faculty"""
     model = Faculty
     fields = '__all__'
@@ -149,7 +149,7 @@ class DepartmentCreateUnderFaculty(RemoveLabelSuffixMixin, generic.edit.CreateVi
         return context
 
 
-class DepartmentUpdate(RemoveLabelSuffixMixin, DisableSlugMixin, generic.edit.UpdateView):
+class DepartmentUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
     """A view to update a Department"""
     model = Department
     fields = '__all__'

@@ -203,6 +203,11 @@ form input[type=text], form input[type=url] {
 	min-width: 400px;
 }
 
+form input[readonly] {
+	border: none;
+	padding: 16px 0px;
+}
+
 form textarea{
 	font-size: 1.2em;
 	padding: 16px;
@@ -215,12 +220,16 @@ form textarea{
 	font-size: 1em;
 }
 
+#id_slug, #id_resource_slug {
+	font-family: 'Source Code Pro', monospace;
+}
+
 form input[type=checkbox] {
 	transform: scale(1.2);
 }
 
-form div.errors input {
-	box-shadow: rgb(255, 0, 0) 0px 0px 1.5px 1px
+form div.errors input, form div.errors textarea {
+	box-shadow: red 0px 0px 1.5px 1px;
 }
 
 form ul.errorlist {
