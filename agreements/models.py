@@ -19,9 +19,12 @@ class Agreement(models.Model):
                             validators=[RegexValidator(regex="^create$",
                                                        message="The slug cannot be 'create'.",
                                                        inverse_match=True)],
-                            help_text='URL-safe identifier for the agreement.')
+                            help_text='URL-safe identifier for the agreement. '
+                                      'It cannot be changed after the agreement is created.')
     resource = models.CharField(max_length=300, help_text='What signing this agreement would give a patron access to.')
-    resource_slug = models.SlugField(max_length=300, unique=True, help_text='URL-safe identifier for the resource.')
+    resource_slug = models.SlugField(max_length=300, unique=True,
+                                     help_text='URL-safe identifier for the resource. '
+                                               'It cannot be changed after the agreement is created.')
     body = BleachField(allowed_tags=['h3', 'p', 'a', 'abbr', 'cite', 'code',
                                      'small', 'em', 'strong', 'sub', 'sup',
                                      'u', 'ul', 'ol', 'li'],
@@ -53,7 +56,8 @@ class Faculty(models.Model):
                             validators=[RegexValidator(regex="^create$",
                                                        message="The slug cannot be 'create'.",
                                                        inverse_match=True)],
-                            help_text='URL-safe identifier for the faculty.')
+                            help_text='URL-safe identifier for the faculty. '
+                                      'It cannot be changed after the Faculty is created.')
 
     def get_absolute_url(self):
         """Returns the canonical URL for a Faculty"""
@@ -71,7 +75,8 @@ class Department(models.Model):
                             validators=[RegexValidator(regex="^create$",
                                                        message="The slug cannot be 'create'.",
                                                        inverse_match=True)],
-                            help_text='URL-safe identifier for the department.')
+                            help_text='URL-safe identifier for the department. '
+                                      'It cannot be changed after the Department is created.')
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
 
     def get_absolute_url(self):

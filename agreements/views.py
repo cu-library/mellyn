@@ -10,6 +10,24 @@ from django.shortcuts import get_object_or_404
 from .models import Agreement, Faculty, Department
 
 
+class RemoveLabelSuffixMixin():  # pylint: disable=too-few-public-methods
+    """Mixin which removes the label suffix"""
+
+    def get_context_data(self, **kwargs):  # pylint: disable=missing-function-docstring
+        context = super().get_context_data(**kwargs)
+        context['form'].label_suffix = ''
+        return context
+
+
+class DisableSlugMixin():  # pylint: disable=too-few-public-methods
+    """Mixin which disables the slug field"""
+
+    def get_context_data(self, **kwargs):  # pylint: disable=missing-function-docstring
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['slug'].disabled = True
+        return context
+
+
 # Agreements
 
 class AgreementList(generic.ListView):
@@ -25,23 +43,23 @@ class AgreementRead(generic.DetailView):
     template_name_suffix = '_read'
 
 
-class AgreementCreate(generic.edit.CreateView):
+class AgreementCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
     """A view to create an Agreement"""
     model = Agreement
     fields = '__all__'
     template_name_suffix = '_create_form'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'].label_suffix = ''
-        return context
 
-
-class AgreementUpdate(generic.edit.UpdateView):
+class AgreementUpdate(RemoveLabelSuffixMixin, DisableSlugMixin, generic.edit.UpdateView):
     """A view to update an Agreement"""
     model = Agreement
     fields = '__all__'
     template_name_suffix = '_update_form'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['resource_slug'].disabled = True
+        return context
 
 
 class AgreementDelete(generic.edit.DeleteView):
@@ -73,14 +91,14 @@ class FacultyRead(generic.DetailView):
         return context
 
 
-class FacultyCreate(generic.edit.CreateView):
+class FacultyCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
     """A view to create a Faculty"""
     model = Faculty
     fields = '__all__'
     template_name_suffix = '_create_form'
 
 
-class FacultyUpdate(generic.edit.UpdateView):
+class FacultyUpdate(RemoveLabelSuffixMixin, DisableSlugMixin, generic.edit.UpdateView):
     """A view to update a Faculty"""
     model = Faculty
     fields = '__all__'
@@ -111,14 +129,14 @@ class DepartmentRead(generic.DetailView):
     template_name_suffix = '_read'
 
 
-class DepartmentCreate(generic.edit.CreateView):
+class DepartmentCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
     """A view to create a Department"""
     model = Department
     fields = '__all__'
     template_name_suffix = '_create_form'
 
 
-class DepartmentCreateUnderFaculty(generic.edit.CreateView):
+class DepartmentCreateUnderFaculty(RemoveLabelSuffixMixin, generic.edit.CreateView):
     """A view to create a Department under a given Faculty"""
     model = Department
     fields = '__all__'
@@ -131,7 +149,7 @@ class DepartmentCreateUnderFaculty(generic.edit.CreateView):
         return context
 
 
-class DepartmentUpdate(generic.edit.UpdateView):
+class DepartmentUpdate(RemoveLabelSuffixMixin, DisableSlugMixin, generic.edit.UpdateView):
     """A view to update a Department"""
     model = Department
     fields = '__all__'

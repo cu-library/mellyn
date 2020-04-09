@@ -167,13 +167,32 @@ class SignatureModelTestCase(TestCase):
             self.test_sig.full_clean()
 
 
-class TemplatesAndViewsTestCase(TestCase):
-    """Tests for the views and templates associated with Agreements"""
+class TemplatesandViewsTestCase(TestCase):
+    """Tests for templates and views associated with Agreements, Faculties, and Departments"""
 
     model_names = [('Agreement', 'Agreements'), ('Faculty', 'Faculties'), ('Department', 'Departments')]
 
-    def test_correct_names(self):
-        """Check the names used in all templates for basic CRUD actions a user can perform"""
+    @staticmethod
+    def create_test_models():
+        """Create test models, so that update and delete views can be tested"""
+        test_agreement = Agreement(title='Test',
+                                   slug='test',
+                                   resource='test-resource',
+                                   resource_slug='test-resource',
+                                   body='body',
+                                   redirect_url='https://example.com',
+                                   redirect_text='example-redirect')
+        test_agreement.full_clean()
+        test_agreement.save()
+        test_faculty = Faculty(name='Test', slug='test')
+        test_faculty.full_clean()
+        test_faculty.save()
+        test_department = Department(name='Test', slug='test', faculty=test_faculty)
+        test_department.full_clean()
+        test_department.save()
+
+    def test_crud_actions(self):
+        """Sanity check all templates for basic CRUD actions a user can perform"""
 
         for singular, plural in self.model_names:
             lowercase_singular = singular.lower()
@@ -197,22 +216,7 @@ class TemplatesAndViewsTestCase(TestCase):
                                 msg_prefix=singular+': ', html=True)
             self.assertContains(response, f'<input type="submit" value="Create">', msg_prefix=singular+': ', html=True)
 
-        # Create the models used in further tests.
-        test_agreement = Agreement(title='Test',
-                                   slug='test',
-                                   resource='test-resource',
-                                   resource_slug='test-resource',
-                                   body='body',
-                                   redirect_url='https://example.com',
-                                   redirect_text='example-redirect')
-        test_agreement.full_clean()
-        test_agreement.save()
-        test_faculty = Faculty(name='Test', slug='test')
-        test_faculty.full_clean()
-        test_faculty.save()
-        test_department = Department(name='Test', slug='test', faculty=test_faculty)
-        test_department.full_clean()
-        test_department.save()
+        self.create_test_models()
 
         for singular, plural in self.model_names:
             lowercase_singular = singular.lower()
@@ -247,6 +251,8 @@ class TemplatesAndViewsTestCase(TestCase):
                                           f'href="{reverse(lowercase_plural+"_read", args=["test"])}">Cancel</a>',
                                 msg_prefix=singular+': ', html=True)
             self.assertContains(response, f'<input type="submit" value="Save">', msg_prefix=singular+': ', html=True)
+            self.assertContains(response, f'<input type="text" name="slug" value="test" maxlength="300" '
+                                          f'required disabled id="id_slug">', msg_prefix=singular+': ', html=True)
 
             # Visit the delete view.
             response = self.client.get(reverse(lowercase_plural+'_delete', args=['test']))
@@ -282,22 +288,7 @@ class TemplatesAndViewsTestCase(TestCase):
             response = self.client.get(reverse(lowercase_plural+'_create'))
             check_skip_link(response, lowercase_plural+'_create')
 
-        # Create the models used in further tests.
-        test_agreement = Agreement(title='Test',
-                                   slug='test',
-                                   resource='test-resource',
-                                   resource_slug='test-resource',
-                                   body='body',
-                                   redirect_url='https://example.com',
-                                   redirect_text='example-redirect')
-        test_agreement.full_clean()
-        test_agreement.save()
-        test_faculty = Faculty(name='Test', slug='test')
-        test_faculty.full_clean()
-        test_faculty.save()
-        test_department = Department(name='Test', slug='test', faculty=test_faculty)
-        test_department.full_clean()
-        test_department.save()
+        self.create_test_models()
 
         for _, plural in self.model_names:
             lowercase_plural = plural.lower()
@@ -317,3 +308,25 @@ class TemplatesAndViewsTestCase(TestCase):
             # Visit the delete view.
             response = self.client.get(reverse(lowercase_plural+'_delete', args=['test']))
             check_skip_link(response, lowercase_plural+'_delete')
+
+    def test_label_suffix(self):
+        """Test to make sure the label suffix has been removed"""
+
+        def check_label_suffix(response):
+            self.assertEqual(response.context['form'].label_suffix, '')
+
+        for _, plural in self.model_names:
+            lowercase_plural = plural.lower()
+
+            # Visit the create view.
+            response = self.client.get(reverse(lowercase_plural+'_create'))
+            check_label_suffix(response)
+
+        self.create_test_models()
+
+        for _, plural in self.model_names:
+            lowercase_plural = plural.lower()
+
+            # Visit the update view.
+            response = self.client.get(reverse(lowercase_plural+'_update', args=['test']))
+            check_label_suffix(response)
