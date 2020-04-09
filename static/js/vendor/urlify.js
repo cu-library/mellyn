@@ -1,4 +1,4 @@
-/* Based off of https://github.com/django/django/blob/master/django/contrib/admin/static/admin/js/urlify.js */
+// Based off of https://github.com/django/django/blob/master/django/contrib/admin/static/admin/js/urlify.js
 (function() {
     'use strict';
 
