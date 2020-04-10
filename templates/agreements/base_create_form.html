@@ -3,12 +3,12 @@
     {{ form.non_field_errors }}
     {% for field in form %}
     <div {% if field.errors %}class="errors"{% endif %}>
-        {{ field.label_tag }}
-        {{ field }}
-        {{ field.errors }}
-        {% if field.help_text %}
-        <p class="help">{{ field.help_text|safe }}</p>
-        {% endif %}
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+      {% if field.help_text %}
+      <p class="help">{{ field.help_text|safe }}</p>
+      {% endif %}
     </div>
     {% endfor %}
     <div id="actions">
