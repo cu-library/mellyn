@@ -37,12 +37,12 @@ body {
 
 h1, h2 {
 	font-weight: 500;
-	margin: 16px 0px;
+	margin: 32px 0px;
 }
 
 h3, h4 {
 	font-weight: 500;
-	margin: 8px 0px;
+	margin: 16px 0px;
 }
 
 strong {
@@ -197,7 +197,7 @@ form label {
 	margin-bottom: 8px;
 }
 
-form input[type=text], form input[type=url] {
+form input[type=text], form input[type=url], form input[type=password]  {
 	font-size: 1.2em;
 	padding: 16px;
 	min-width: 400px;
@@ -239,6 +239,10 @@ form ul.errorlist {
 	font-size: 0.9em;
 	font-weight: 350;
 	color: #b40000;
+}
+
+form ul.errorlist.nonfield {
+	margin: 8px 0px 16px 0px;
 }
 
 form p.help {
@@ -328,7 +332,7 @@ form div.errors p.help {
 }
 
 #objectlist li {
-	margin-bottom: 16px;
+	margin-bottom: 32px;
 }
 
 div.agreementcreated {
@@ -340,7 +344,7 @@ div.agreementresource {
 }
 
 section.agreementbody {
-	margin-bottom: 16px;
+	margin: 32px 0px 32px 0px;
 }
 
 body > footer {
