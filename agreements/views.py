@@ -7,6 +7,7 @@ https://docs.djangoproject.com/en/3.0/topics/http/views/
 from django.urls import reverse_lazy
 from django.views import generic
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .models import Agreement, Faculty, Department
 
 
@@ -30,24 +31,26 @@ class ReadonlySlugMixin():  # pylint: disable=too-few-public-methods
 
 # Agreements
 
-class AgreementList(generic.ListView):
+class AgreementList(LoginRequiredMixin, generic.ListView):
     """A view of all Agreements"""
     model = Agreement
     context_object_name = 'agreements'
 
 
-class AgreementRead(generic.DetailView):
+class AgreementRead(PermissionRequiredMixin, generic.DetailView):
     """A view of an Agreement"""
     model = Agreement
     context_object_name = 'agreement'
     template_name_suffix = '_read'
+    permission_required = 'agreements.view_agreement'
 
 
-class AgreementCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
+class AgreementCreate(PermissionRequiredMixin, RemoveLabelSuffixMixin, generic.edit.CreateView):
     """A view to create an Agreement"""
     model = Agreement
     fields = '__all__'
     template_name_suffix = '_create_form'
+    permission_required = 'agreements.add_agreement'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -55,11 +58,12 @@ class AgreementCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
         return context
 
 
-class AgreementUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
+class AgreementUpdate(PermissionRequiredMixin, RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
     """A view to update an Agreement"""
     model = Agreement
     fields = '__all__'
     template_name_suffix = '_update_form'
+    permission_required = 'agreements.change_agreement'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,13 +72,14 @@ class AgreementUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.Up
         return context
 
 
-class AgreementDelete(generic.edit.DeleteView):
+class AgreementDelete(PermissionRequiredMixin, generic.edit.DeleteView):
     """A view to delete an Agreement"""
     model = Agreement
     fields = '__all__'
     context_object_name = 'agreement'
     template_name_suffix = '_delete_form'
     success_url = reverse_lazy('agreements_list')
+    permission_required = 'agreements.delete_agreement'
 
 
 # Faculties
