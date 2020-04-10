@@ -49,6 +49,11 @@ class AgreementCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
     fields = '__all__'
     template_name_suffix = '_create_form'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['body'].widget.attrs['data-allowed-tags'] = ','.join(Agreement.BODY_ALLOWED_TAGS)
+        return context
+
 
 class AgreementUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
     """A view to update an Agreement"""
@@ -59,6 +64,7 @@ class AgreementUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.Up
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['resource_slug'].widget.attrs['readonly'] = True
+        context['form'].fields['body'].widget.attrs['data-allowed-tags'] = ','.join(Agreement.BODY_ALLOWED_TAGS)
         return context
 
 
