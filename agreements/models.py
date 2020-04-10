@@ -96,15 +96,11 @@ class Signature(models.Model):
     A signature provides a user access to an Agreement's resources.
     """
 
-    BANNER_ID_OUT_OF_RANGE_ERROR_MESSAGE = 'Incorrect Banner ID Number'
-
     agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE, limit_choices_to={'hidden': False})
     signatory = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    username = models.CharField(max_length=300)
     first_name = models.CharField(max_length=300)
     last_name = models.CharField(max_length=300)
-    user_type = models.CharField(max_length=100)
     email = models.CharField(max_length=200, validators=[validate_email])
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
-    banner_id = models.IntegerField(validators=[MinValueValidator(100000000, BANNER_ID_OUT_OF_RANGE_ERROR_MESSAGE),
-                                                MaxValueValidator(199999999, BANNER_ID_OUT_OF_RANGE_ERROR_MESSAGE)])
     signed_at = models.TimeField(auto_now_add=True)
