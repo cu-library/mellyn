@@ -74,7 +74,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'mellyn.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.User'
-
+LOGIN_REDIRECT_URL = 'agreements_list'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'index'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

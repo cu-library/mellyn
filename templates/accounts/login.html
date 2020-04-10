@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Login{% endblock %}
+
+{% block main %}
+  <h2>Login</h2>
+
+  {% if next %}
+      {% if user.is_authenticated %}
+      <p>Please login with an account that has access.</p>
+      {% else %}
+      <p>Please login to see this page.</p>
+      {% endif %}
+  {% endif %}
+
+  <form method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div {% if field.errors %}class="errors"{% endif %}>
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+      {% if field.help_text %}
+      <p class="help">{{ field.help_text|safe }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div id="actions">
+      <input type="submit" value="Login">
+      <a class="warning" href="{% url 'index' %}">Cancel</a>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+{% endblock %}
