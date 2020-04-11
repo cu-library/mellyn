@@ -88,6 +88,10 @@ class Department(models.Model):
         """Returns the canonical URL for a Department"""
         return reverse('departments_read', args=[self.slug])
 
+    def __str__(self):
+        """Returns the string representation of a Faculty"""
+        return f'{self.faculty.name}: {self.name}'
+
 
 class Signature(models.Model):
     """
@@ -95,12 +99,16 @@ class Signature(models.Model):
 
     A signature provides a user access to an Agreement's resources.
     """
-
     agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE, limit_choices_to={'hidden': False})
     signatory = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     username = models.CharField(max_length=300)
-    first_name = models.CharField(max_length=300)
-    last_name = models.CharField(max_length=300)
+    first_name = models.CharField(max_length=300, blank=True)
+    last_name = models.CharField(max_length=300, blank=True)
     email = models.CharField(max_length=200, validators=[validate_email])
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
     signed_at = models.TimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['agreement', 'signatory'], name='unique_signature')
+        ]

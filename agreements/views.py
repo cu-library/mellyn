@@ -6,9 +6,10 @@ https://docs.djangoproject.com/en/3.0/topics/http/views/
 
 from django.urls import reverse_lazy
 from django.views import generic
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from .models import Agreement, Faculty, Department
+from .models import Agreement, Faculty, Department, Signature
+from .forms import SignatureForm
 
 
 class RemoveLabelSuffixMixin():  # pylint: disable=too-few-public-methods
@@ -37,12 +38,36 @@ class AgreementList(LoginRequiredMixin, generic.ListView):
     context_object_name = 'agreements'
 
 
-class AgreementRead(PermissionRequiredMixin, generic.DetailView):
+class AgreementRead(PermissionRequiredMixin, generic.edit.FormMixin, generic.DetailView, generic.edit.ProcessFormView):
     """A view of an Agreement"""
     model = Agreement
     context_object_name = 'agreement'
     template_name_suffix = '_read'
     permission_required = 'agreements.view_agreement'
+    form_class = SignatureForm
+
+    def get_success_url(self):
+        return reverse_lazy('agreements_read', kwargs={'slug': self.kwargs['slug']})
+
+    def form_valid(self, form):
+        signature = form.save(commit=False)
+        signature.agreement = self.get_object()
+        signature.signatory =self.request.user
+        signature.username = self.request.user.username
+        signature.first_name = self.request.user.first_name
+        signature.last_name = self.request.user.last_name
+        signature.email = self.request.user.email
+        signature.full_clean()
+        signature.save()
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['associated_signature'] = context['agreement'].signature_set.filter(signatory=self.request.user).get()
+        except Signature.DoesNotExist:
+            context['associated_signature'] = None
+        return context
 
 
 class AgreementCreate(PermissionRequiredMixin, RemoveLabelSuffixMixin, generic.edit.CreateView):
@@ -55,6 +80,7 @@ class AgreementCreate(PermissionRequiredMixin, RemoveLabelSuffixMixin, generic.e
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['body'].widget.attrs['data-allowed-tags'] = ','.join(Agreement.BODY_ALLOWED_TAGS)
+        context['form'].fields['redirect_url'].initial = 'https://'
         return context
 
 

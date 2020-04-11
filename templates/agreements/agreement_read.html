@@ -11,4 +11,24 @@
     <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
     <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>
   </div>
+  {% if associated_signature %}
+  <div>
+    {{ associated_signature.username }}
+  </div>
+  {% else %}
+  <form method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div {% if field.errors %}class="errors"{% endif %}>
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+      {% if field.help_text %}
+      <p class="help">{{ field.help_text|safe }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <input type="submit" value="Save">
+  </form>
+  {% endif %}
 {% endblock %}
