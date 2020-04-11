@@ -143,34 +143,40 @@ class SignatureModelTestCase(TestCase):
         """Initially, create a signature which passes all validation."""
         self.test_sig = Signature(agreement=self.test_agreement,
                                   signatory=self.test_user,
+                                  username=self.test_user.username,
                                   first_name=self.test_user.first_name,
                                   last_name=self.test_user.last_name,
-                                  user_type='test',
                                   email=self.test_user.email,
-                                  department=self.test_department,
-                                  banner_id=100000000)
+                                  department=self.test_department)
         self.test_sig.full_clean()
         self.test_sig.save()
 
-    def test_banner_id_validation_min(self):
-        """Check that creating a signature with a Banner ID below min fails."""
-
-        with self.assertRaisesRegex(ValidationError, 'Incorrect Banner ID Number'):
-            self.test_sig.banner_id -= 1
-            self.test_sig.full_clean()
-
-    def test_banner_id_validation_max(self):
-        """Check that creating a signature with a Banner ID above max fails."""
-
-        with self.assertRaisesRegex(ValidationError, 'Incorrect Banner ID Number'):
-            self.test_sig.banner_id += 100000000
-            self.test_sig.full_clean()
+    def test_unique_signature_constraint(self):
+        """Check that the same user can't sign the same agreement twice."""
+        with self.assertRaisesRegex(ValidationError, 'Signature with this Agreement and Signatory already exists.'):
+            new_test_sig = Signature(agreement=self.test_agreement,
+                                     signatory=self.test_user,
+                                     username=self.test_user.username,
+                                     first_name=self.test_user.first_name,
+                                     last_name=self.test_user.last_name,
+                                     email=self.test_user.email,
+                                     department=self.test_department)
+            new_test_sig.full_clean()
 
 
 class TemplatesandViewsTestCase(TestCase):
     """Tests for templates and views associated with Agreements, Faculties, and Departments"""
 
     model_names = [('Agreement', 'Agreements'), ('Faculty', 'Faculties'), ('Department', 'Departments')]
+
+    @classmethod
+    def setUpTestData(cls):
+        """Create a dummy agreement and user for the signatures to reference."""
+        cls.test_user = get_user_model().objects.create_superuser(username='test',
+                                                                  first_name='test',
+                                                                  last_name='test',
+                                                                  email='test@test.com',
+                                                                  password='test')
 
     @staticmethod
     def create_test_models():
@@ -193,6 +199,8 @@ class TemplatesandViewsTestCase(TestCase):
 
     def test_crud_actions(self):
         """Sanity check all templates for basic CRUD actions a user can perform"""
+
+        self.client.login(username='test', password='test')
 
         for singular, plural in self.model_names:
             lowercase_singular = singular.lower()
@@ -279,6 +287,8 @@ class TemplatesandViewsTestCase(TestCase):
         response = self.client.get(reverse('index'))
         check_skip_link(response, 'index')
 
+        self.client.login(username='test', password='test')
+
         for _, plural in self.model_names:
             lowercase_plural = plural.lower()
 
@@ -315,6 +325,8 @@ class TemplatesandViewsTestCase(TestCase):
 
         def check_label_suffix(response):
             self.assertEqual(response.context['form'].label_suffix, '')
+
+        self.client.login(username='test', password='test')
 
         for _, plural in self.model_names:
             lowercase_plural = plural.lower()
