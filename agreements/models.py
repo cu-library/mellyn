@@ -7,8 +7,7 @@ https://docs.djangoproject.com/en/3.0/topics/db/models/
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-from django.core.validators import RegexValidator, URLValidator, MaxValueValidator, MinValueValidator, \
-                                   validate_email
+from django.core.validators import RegexValidator, URLValidator, validate_email
 from django_bleach.models import BleachField
 
 
