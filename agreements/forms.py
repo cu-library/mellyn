@@ -8,12 +8,13 @@ from django import forms
 from django.forms import ModelForm
 from .models import Signature
 
-class SignatureForm(ModelForm):
-    """A custm ModelForm for Signatures"""
 
-    sign = forms.BooleanField(label='I accept this agreement.', label_suffix='')
-    label_suffix = ''
+class SignatureForm(ModelForm):
+    """A custom ModelForm for Signatures"""
+
+    sign = forms.BooleanField(label='I have read and accepted this agreement', label_suffix='')
 
     class Meta:
         model = Signature
-        fields = ['department']
+        fields = ['sign', 'department']
+        labels = {'department': 'Your Department'}
