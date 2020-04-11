@@ -13,7 +13,7 @@
   {% else %}
   <p>This faculty has no departments.</p>
   {% endif %}
-  <div id="actions">
+  <div class="actions">
     <a class="bonus" href="{% url 'departments_create_under_faculty' faculty.slug%}">Add a department</a>
     <a class="ok" href="{% url 'faculties_update' faculty.slug %}">Edit</a>
     <a class="warning" href="{% url 'faculties_delete' faculty.slug %}">Delete</a>

@@ -4,22 +4,22 @@
 
 {% block main %}
   <h2>{{ agreement.title }}</h2>
-  <div class="agreementcreated">Created {{ agreement.created | date:"Y-m-d"}}</div>
-  <div class="agreementresource">Provides access to {{ agreement.resource }}</div>
+  <p class="agreementcreated">Created {{ agreement.created | date:"Y-m-d"}}</p>
+  <p class="agreementresource">Provides access to {{ agreement.resource }}</p>
   <section class="agreementbody">{{ agreement.body | safe}}</section>
-  <div id="actions">
+  <div class="actions">
     <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
     <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>
   </div>
   {% if associated_signature %}
-  <div>
-    {{ associated_signature.username }}
+  <div class="signature">
+    <p>You signed this agreement on {{ associated_signature.signed_at | date:"Y-m-d"}}</p>
   </div>
   {% else %}
-  <form method="post">{% csrf_token %}
+  <form class="signature" method="post">{% csrf_token %}
     {{ form.non_field_errors }}
     {% for field in form %}
-    <div {% if field.errors %}class="errors"{% endif %}>
+    <div id="{{ field.html_name }}_wrapper" {% if field.errors %}class="errors"{% endif %}>
       {{ field.label_tag }}
       {{ field }}
       {{ field.errors }}
@@ -28,7 +28,9 @@
       {% endif %}
     </div>
     {% endfor %}
-    <input type="submit" value="Save">
+    <div class="actions">
+      <input class="ok" type="submit" value="Submit">
+    </div>
   </form>
   {% endif %}
 {% endblock %}

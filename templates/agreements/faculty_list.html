@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block sitetitle %}Faculties{% endblock %}
 
 {% block main %}
   <h2>Faculties</h2>
   {% if faculties %}
-  <ul id="objectlist">
+  <ul class="objectlist">
     {% for faculty in faculties %}
     <li><a href="{% url 'faculties_read' faculty.slug %}">{{ faculty.name }}</a></li>
     {% endfor %}

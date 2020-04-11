@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block sitetitle %}Agreements{% endblock %}
 
 {% block main %}
   <h2>Agreements</h2>
   {% if agreements %}
-  <ul id="objectlist">
+  <ul class="objectlist">
     {% for agreement in agreements %}
     <li>
       <a href="{% url 'agreements_read' agreement.slug %}"><h3>{{ agreement.title }}</h3></a>
@@ -18,7 +17,7 @@
   {% else %}
     <p>No agreements found.</p>
   {% endif %}
-  <div id="actions">
+  <div class="actions">
     <a class="ok" href="{% url 'agreements_create' %}">Create a new agreement</a>
   </div>
 {% endblock %}
