@@ -6,7 +6,7 @@ https://docs.djangoproject.com/en/3.0/topics/http/views/
 
 from django.urls import reverse_lazy
 from django.views import generic
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .models import Agreement, Faculty, Department, Signature
 from .forms import SignatureForm
@@ -38,7 +38,8 @@ class AgreementList(LoginRequiredMixin, generic.ListView):
     context_object_name = 'agreements'
 
 
-class AgreementRead(PermissionRequiredMixin, generic.edit.FormMixin, generic.DetailView, generic.edit.ProcessFormView):
+class AgreementRead(PermissionRequiredMixin, RemoveLabelSuffixMixin,
+                    generic.edit.FormMixin, generic.DetailView, generic.edit.ProcessFormView):
     """A view of an Agreement"""
     model = Agreement
     context_object_name = 'agreement'
@@ -52,7 +53,7 @@ class AgreementRead(PermissionRequiredMixin, generic.edit.FormMixin, generic.Det
     def form_valid(self, form):
         signature = form.save(commit=False)
         signature.agreement = self.get_object()
-        signature.signatory =self.request.user
+        signature.signatory = self.request.user
         signature.username = self.request.user.username
         signature.first_name = self.request.user.first_name
         signature.last_name = self.request.user.last_name
@@ -64,7 +65,9 @@ class AgreementRead(PermissionRequiredMixin, generic.edit.FormMixin, generic.Det
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context['associated_signature'] = context['agreement'].signature_set.filter(signatory=self.request.user).get()
+            context['associated_signature'] = (
+                context['agreement'].signature_set.filter(signatory=self.request.user).get()
+                )
         except Signature.DoesNotExist:
             context['associated_signature'] = None
         return context
