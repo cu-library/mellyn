@@ -37,7 +37,7 @@ body {
 
 h1, h2 {
 	font-weight: 500;
-	margin: 32px 0px;
+	margin: 16px 0px;
 }
 
 h3, h4 {
@@ -50,7 +50,7 @@ strong {
 }
 
 a {
-	text-decoration: none;
+	text-decoration: underline;
 	color: inherit;
 }
 
@@ -59,8 +59,12 @@ p {
 	margin: 16px 0px;
 }
 
-ul, ol {
+main ul, ol {
 	padding-left: 16px;
+}
+
+main li {
+	padding: 4px 0px;
 }
 
 #skip {
@@ -109,8 +113,12 @@ body > header {
 	margin: 0;
 }
 
-#branding > img {
+#branding img {
 	padding-right: 10px;
+}
+
+body > header a {
+	text-decoration: none;
 }
 
 body > header > nav ul {
@@ -137,7 +145,6 @@ body > header > nav ul li:last-child {
 body > header > nav a {
 	padding: 16px;
 	font-size: 110%;
-	border-radius: 5px;
 	display: block;
 }
 
@@ -176,11 +183,6 @@ body > header > nav a:hover {
 	margin: 0 auto;
 	padding: 0px 20px;
 	width: 100%;
-}
-
-#main a {
-	text-decoration: underline;
-	color: inherit;
 }
 
 form div {
@@ -255,7 +257,7 @@ form div.errors p.help {
 	margin-top: 4px;
 }
 
-#actions {
+.actions {
 	width: 100%;
 	margin: 3px 0px 32px 0px;
 	display: flex;
@@ -264,7 +266,7 @@ form div.errors p.help {
 	align-items: center;
 }
 
-#actions a, #actions input[type=submit] {
+.actions a, .actions input[type=submit] {
 	padding: 16px 32px;
 	border-radius: 10px;
 	text-decoration: none;
@@ -272,74 +274,74 @@ form div.errors p.help {
 	cursor: pointer;
 }
 
-#actions a:not(:last-child), #actions input[type=submit]:not(:last-child) {
+.actions a:not(:last-child), .actions input[type=submit]:not(:last-child) {
 	margin-right: 16px;
 }
 
 @media (max-width: 560px) {
-	#actions {
+	.actions {
 		flex-direction: column;
 		align-items: stretch;
 		margin-top: 22px;
 	}
 
-	#actions a, #actions input[type=submit] {
+	.actions a, .actions input[type=submit] {
 		text-align: center;
 	}
 
-	#actions a:not(:last-child), #actions input[type="submit"]:not(:last-child) {
+	.actions a:not(:last-child), .actions input[type="submit"]:not(:last-child) {
 		margin-right: 0px;
 		margin-bottom: 16px;
 	}
 }
 
-#actions a.ok, #actions input[type=submit] {
+.actions a.ok, .actions input[type=submit] {
 	background-color: var(--ok-button-background);
 }
 
-#actions a.ok:hover, #actions input[type=submit]:hover {
+.actions a.ok:hover, .actions input[type=submit]:hover {
 	background-color: var(--ok-button-hover-background);
 	transition-property: background-color;
 	transition-duration: 0.1s;
 }
 
-#actions a.warning {
+.actions a.warning {
 	background-color: var(--warning-button-background);
 }
 
-#actions a.warning:hover {
+.actions a.warning:hover {
 	background-color: var(--warning-button-hover-background);
 	transition-property: background-color;
 	transition-duration: 0.1s;
 }
 
-#actions a.bonus {
+.actions a.bonus {
 	background-color: var(--bonus-button-background);
 }
 
-#actions a.bonus:hover {
+.actions a.bonus:hover {
 	background-color: var(--bonus-button-hover-background);
 	transition-property: background-color;
 	transition-duration: 0.1s;
 }
 
-#objectlist {
+ul.objectlist {
 	padding-left: 0;
 }
 
-#objectlist li {
+ul.objectlist li {
 	list-style: none;
 }
 
-#objectlist li {
+ul.objectlist li {
 	margin-bottom: 32px;
 }
 
-div.agreementcreated {
+p.agreementcreated {
 	margin: 8px 0px;
 }
 
-div.agreementresource {
+p.agreementresource {
 	margin: 8px 0px;
 }
 
@@ -347,13 +349,29 @@ section.agreementbody {
 	margin: 32px 0px 32px 0px;
 }
 
+#sign_wrapper {
+	flex-direction: row;
+	align-items: baseline;
+}
+
+#sign_wrapper label{
+	margin-right: 16px;
+}
+
 body > footer {
 	background-color: #222;
 	color: #bababa;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	min-height: 70px;
+}
+
+body > footer p {
+	padding: 0px 20px;
+	max-width: 1000px;
+	text-align: center;
 }
 
 body > footer a {
@@ -362,4 +380,8 @@ body > footer a {
 
 body > footer a:hover {
 	color: white;
+}
+
+#privacynotice {
+	font-size: 90%;
 }
