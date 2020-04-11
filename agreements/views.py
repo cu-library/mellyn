@@ -200,3 +200,10 @@ class DepartmentDelete(generic.edit.DeleteView):
     context_object_name = 'department'
     template_name_suffix = '_delete_form'
     success_url = reverse_lazy('departments_list')
+
+
+# Other views
+
+class AdminView(LoginRequiredMixin, generic.base.TemplateView):
+    """A view to help admin staff access lists of Models"""
+    template_name = "admin.html"

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block sitetitle %}Admin{% endblock %}
+
+{% block main %}
+  <h2>All Options</h2>
+  <ul>
+    <li><a href="{% url 'agreements_list' %}">Agreements</a></li>
+    <li><a href="{% url 'faculties_list' %}">Faculties</a></li>
+    <li><a href="{% url 'departments_list' %}">Departments</a></li>
+  </ul>
+{% endblock %}

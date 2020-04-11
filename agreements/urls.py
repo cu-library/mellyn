@@ -27,4 +27,5 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('departments/<slug:slug>/', views.DepartmentRead.as_view(), name='departments_read'),
     path('departments/<slug:slug>/update/', views.DepartmentUpdate.as_view(), name='departments_update'),
     path('departments/<slug:slug>/delete/', views.DepartmentDelete.as_view(), name='departments_delete'),
+    path('admin/', views.AdminView.as_view(), name='admin')
 ]
