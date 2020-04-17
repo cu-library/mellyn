@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Staff Member {{ staff_user.first_name }} {{ staff_user.last_name }}{% endblock %}
+
+{% block main %}
+  <h2>{{ staff_user.first_name }} {{ staff_user.last_name }}</h2>
+  <p><strong>Username: </strong>{{ staff_user.username }}</p>
+  <p><strong>First Name: </strong>{{ staff_user.first_name }}</p>
+  <p><strong>Last Name: </strong>{{ staff_user.last_name }}</p>
+  <p><strong>Email: </strong>{{ staff_user.email }}</p>
+  <p>
+    <strong>Groups: </strong>
+    {% if staff_user.groups.all %}
+    <ul>
+      {% for group in staff_user.groups.all %}
+      <li>{{group.name}}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    None
+    {% endif %}
+  </p>
+{% endblock %}

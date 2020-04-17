@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Update {{ resource.name }}{% endblock %}
+
+{% block main %}
+  {% include "agreements/base_update_form.html" with name=resource.name form=form csrf_token=csrf_token urlname='resources_read' urlslug=resource.slug %}
+{% endblock %}

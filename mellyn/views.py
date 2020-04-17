@@ -2,6 +2,7 @@
 
 from django.shortcuts import render, redirect
 
+
 def index(request):
     """A view for the 'homepage', or root page, of the project"""
     if request.user.is_authenticated:

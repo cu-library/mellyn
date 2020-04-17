@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Staff{% endblock %}
+
+{% block main %}
+  <h2>Staff</h2>
+  {% if staff %}
+  <ul class="objectlist">
+    {% for staff_user in staff %}
+    <li><a href="{% url 'staff_read' staff_user.username %}" title="{{ staff_user.first_name }}{{ staff_user.last_name }}">{{ staff_user.username }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No staff users found.</p>
+  {% endif %}
+{% endblock %}

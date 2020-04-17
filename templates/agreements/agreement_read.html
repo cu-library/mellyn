@@ -4,9 +4,9 @@
 
 {% block main %}
   <h2>{{ agreement.title }}</h2>
-  <p class="agreementcreated">Created {{ agreement.created | date:"Y-m-d"}}</p>
-  <p class="agreementresource">Provides access to {{ agreement.resource }}</p>
-  <section class="agreementbody">{{ agreement.body | safe}}</section>
+  <p class="created">Created {{ agreement.created | date:"Y-m-d"}}</p>
+  <p class="resource">Provides access to {{ agreement.resource.name }}</p>
+  <section class="htmlfield">{{ agreement.body | safe}}</section>
   <div class="actions">
     <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
     <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>

@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import include, path
 from . import views
 
-urlpatterns = [ # pylint: disable=invalid-name
+urlpatterns = [  # pylint: disable=invalid-name
     path('', include('agreements.urls')),
     path('', include('accounts.urls')),
     path('', views.index, name='index'),

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}{{ resource.name }}{% endblock %}
+
+{% block main %}
+  <h2>{{ resource.name }}</h2>
+  <section class="htmlfield">{{ resource.description | safe}}</section>
+  <div class="actions">
+    <a class="ok" href="{% url 'resources_update' resource.slug %}">Edit</a>
+    <a class="warning" href="{% url 'resources_delete' resource.slug %}">Delete</a>
+  </div>
+{% endblock %}

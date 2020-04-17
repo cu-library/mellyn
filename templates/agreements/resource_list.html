@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Resources{% endblock %}
+
+{% block main %}
+  <h2>Resources</h2>
+  {% if resources %}
+  <ul class="objectlist">
+    {% for resource in resources %}
+    <li><a href="{% url 'resources_read' resource.slug %}">{{ resource.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No resources found.</p>
+  {% endif %}
+  <div id="actions">
+    <a class="ok" href="{% url 'resources_create' %}">Create a new resource</a>
+  </div>
+{% endblock %}

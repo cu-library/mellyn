@@ -4,48 +4,209 @@ This module defines the views provided by this application.
 https://docs.djangoproject.com/en/3.0/topics/http/views/
 """
 
-from django.urls import reverse_lazy
-from django.views import generic
+from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from .models import Agreement, Faculty, Department, Signature
-from .forms import SignatureForm
+from django.urls import reverse_lazy
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, \
+                                       PermissionRequiredMixin, \
+                                       UserPassesTestMixin
+from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
+                                      FormMixin, ProcessFormView
+from .models import Resource, Faculty, Department, Agreement, Signature
+from .forms import ResourceCreateForm, ResourceUpdateForm, \
+                   FacultyCreateForm, FacultyUpdateForm, \
+                   DepartmentCreateForm, DepartmentUpdateForm, \
+                   AgreementCreateForm, AgreementUpdateForm, \
+                   SignatureCreateForm
 
 
-class RemoveLabelSuffixMixin():  # pylint: disable=too-few-public-methods
-    """Mixin which removes the label suffix"""
+# Custom Mixins
 
-    def get_context_data(self, **kwargs):  # pylint: disable=missing-function-docstring
+class SuccessMessageIfChangedMixin:
+    """
+    Add a success message on successful form submission if the form has changed.
+    """
+    success_message = ''
+
+    def form_valid(self, form):  # pylint: disable=missing-function-docstring
+        response = super().form_valid(form)
+        if form.has_changed():
+            success_message = self.get_success_message(form.cleaned_data)
+            if success_message:
+                messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, cleaned_data):  # pylint: disable=missing-function-docstring
+        return self.success_message % cleaned_data
+
+
+# Resources
+
+class ResourceList(LoginRequiredMixin, ListView):
+    """A view of all Resources"""
+    model = Resource
+    context_object_name = 'resources'
+
+
+class ResourceRead(LoginRequiredMixin, DetailView):
+    """A view of a Resource"""
+    model = Resource
+    context_object_name = 'resource'
+    template_name_suffix = '_read'
+
+
+class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+    """A view to create a Resource"""
+    model = Resource
+    template_name_suffix = '_create_form'
+    permission_required = 'agreements.add_resource'
+    success_message = '%(name)s was created successfully.'
+    form_class = ResourceCreateForm
+
+
+class ResourceUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
+    """A view to update a Resource"""
+    model = Resource
+    template_name_suffix = '_update_form'
+    permission_required = 'agreements.change_resource'
+    success_message = '%(name)s was updated successfully.'
+    form_class = ResourceUpdateForm
+
+
+class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+    """A view to delete a Resource"""
+    model = Resource
+    fields = '__all__'
+    context_object_name = 'resource'
+    template_name_suffix = '_delete_form'
+    permission_required = 'agreements.delete_resource'
+    success_message = '%(name)s was deleted successfully.'
+    success_url = reverse_lazy('resource_list')
+
+
+# Faculties
+
+class FacultyList(PermissionRequiredMixin, ListView):
+    """A view of all Faculties"""
+    model = Faculty
+    context_object_name = 'faculties'
+    permission_required = 'agreements.view_faculty'
+
+
+class FacultyRead(PermissionRequiredMixin, DetailView):
+    """A view of a Faculty"""
+    model = Faculty
+    context_object_name = 'faculty'
+    template_name_suffix = '_read'
+    permission_required = 'agreements.view_faculty'
+
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].label_suffix = ''
+        context['departments'] = context['faculty'].department_set.all()
         return context
 
 
-class ReadonlySlugMixin():  # pylint: disable=too-few-public-methods
-    """Mixin which disables the slug field"""
+class FacultyCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+    """A view to create a Faculty"""
+    model = Faculty
+    template_name_suffix = '_create_form'
+    permission_required = 'agreements.add_faculty'
+    success_message = '%(name)s was created successfully.'
+    form_class = FacultyCreateForm
 
-    def get_context_data(self, **kwargs):  # pylint: disable=missing-function-docstring
+
+class FacultyUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
+    """A view to update a Faculty"""
+    model = Faculty
+    template_name_suffix = '_update_form'
+    permission_required = 'agreements.change_faculty'
+    success_message = '%(name)s was updated successfully.'
+    form_class = FacultyUpdateForm
+
+
+class FacultyDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+    """A view to delete a Faculty"""
+    model = Faculty
+    fields = '__all__'
+    context_object_name = 'faculty'
+    template_name_suffix = '_delete_form'
+    permission_required = 'agreements.delete_faculty'
+    success_message = '%(name)s was deleted successfully.'
+    success_url = reverse_lazy('faculties_list')
+
+
+# Departments
+
+class DepartmentList(PermissionRequiredMixin, ListView):
+    """A view of all Departments"""
+    model = Department
+    context_object_name = 'departments'
+    permission_required = 'agreements.view_department'
+
+
+class DepartmentRead(PermissionRequiredMixin, DetailView):
+    """A view of a Department"""
+    model = Department
+    context_object_name = 'department'
+    template_name_suffix = '_read'
+    permission_required = 'agreements.view_department'
+
+
+class DepartmentCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+    """A view to create a Department"""
+    model = Department
+    template_name_suffix = '_create_form'
+    permission_required = 'agreements.add_department'
+    success_message = '%(name)s was created successfully.'
+    form_class = DepartmentCreateForm
+
+
+class DepartmentCreateUnderFaculty(DepartmentCreate):
+    """A view to create a Department under a given Faculty"""
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['slug'].widget.attrs['readonly'] = True
+        faculty = get_object_or_404(Faculty, slug=self.kwargs['facultyslug'])
+        context['form'].fields['faculty'].initial = faculty.id
         return context
+
+
+class DepartmentUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
+    """A view to update a Department"""
+    model = Department
+    template_name_suffix = '_update_form'
+    permission_required = 'agreements.change_department'
+    success_message = '%(name)s was updated successfully.'
+    form_class = DepartmentUpdateForm
+
+
+class DepartmentDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+    """A view to delete a Department"""
+    model = Department
+    fields = '__all__'
+    context_object_name = 'department'
+    template_name_suffix = '_delete_form'
+    permission_required = 'agreements.delete_department'
+    success_message = '%(name)s was deleted successfully.'
+    success_url = reverse_lazy('departments_list')
 
 
 # Agreements
 
-class AgreementList(LoginRequiredMixin, generic.ListView):
+class AgreementList(LoginRequiredMixin, ListView):
     """A view of all Agreements"""
     model = Agreement
     context_object_name = 'agreements'
 
 
-class AgreementRead(PermissionRequiredMixin, RemoveLabelSuffixMixin,
-                    generic.edit.FormMixin, generic.DetailView, generic.edit.ProcessFormView):
+class AgreementRead(PermissionRequiredMixin, FormMixin, DetailView, ProcessFormView):
     """A view of an Agreement"""
     model = Agreement
     context_object_name = 'agreement'
     template_name_suffix = '_read'
     permission_required = 'agreements.view_agreement'
-    form_class = SignatureForm
+    form_class = SignatureCreateForm
 
     def get_success_url(self):
         return reverse_lazy('agreements_read', kwargs={'slug': self.kwargs['slug']})
@@ -73,140 +234,40 @@ class AgreementRead(PermissionRequiredMixin, RemoveLabelSuffixMixin,
         return context
 
 
-class AgreementCreate(PermissionRequiredMixin, RemoveLabelSuffixMixin, generic.edit.CreateView):
+class AgreementCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create an Agreement"""
     model = Agreement
-    fields = '__all__'
     template_name_suffix = '_create_form'
     permission_required = 'agreements.add_agreement'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'].fields['body'].widget.attrs['data-allowed-tags'] = ','.join(Agreement.BODY_ALLOWED_TAGS)
-        context['form'].fields['redirect_url'].initial = 'https://'
-        return context
+    success_message = '%(title)s was created successfully.'
+    form_class = AgreementCreateForm
 
 
-class AgreementUpdate(PermissionRequiredMixin, RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
+class AgreementUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update an Agreement"""
     model = Agreement
-    fields = '__all__'
     template_name_suffix = '_update_form'
     permission_required = 'agreements.change_agreement'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'].fields['resource_slug'].widget.attrs['readonly'] = True
-        context['form'].fields['body'].widget.attrs['data-allowed-tags'] = ','.join(Agreement.BODY_ALLOWED_TAGS)
-        return context
+    success_message = '%(title)s was updated successfully.'
+    form_class = AgreementUpdateForm
 
 
-class AgreementDelete(PermissionRequiredMixin, generic.edit.DeleteView):
+class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete an Agreement"""
     model = Agreement
     fields = '__all__'
     context_object_name = 'agreement'
     template_name_suffix = '_delete_form'
-    success_url = reverse_lazy('agreements_list')
     permission_required = 'agreements.delete_agreement'
-
-
-# Faculties
-
-class FacultyList(generic.ListView):
-    """A view of all Faculties"""
-    model = Faculty
-    context_object_name = 'faculties'
-
-
-class FacultyRead(generic.DetailView):
-    """A view of a Faculty"""
-    model = Faculty
-    context_object_name = 'faculty'
-    template_name_suffix = '_read'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['departments'] = context['faculty'].department_set.all()
-        return context
-
-
-class FacultyCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
-    """A view to create a Faculty"""
-    model = Faculty
-    fields = '__all__'
-    template_name_suffix = '_create_form'
-
-
-class FacultyUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
-    """A view to update a Faculty"""
-    model = Faculty
-    fields = '__all__'
-    template_name_suffix = '_update_form'
-
-
-class FacultyDelete(generic.edit.DeleteView):
-    """A view to delete a Faculty"""
-    model = Faculty
-    fields = '__all__'
-    context_object_name = 'faculty'
-    template_name_suffix = '_delete_form'
-    success_url = reverse_lazy('faculties_list')
-
-
-# Departments
-
-class DepartmentList(generic.ListView):
-    """A view of all Departments"""
-    model = Department
-    context_object_name = 'departments'
-
-
-class DepartmentRead(generic.DetailView):
-    """A view of a Department"""
-    model = Department
-    context_object_name = 'department'
-    template_name_suffix = '_read'
-
-
-class DepartmentCreate(RemoveLabelSuffixMixin, generic.edit.CreateView):
-    """A view to create a Department"""
-    model = Department
-    fields = '__all__'
-    template_name_suffix = '_create_form'
-
-
-class DepartmentCreateUnderFaculty(RemoveLabelSuffixMixin, generic.edit.CreateView):
-    """A view to create a Department under a given Faculty"""
-    model = Department
-    fields = '__all__'
-    template_name_suffix = '_create_form'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        faculty = get_object_or_404(Faculty, slug=self.kwargs['facultyslug'])
-        context['form'].fields['faculty'].initial = faculty.id
-        return context
-
-
-class DepartmentUpdate(RemoveLabelSuffixMixin, ReadonlySlugMixin, generic.edit.UpdateView):
-    """A view to update a Department"""
-    model = Department
-    fields = '__all__'
-    template_name_suffix = '_update_form'
-
-
-class DepartmentDelete(generic.edit.DeleteView):
-    """A view to delete a Department"""
-    model = Department
-    fields = '__all__'
-    context_object_name = 'department'
-    template_name_suffix = '_delete_form'
-    success_url = reverse_lazy('departments_list')
+    success_message = '%(title)s was deleted successfully.'
+    success_url = reverse_lazy('agreements_list')
 
 
 # Other views
 
-class AdminView(LoginRequiredMixin, generic.base.TemplateView):
+class AdminView(UserPassesTestMixin, TemplateView):
     """A view to help admin staff access lists of Models"""
     template_name = "admin.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
