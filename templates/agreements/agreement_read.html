@@ -4,16 +4,17 @@
 
 {% block main %}
   <h2>{{ agreement.title }}</h2>
-  <p class="created">Created {{ agreement.created | date:"Y-m-d"}}</p>
+  <p class="created">Created {{ agreement.created | date:"Y-m-d" }}</p>
   <p class="resource">Provides access to {{ agreement.resource.name }}</p>
-  <section class="htmlfield">{{ agreement.body | safe}}</section>
+  <section class="htmlfield">{{ agreement.body | safe }}</section>
   <div class="actions">
+    <a class="bonus" href="{% url 'signatures_for_agreement_list' agreement.slug%}">Search Signatures</a>
     <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
     <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>
   </div>
   {% if associated_signature %}
   <div class="signature">
-    <p>You signed this agreement on {{ associated_signature.signed_at | date:"Y-m-d"}}</p>
+    <p>You signed this agreement on {{ associated_signature.signed_at | date:"Y-m-d" }}.</p>
   </div>
   {% else %}
   <form class="signature" method="post">{% csrf_token %}
@@ -24,7 +25,7 @@
       {{ field }}
       {{ field.errors }}
       {% if field.help_text %}
-      <p class="help">{{ field.help_text|safe }}</p>
+      <p class="help">{{ field.help_text | safe }}</p>
       {% endif %}
     </div>
     {% endfor %}

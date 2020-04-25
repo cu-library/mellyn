@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Signatures{%if agreement %} for {{ agreement.title }}{% endif %}{% endblock %}
+
+{% block main %}
+  <h2>Signatures</h2>
+  {% if agreement %}
+  <p>For <a href="{% url 'agreements_read' agreement.slug %}">{{ agreement.title }}</a></p>
+  {% endif %}
+  <form class="search" method="get">
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div id="{{ field.html_name }}_wrapper" {% if field.errors %}class="errors"{% endif %}>
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+      {% if field.help_text %}
+      <p class="help">{{ field.help_text|safe }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="actions">
+      <input class="ok" type="submit" value="Submit">
+    </div>
+  </form>
+  {% if signatures %}
+  <ul class="objectlist">
+    {% for signature in signatures %}
+    <li>{{ signature.signed_at | date:"Y-m-d" }} - {{ signature.username }} - {{ signature.email }} - {{ signature.first_name }} {{ signature.last_name }} - {{ signature.department }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No signatures found.</p>
+  {% endif %}
+  <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+  </div>
+{% endblock %}

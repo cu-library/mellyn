@@ -5,12 +5,14 @@ https://docs.djangoproject.com/en/3.0/topics/http/views/
 """
 
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, \
                                        PermissionRequiredMixin, \
                                        UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
                                       FormMixin, ProcessFormView
@@ -19,7 +21,7 @@ from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    FacultyCreateForm, FacultyUpdateForm, \
                    DepartmentCreateForm, DepartmentUpdateForm, \
                    AgreementCreateForm, AgreementUpdateForm, \
-                   SignatureCreateForm
+                   SignatureCreateForm, SignatureSearchForm
 
 
 # Custom Mixins
@@ -200,12 +202,11 @@ class AgreementList(LoginRequiredMixin, ListView):
     context_object_name = 'agreements'
 
 
-class AgreementRead(PermissionRequiredMixin, FormMixin, DetailView, ProcessFormView):
+class AgreementRead(FormMixin, DetailView, ProcessFormView):
     """A view of an Agreement"""
     model = Agreement
     context_object_name = 'agreement'
     template_name_suffix = '_read'
-    permission_required = 'agreements.view_agreement'
     form_class = SignatureCreateForm
 
     def get_success_url(self):
@@ -219,7 +220,11 @@ class AgreementRead(PermissionRequiredMixin, FormMixin, DetailView, ProcessFormV
         signature.first_name = self.request.user.first_name
         signature.last_name = self.request.user.last_name
         signature.email = self.request.user.email
-        signature.full_clean()
+        try:
+            signature.full_clean()
+        except ValidationError:
+            messages.error(self.request, 'Agreement already signed.')
+            return redirect(self.get_object())
         signature.save()
         return super().form_valid(form)
 
@@ -261,6 +266,46 @@ class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     permission_required = 'agreements.delete_agreement'
     success_message = '%(title)s was deleted successfully.'
     success_url = reverse_lazy('agreements_list')
+
+
+# Signatures
+
+class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
+    """A view to list and search through Signatures of an Agreement"""
+    model = Signature
+    context_object_name = 'signatures'
+    permission_required = 'agreements.view_signature'
+    form_class = SignatureSearchForm
+    paginate_by = 15
+
+    def get_queryset(self):
+        qs = Signature.objects.all()
+        if 'agreementslug' in self.kwargs:
+            self.agreement = get_object_or_404(  # pylint: disable=attribute-defined-outside-init
+                Agreement, slug=self.kwargs['agreementslug']
+            )
+            qs = qs.filter(agreement=self.agreement)
+        if 'search' in self.request.GET:
+            q_param = self.request.GET['search']
+            if q_param != '':
+                qs = qs.filter(
+                    Q(username__icontains=q_param) |
+                    Q(first_name__icontains=q_param) |
+                    Q(last_name__icontains=q_param) |
+                    Q(email__icontains=q_param) |
+                    Q(department__name__icontains=q_param) |
+                    Q(department__faculty__name__icontains=q_param)
+                )
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['agreement'] = self.agreement
+        except AttributeError:
+            context['agreement'] = None
+        context['form'].fields['search'].initial = self.request.GET.get('search', default='')
+        return context
 
 
 # Other views

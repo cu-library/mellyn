@@ -32,5 +32,9 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('agreements/<slug:slug>/', views.AgreementRead.as_view(), name='agreements_read'),
     path('agreements/<slug:slug>/update/', views.AgreementUpdate.as_view(), name='agreements_update'),
     path('agreements/<slug:slug>/delete/', views.AgreementDelete.as_view(), name='agreements_delete'),
+    path('signatures/', views.SignatureList.as_view(), name='signatures_list'),
+    path('signatures/on/<slug:agreementslug>/',
+         views.SignatureList.as_view(),
+         name='signatures_for_agreement_list'),
     path('admin/', views.AdminView.as_view(), name='admin')
 ]
