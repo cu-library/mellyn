@@ -248,10 +248,21 @@ form label {
 
 form input[type=text],
 form input[type=url],
-form input[type=password] {
-  font-size: 1.2em;
-  padding: 16px;
+form input[type=password],
+form select {
+  font-size: 1.1em;
+  padding: 8px;
   min-width: 400px;
+}
+
+@media (max-width: 560px) {
+  form input[type=text],
+  form input[type=url],
+  form input[type=password],
+  form select {
+    min-width: unset;
+    width: 100%;
+  }
 }
 
 form input[readonly] {
