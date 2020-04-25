@@ -125,7 +125,7 @@ class Signature(models.Model):
     last_name = models.CharField(max_length=300, blank=True)
     email = models.CharField(max_length=200, validators=[validate_email])
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
-    signed_at = models.TimeField(auto_now_add=True)
+    signed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
