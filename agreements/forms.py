@@ -5,8 +5,9 @@ https://docs.djangoproject.com/en/3.0/topics/forms/
 """
 
 from django import forms
-from django.forms import ModelForm, SlugField, URLField, Textarea
+from django.forms import Form, ModelForm, SlugField, URLField, Textarea
 from .models import Resource, Faculty, Department, Agreement, Signature, DEFAULT_ALLOWED_TAGS
+from .fields import GroupedModelChoiceField
 
 
 # Resources
@@ -103,7 +104,7 @@ class DepartmentCreateForm(ModelForm):
 
     class Meta:
         model = Department
-        fields = ['name', 'slug']
+        fields = ['name', 'slug', 'faculty']
         help_texts = {
             'slug': 'URL-safe identifier for the Department. It cannot be changed after the Department is created.'
         }
@@ -123,7 +124,7 @@ class DepartmentUpdateForm(ModelForm):
 
     class Meta:
         model = Department
-        fields = ['name', 'slug']
+        fields = ['name', 'slug', 'faculty']
 
 
 # Agreements
@@ -188,8 +189,18 @@ class SignatureCreateForm(ModelForm):
         return object.__getattribute__(self, name)
 
     sign = forms.BooleanField(label='I have read and accepted this agreement')
+    department = GroupedModelChoiceField(
+        label='Your Department',
+        queryset=Department.objects.all(),
+        choices_groupby='faculty'
+    )
 
     class Meta:
         model = Signature
         fields = ['sign', 'department']
         labels = {'department': 'Your Department'}
+
+
+class SignatureSearchForm(Form):
+    """A form for searching for Signatures"""
+    search = forms.CharField(label='', max_length=100, required=False)

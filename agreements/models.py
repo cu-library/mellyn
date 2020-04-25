@@ -76,7 +76,7 @@ class Department(models.Model):
 
     def __str__(self):
         """Returns the string representation of a Faculty"""
-        return f'{self.faculty.name}: {self.name}'
+        return self.name
 
 
 class Agreement(models.Model):
