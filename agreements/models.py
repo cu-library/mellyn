@@ -30,7 +30,7 @@ class Resource(models.Model):
                               allowed_protocols=['https', 'mailto'],
                               strip_tags=False,
                               strip_comments=True,
-                              help_text=f'An HTML description of the Resource. '
+                              help_text=f'An HTML description of the resource. '
                                         f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
 
     def get_absolute_url(self):
