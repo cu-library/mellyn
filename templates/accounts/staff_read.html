@@ -3,6 +3,7 @@
 {% block sitetitle %}Staff Member {{ staff_user.first_name }} {{ staff_user.last_name }}{% endblock %}
 
 {% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the list of staff" href="{% url 'staff_list' %}">&larr; Staff List</a></div>
   <h2>{{ staff_user.first_name }} {{ staff_user.last_name }}</h2>
   <p><strong>Username: </strong>{{ staff_user.username }}</p>
   <p><strong>First Name: </strong>{{ staff_user.first_name }}</p>

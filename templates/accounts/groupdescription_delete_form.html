@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Delete {{ groupdescription.name }}{% endblock %}
+
+{% block main %}
+  {% include "base_delete_form.html" with name=groupdescription.name model='group' form=form csrf_token=csrf_token urlname='groupdescriptions_read' urlslug=groupdescription.slug %}
+{% endblock %}

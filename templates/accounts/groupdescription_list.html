@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Groups{% endblock %}
+
+{% block main %}
+  <h2>Groups</h2>
+  {% if groupdescriptions %}
+  <ul class="objectlist">
+    {% for groupdescription in groupdescriptions %}
+    <li><a href="{% url 'groupdescriptions_read' groupdescription.slug %}">{{ groupdescription.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No groups found.</p>
+  {% endif %}
+  <div class="actions">
+    <a class="ok" href="{% url 'groupdescriptions_create' %}">Create a new group</a>
+  </div>
+{% endblock %}

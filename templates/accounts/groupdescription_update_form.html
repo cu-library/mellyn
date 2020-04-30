@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Update {{ groupdescription.name }}{% endblock %}
+
+{% block main %}
+  {% include "base_update_form.html" with name=groupdescription.name form=form csrf_token=csrf_token urlname='groupdescriptions_read' urlslug=groupdescription.slug %}
+{% endblock %}

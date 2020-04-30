@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Create a new group{% endblock %}
+
+{% block main %}
+  {% include "base_create_form.html" with name='group' form=form csrf_token=csrf_token urlname='groupdescriptions_list' %}
+{% endblock %}
+
+
+
+
