@@ -6,16 +6,12 @@
   <div class="breadcrumb"><a aria-label="Return to the list of agreements" href="{% url 'agreements_list' %}">&larr; Agreements</a></div>
   <h2>{{ agreement.title }}</h2>
   <p class="created">Created {{ agreement.created | date:"Y-m-d" }}</p>
-  <p class="resource">Provides access to {{ agreement.resource.name }}</p>
+  <p class="resource">Provides access to <a href="{% url 'resources_read' agreement.resource.slug %}">{{ agreement.resource.name }}</a></p>
   <section class="htmlfield">{{ agreement.body | safe }}</section>
-  <div class="actions">
-    <a class="bonus" href="{% url 'signatures_for_agreement_list' agreement.slug%}">Search Signatures</a>
-    <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
-    <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>
-  </div>
   {% if associated_signature %}
   <div class="signature">
     <p>You signed this agreement on {{ associated_signature.signed_at | date:"Y-m-d" }}.</p>
+    <p>Return to <a href="{{ agreement.redirect_url }}">{{ agreement.redirect_text }}</a></p>
   </div>
   {% else %}
   <form class="signature" method="post">{% csrf_token %}
@@ -35,4 +31,9 @@
     </div>
   </form>
   {% endif %}
+  <div class="actions">
+    <a class="bonus" href="{% url 'signatures_for_agreement_list' agreement.slug %}">Search Signatures</a>
+    <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
+    <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>
+  </div>
 {% endblock %}
