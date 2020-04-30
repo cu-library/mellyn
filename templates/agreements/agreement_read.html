@@ -3,6 +3,7 @@
 {% block sitetitle %}{{ agreement.title }}{% endblock %}
 
 {% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the list of agreements" href="{% url 'agreements_list' %}">&larr; Agreements</a></div>
   <h2>{{ agreement.title }}</h2>
   <p class="created">Created {{ agreement.created | date:"Y-m-d" }}</p>
   <p class="resource">Provides access to {{ agreement.resource.name }}</p>

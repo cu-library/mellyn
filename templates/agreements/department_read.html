@@ -3,6 +3,7 @@
 {% block sitetitle %}{{ department.name }}{% endblock %}
 
 {% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the list of departments" href="{% url 'departments_list' %}">&larr; Departments</a></div>
   <h2>{{ department.name }}</h2>
   <p>Part of <a href="{% url 'faculties_read' department.faculty.slug %}">{{ department.faculty.name }}</a>.</p>
   <div class="actions">

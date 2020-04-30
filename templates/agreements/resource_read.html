@@ -3,6 +3,7 @@
 {% block sitetitle %}{{ resource.name }}{% endblock %}
 
 {% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the list of resources" href="{% url 'resources_list' %}">&larr; Resources</a></div>
   <h2>{{ resource.name }}</h2>
   <section class="htmlfield">{{ resource.description | safe}}</section>
   <div class="actions">

@@ -3,6 +3,7 @@
 {% block sitetitle %}{{ faculty.name }}{% endblock %}
 
 {% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the list of faculties" href="{% url 'faculties_list' %}">&larr; Faculties</a></div>
   <h2>{{ faculty.name }}</h2>
   {% if departments %}
   <ul>

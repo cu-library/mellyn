@@ -232,6 +232,10 @@ ul.messages li.error {
   background: var(--error-message-background);
 }
 
+div.breadcrumb {
+  margin: 16px 0 32px 0;
+}
+
 form div {
   display: flex;
   flex-direction: column;
