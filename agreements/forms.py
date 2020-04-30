@@ -24,7 +24,7 @@ class ResourceCreateForm(ModelForm):
         model = Resource
         fields = ['name', 'slug', 'description']
         help_texts = {
-            'slug': 'URL-safe identifier for the Resource. It cannot be changed after the Resource is created.'
+            'slug': 'URL-safe identifier for the resource. It cannot be changed after the resource is created.'
         }
         widgets = {
             'description': Textarea(attrs={
@@ -43,7 +43,7 @@ class ResourceUpdateForm(ModelForm):
         return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
-                     help_text='URL-safe identifier for the Resource. It has been set and cannot be changed.',
+                     help_text='URL-safe identifier for the resource. It has been set and cannot be changed.',
                      disabled=True)
 
     class Meta:
@@ -71,7 +71,7 @@ class FacultyCreateForm(ModelForm):
         model = Faculty
         fields = ['name', 'slug']
         help_texts = {
-            'slug': 'URL-safe identifier for the Faculty. It cannot be changed after the Faculty is created.'
+            'slug': 'URL-safe identifier for the faculty. It cannot be changed after the faculty is created.'
         }
 
 
@@ -84,7 +84,7 @@ class FacultyUpdateForm(ModelForm):
         return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
-                     help_text='URL-safe identifier for the Faculty. It has been set and cannot be changed.',
+                     help_text='URL-safe identifier for the faculty. It has been set and cannot be changed.',
                      disabled=True)
 
     class Meta:
@@ -106,7 +106,7 @@ class DepartmentCreateForm(ModelForm):
         model = Department
         fields = ['name', 'slug', 'faculty']
         help_texts = {
-            'slug': 'URL-safe identifier for the Department. It cannot be changed after the Department is created.'
+            'slug': 'URL-safe identifier for the department. It cannot be changed after the department is created.'
         }
 
 
@@ -119,7 +119,7 @@ class DepartmentUpdateForm(ModelForm):
         return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
-                     help_text='URL-safe identifier for the Department. It has been set and cannot be changed.',
+                     help_text='URL-safe identifier for the department. It has been set and cannot be changed.',
                      disabled=True)
 
     class Meta:
@@ -164,7 +164,7 @@ class AgreementUpdateForm(ModelForm):
         return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
-                     help_text='URL-safe identifier for the Agreement. It has been set and cannot be changed.',
+                     help_text='URL-safe identifier for the agreement. It has been set and cannot be changed.',
                      disabled=True)
 
     class Meta:
