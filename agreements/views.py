@@ -70,6 +70,7 @@ class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 class ResourceUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a Resource"""
     model = Resource
+    context_object_name = 'resource'
     template_name_suffix = '_update_form'
     permission_required = 'agreements.change_resource'
     success_message = '%(name)s was updated successfully.'
@@ -121,6 +122,7 @@ class FacultyCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 class FacultyUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a Faculty"""
     model = Faculty
+    context_object_name = 'faculty'
     template_name_suffix = '_update_form'
     permission_required = 'agreements.change_faculty'
     success_message = '%(name)s was updated successfully.'
@@ -176,6 +178,7 @@ class DepartmentCreateUnderFaculty(DepartmentCreate):
 class DepartmentUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a Department"""
     model = Department
+    context_object_name = 'department'
     template_name_suffix = '_update_form'
     permission_required = 'agreements.change_department'
     success_message = '%(name)s was updated successfully.'
@@ -250,6 +253,7 @@ class AgreementCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 class AgreementUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update an Agreement"""
     model = Agreement
+    context_object_name = 'agreement'
     template_name_suffix = '_update_form'
     permission_required = 'agreements.change_agreement'
     success_message = '%(title)s was updated successfully.'
