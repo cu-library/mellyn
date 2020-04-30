@@ -293,6 +293,19 @@ form textarea {
   font-weight: 300;
 }
 
+#id_permissions {
+  padding-left: 0;
+}
+
+#id_permissions li {
+  list-style: none;
+  padding: 16px 0;
+}
+
+#id_permissions li input {
+  margin-right: 8px;
+}
+
 form input[type=checkbox] {
   transform: scale(1.2);
 }
@@ -425,6 +438,10 @@ section.htmlfield {
 
 #sign_wrapper label {
   margin-right: 16px;
+}
+
+div.pagination {
+  margin: 32px 0 32px 0;
 }
 
 body > footer {
