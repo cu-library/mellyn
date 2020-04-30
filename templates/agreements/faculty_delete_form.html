@@ -3,5 +3,5 @@
 {% block sitetitle %}Delete {{ faculty.name }}{% endblock %}
 
 {% block main %}
-  {% include "agreements/base_delete_form.html" with name=faculty.name model='faculty' form=form csrf_token=csrf_token urlname='faculties_read' urlslug=faculty.slug %}
+  {% include "base_delete_form.html" with name=faculty.name model='faculty' form=form csrf_token=csrf_token urlname='faculties_read' urlslug=faculty.slug %}
 {% endblock %}

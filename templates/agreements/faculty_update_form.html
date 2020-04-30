@@ -3,5 +3,5 @@
 {% block sitetitle %}Update {{ faculty.name }}{% endblock %}
 
 {% block main %}
-  {% include "agreements/base_update_form.html" with name=faculty.name form=form csrf_token=csrf_token urlname='faculties_read' urlslug=faculty.slug %}
+  {% include "base_update_form.html" with name=faculty.name form=form csrf_token=csrf_token urlname='faculties_read' urlslug=faculty.slug %}
 {% endblock %}

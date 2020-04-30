@@ -3,7 +3,7 @@
 {% block sitetitle %}Create a new agreement{% endblock %}
 
 {% block main %}
-  {% include "agreements/base_create_form.html" with name='agreement' form=form csrf_token=csrf_token urlname='agreements_list' %}
+  {% include "base_create_form.html" with name='agreement' form=form csrf_token=csrf_token urlname='agreements_list' %}
 {% endblock %}
 
 

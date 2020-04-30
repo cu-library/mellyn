@@ -3,7 +3,7 @@
 {% block sitetitle %}Create a new resource{% endblock %}
 
 {% block main %}
-  {% include "agreements/base_create_form.html" with name='resource' form=form csrf_token=csrf_token urlname='resources_list' %}
+  {% include "base_create_form.html" with name='resource' form=form csrf_token=csrf_token urlname='resources_list' %}
 {% endblock %}
 
 
