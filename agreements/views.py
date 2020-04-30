@@ -10,10 +10,9 @@ from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, \
-                                       PermissionRequiredMixin, \
-                                       UserPassesTestMixin
+                                       PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
                                       FormMixin, ProcessFormView
 from .models import Resource, Faculty, Department, Agreement, Signature
@@ -306,13 +305,3 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
             context['agreement'] = None
         context['form'].fields['search'].initial = self.request.GET.get('search', default='')
         return context
-
-
-# Other views
-
-class AdminView(UserPassesTestMixin, TemplateView):
-    """A view to help admin staff access lists of Models"""
-    template_name = "admin.html"
-
-    def test_func(self):
-        return self.request.user.is_staff
