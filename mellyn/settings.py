@@ -59,6 +59,8 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+GUARDIAN_MONKEY_PATCH = False
+
 ROOT_URLCONF = 'mellyn.urls'
 
 TEMPLATES = [
@@ -76,6 +78,8 @@ TEMPLATES = [
         },
     },
 ]
+
+FIXTURE_DIRS = [os.path.join(BASE_DIR, "mellyn", "fixtures")]
 
 WSGI_APPLICATION = 'mellyn.wsgi.application'
 
