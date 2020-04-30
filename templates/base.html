@@ -46,6 +46,9 @@
       <p>A service of the&nbsp;<a href="https://library.carleton.ca">Carleton University Library</a>.</p>
       <p id="privacynotice">Privacy Notice: Personal information is collected by Carleton University <wbr>under the authority of Ontario’s Freedom of Information and Protection of Privacy Act <wbr>and the Carleton University Act 1952. <br>If you have any questions about the collection of personal information by Carleton University <wbr>contact the Carleton University Privacy Office, 613-520-2600 ext. 2047, <a href="mailto:University_Privacy_Office@carleton.ca">University_Privacy_Office@carleton.ca</a>.</p>
       {% endblock %}
+      {% if request.user.is_staff %}
+      <p><a href="{% url 'admin' %}">Admin Access</a></p>
+      {% endif %}
     </footer>
   </body>
   <!-- Mellyn - Speak, Friends, and Enter! A project by Kevin Bowrin -->
