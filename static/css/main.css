@@ -419,6 +419,9 @@ ul.objectlist li {
   margin-bottom: 32px;
 }
 
+li.hidden {
+  color: #535353;
+}
 
 p.alert {
   background: var(--warning-message-background);
