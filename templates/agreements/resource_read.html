@@ -6,6 +6,18 @@
   <div class="breadcrumb"><a aria-label="Return to the list of resources" href="{% url 'resources_list' %}">&larr; Resources</a></div>
   <h2>{{ resource.name }}</h2>
   <section class="htmlfield">{{ resource.description | safe}}</section>
+  <p><a href="{% url 'resources_access' resource.slug %}">File Access</a></p>
+  {% if agreements %}
+  <h3>Associated Agreements</h3>
+  <ul class="objectlist">
+    {% for agreement in agreements %}
+    <li {% if agreement.hidden %}class="hidden"{% endif %}>
+      <a href="{% url 'agreements_read' agreement.slug %}"><h3>{{ agreement.title }}{% if agreement.hidden %} (Hidden){% endif %}</h3></a>
+      <div class="agreementcreated">Created {{ agreement.created | date:"Y-m-d"}}</div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   <div class="actions">
     <a class="ok" href="{% url 'resources_update' resource.slug %}">Edit</a>
     <a class="warning" href="{% url 'resources_delete' resource.slug %}">Delete</a>
