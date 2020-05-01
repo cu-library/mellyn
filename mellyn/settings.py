@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bleach',
     'guardian',
+    'django_sendfile',
     'agreements.apps.AgreementsConfig',
     'accounts.apps.AccountsConfig',
 ]
@@ -133,3 +134,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static_files')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+
+# File Storage
+
+# MEDIA_ROOT = '/var/sign/storage/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mellyn', 'fixtures', 'test_media_root')
+SENDFILE_BACKEND = "django_sendfile.backends.simple"

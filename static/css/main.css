@@ -419,6 +419,12 @@ ul.objectlist li {
   margin-bottom: 32px;
 }
 
+
+p.alert {
+  background: var(--warning-message-background);
+  padding: 16px 8px;
+}
+
 p.created {
   margin: 8px 0;
 }

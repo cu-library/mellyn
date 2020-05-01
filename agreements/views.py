@@ -4,17 +4,24 @@ This module defines the views provided by this application.
 https://docs.djangoproject.com/en/3.0/topics/http/views/
 """
 
+import operator
+import os
+from pathlib import Path
 from django.contrib import messages
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
 from django.db.models import Q
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, \
                                        PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import ListView, DetailView
+from django.core.files.storage import default_storage
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
                                       FormMixin, ProcessFormView
+from django_sendfile import sendfile
+import humanize
 from .models import Resource, Faculty, Department, Agreement, Signature
 from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    FacultyCreateForm, FacultyUpdateForm, \
@@ -57,6 +64,14 @@ class ResourceRead(LoginRequiredMixin, DetailView):
     context_object_name = 'resource'
     template_name_suffix = '_read'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        agreements = Agreement.objects.filter(resource=self.get_object()).order_by('-created')
+        if not self.request.user.has_perm('agreements.view_agreement'):
+            agreements = agreements.exclude(hidden=True)
+        context['agreements'] = agreements
+        return context
+
 
 class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create a Resource"""
@@ -86,6 +101,73 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     permission_required = 'agreements.delete_resource'
     success_message = '%(name)s was deleted successfully.'
     success_url = reverse_lazy('resource_list')
+
+
+class ResourceAccess(LoginRequiredMixin, DetailView):
+    """A view which allows access to files associated with a Resource"""
+    model = Resource
+    context_object_name = 'resource'
+    template_name_suffix = '_access'
+
+    def get(self, request, *args, **kwargs):
+        # Has the user signed the newest, unhidden agreement associated with this
+        # resource?
+        resource = self.get_object()
+        try:
+            newest_associated_agreement = Agreement.objects.filter(hidden=False, resource=resource) \
+                                                           .order_by('-created')[0]
+        except IndexError:
+            raise Http404("Unable to find associated, unhidden agreement.")
+        try:
+            newest_associated_agreement.signature_set.filter(signatory=self.request.user).get()
+        except Signature.DoesNotExist:
+            messages.error(self.request,
+                           'You must sign an agreement before accessing files associated with this resource.')
+            return redirect(newest_associated_agreement)
+
+        # Access is granted, is the access path a file or a directory?
+        resource_scoped_path = os.path.join(resource.slug, self.kwargs['accesspath'])
+        try:
+            self.path = default_storage.path(resource_scoped_path)  # pylint: disable=attribute-defined-outside-init
+            if not os.path.exists(self.path):
+                raise Http404("File not found at access path.")
+            if os.path.isfile(self.path):
+                return sendfile(request, self.path)
+        except SuspiciousFileOperation:
+            raise PermissionDenied('SuspiciousFileOperation on file access.')
+
+        # Redirect if the file listing doesn't end in a slash
+        if self.kwargs['accesspath'] != '' and self.kwargs['accesspath'][-1] != '/':
+            return redirect(reverse_lazy('resources_access', args=[resource.slug, self.kwargs['accesspath']+'/']))
+        # Render a file listing to the user.
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['accesspath'] = self.kwargs['accesspath']
+        context['directories'] = []
+        context['files'] = []
+        for entry in os.scandir(self.path):
+            if entry.is_dir():
+                directory = {}
+                directory['name'] = entry.name
+                directory['accesspath'] = os.path.join(self.kwargs['accesspath'], entry.name)
+                context['directories'].append(directory)
+            else:
+                file = {}
+                file['name'] = entry.name
+                file['accesspath'] = os.path.join(self.kwargs['accesspath'], entry.name)
+                file['size'] = humanize.naturalsize(entry.stat().st_size, binary=True)
+                context['files'].append(file)
+        context['directories'].sort(key=operator.itemgetter('name'))
+        context['files'].sort(key=operator.itemgetter('name'))
+
+        if self.kwargs['accesspath'] != '':
+            parentdir = str(Path(self.kwargs['accesspath']).parent)
+            if parentdir == '.':
+                parentdir = ''
+            context['parentdir'] = parentdir
+        return context
 
 
 # Faculties
@@ -202,6 +284,13 @@ class AgreementList(LoginRequiredMixin, ListView):
     """A view of all Agreements"""
     model = Agreement
     context_object_name = 'agreements'
+    paginate_by = 15
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.has_perm('agreements.view_agreement'):
+            qs = qs.exclude(hidden=True)
+        return qs
 
 
 class AgreementRead(FormMixin, DetailView, ProcessFormView):

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Resources{% endblock %}
+
+{% block main %}
+  {% if parentdir is not None %}
+  {% if parentdir %}
+  <div class="breadcrumb"><a aria-label="Navigate up to the parent directory" href="{% url 'resources_access' resource.slug parentdir %}">&uarr; Parent Directory</a></div>
+  {% else %}
+  <div class="breadcrumb"><a aria-label="Navigate up to the parent directory" href="{% url 'resources_access' resource.slug %}">&uarr; Parent Directory</a></div>
+  {% endif %}
+  {% else %}
+  <div class="breadcrumb"><a aria-label="Return to the resource associted with these files" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }} </a></div>
+  {% endif %}
+  <h2>File Access for {{ resource.name }}</h2>
+  {% if directories %}
+  <h3>Subdirectories</h3>
+  <ul>
+    {% for directory in directories %}
+    <li><a href="{% url 'resources_access' resource.slug directory.accesspath %}">{{ directory.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if files %}
+  <h3>Files</h3>
+  <ul>
+    {% for file in files %}
+    <li><a href="{% url 'resources_access' resource.slug file.accesspath %}">{{ file.name }}</a> {{ file.size }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endblock %}
