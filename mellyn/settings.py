@@ -80,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-FIXTURE_DIRS = [os.path.join(BASE_DIR, "mellyn", "fixtures")]
+FIXTURE_DIRS = [os.path.join(BASE_DIR, 'mellyn', 'fixtures')]
 
 WSGI_APPLICATION = 'mellyn.wsgi.application'
 
