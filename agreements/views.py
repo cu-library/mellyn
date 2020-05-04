@@ -352,7 +352,7 @@ class AgreementList(LoginRequiredMixin, ListView):
         return qs
 
 
-class AgreementRead(FormMixin, DetailView, ProcessFormView):
+class AgreementRead(LoginRequiredMixin, FormMixin, DetailView, ProcessFormView):
     """A view of an Agreement"""
     context_object_name = 'agreement'
     form_class = SignatureCreateForm
