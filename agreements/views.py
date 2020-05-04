@@ -55,16 +55,16 @@ class SuccessMessageIfChangedMixin:
 
 class ResourceList(LoginRequiredMixin, ListView):
     """A view of all Resources"""
-    model = Resource
     context_object_name = 'resources'
-    paginate_by = 15
+    model = Resource
     ordering = 'name'
+    paginate_by = 15
 
 
 class ResourceRead(LoginRequiredMixin, DetailView):
     """A view of a Resource"""
-    model = Resource
     context_object_name = 'resource'
+    model = Resource
     template_name_suffix = '_read'
 
     def get_context_data(self, **kwargs):
@@ -78,38 +78,38 @@ class ResourceRead(LoginRequiredMixin, DetailView):
 
 class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create a Resource"""
+    form_class = ResourceCreateForm
     model = Resource
-    template_name_suffix = '_create_form'
     permission_required = 'agreements.add_resource'
     success_message = '%(name)s was created successfully.'
-    form_class = ResourceCreateForm
+    template_name_suffix = '_create_form'
 
 
 class ResourceUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a Resource"""
-    model = Resource
     context_object_name = 'resource'
-    template_name_suffix = '_update_form'
+    form_class = ResourceUpdateForm
+    model = Resource
     permission_required = 'agreements.change_resource'
     success_message = '%(name)s was updated successfully.'
-    form_class = ResourceUpdateForm
+    template_name_suffix = '_update_form'
 
 
 class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete a Resource"""
-    model = Resource
-    fields = '__all__'
     context_object_name = 'resource'
-    template_name_suffix = '_delete_form'
+    fields = '__all__'
+    model = Resource
     permission_required = 'agreements.delete_resource'
     success_message = '%(name)s was deleted successfully.'
     success_url = reverse_lazy('resource_list')
+    template_name_suffix = '_delete_form'
 
 
 class ResourceAccess(LoginRequiredMixin, DetailView):
     """A view which allows access to files associated with a Resource"""
-    model = Resource
     context_object_name = 'resource'
+    model = Resource
     template_name_suffix = '_access'
 
     def get(self, request, *args, **kwargs):
@@ -177,12 +177,12 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
 
 class ResourceLicenseCode(PermissionRequiredMixin, ListView):
     """A view of a Resource"""
-    model = LicenseCode
     context_object_name = 'license_codes'
-    template_name_suffix = '_list_for_resource'
+    model = LicenseCode
+    ordering = 'name'
     paginate_by = 15
     permission_required = 'agreements.view_licensecode'
-    ordering = 'name'
+    template_name_suffix = '_list_for_resource'
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -197,10 +197,10 @@ class ResourceLicenseCode(PermissionRequiredMixin, ListView):
 
 class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
     """A view where a staff user can add more License Codes to a Resource"""
-    model = Resource
     context_object_name = 'resource'
-    template_name = 'agreements/licensecode_add_form.html'
     form_class = LicenseCodeAddForm
+    model = Resource
+    template_name = 'agreements/licensecode_add_form.html'
 
     def get_success_url(self):
         return reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']})
@@ -232,17 +232,17 @@ class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
 
 class FacultyList(PermissionRequiredMixin, ListView):
     """A view of all Faculties"""
-    model = Faculty
     context_object_name = 'faculties'
+    model = Faculty
     permission_required = 'agreements.view_faculty'
 
 
 class FacultyRead(PermissionRequiredMixin, DetailView):
     """A view of a Faculty"""
-    model = Faculty
     context_object_name = 'faculty'
-    template_name_suffix = '_read'
+    model = Faculty
     permission_required = 'agreements.view_faculty'
+    template_name_suffix = '_read'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -252,58 +252,58 @@ class FacultyRead(PermissionRequiredMixin, DetailView):
 
 class FacultyCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create a Faculty"""
+    form_class = FacultyCreateForm
     model = Faculty
-    template_name_suffix = '_create_form'
     permission_required = 'agreements.add_faculty'
     success_message = '%(name)s was created successfully.'
-    form_class = FacultyCreateForm
+    template_name_suffix = '_create_form'
 
 
 class FacultyUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a Faculty"""
-    model = Faculty
     context_object_name = 'faculty'
-    template_name_suffix = '_update_form'
+    form_class = FacultyUpdateForm
+    model = Faculty
     permission_required = 'agreements.change_faculty'
     success_message = '%(name)s was updated successfully.'
-    form_class = FacultyUpdateForm
+    template_name_suffix = '_update_form'
 
 
 class FacultyDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete a Faculty"""
-    model = Faculty
-    fields = '__all__'
     context_object_name = 'faculty'
-    template_name_suffix = '_delete_form'
+    fields = '__all__'
+    model = Faculty
     permission_required = 'agreements.delete_faculty'
     success_message = '%(name)s was deleted successfully.'
     success_url = reverse_lazy('faculties_list')
+    template_name_suffix = '_delete_form'
 
 
 # Departments
 
 class DepartmentList(PermissionRequiredMixin, ListView):
     """A view of all Departments"""
-    model = Department
     context_object_name = 'departments'
+    model = Department
     permission_required = 'agreements.view_department'
 
 
 class DepartmentRead(PermissionRequiredMixin, DetailView):
     """A view of a Department"""
-    model = Department
     context_object_name = 'department'
-    template_name_suffix = '_read'
+    model = Department
     permission_required = 'agreements.view_department'
+    template_name_suffix = '_read'
 
 
 class DepartmentCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create a Department"""
+    form_class = DepartmentCreateForm
     model = Department
-    template_name_suffix = '_create_form'
     permission_required = 'agreements.add_department'
     success_message = '%(name)s was created successfully.'
-    form_class = DepartmentCreateForm
+    template_name_suffix = '_create_form'
 
 
 class DepartmentCreateUnderFaculty(DepartmentCreate):
@@ -317,33 +317,33 @@ class DepartmentCreateUnderFaculty(DepartmentCreate):
 
 class DepartmentUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a Department"""
-    model = Department
     context_object_name = 'department'
-    template_name_suffix = '_update_form'
+    form_class = DepartmentUpdateForm
+    model = Department
     permission_required = 'agreements.change_department'
     success_message = '%(name)s was updated successfully.'
-    form_class = DepartmentUpdateForm
+    template_name_suffix = '_update_form'
 
 
 class DepartmentDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete a Department"""
-    model = Department
-    fields = '__all__'
     context_object_name = 'department'
-    template_name_suffix = '_delete_form'
+    fields = '__all__'
+    model = Department
     permission_required = 'agreements.delete_department'
     success_message = '%(name)s was deleted successfully.'
     success_url = reverse_lazy('departments_list')
+    template_name_suffix = '_delete_form'
 
 
 # Agreements
 
 class AgreementList(LoginRequiredMixin, ListView):
     """A view of all Agreements"""
-    model = Agreement
     context_object_name = 'agreements'
-    paginate_by = 15
+    model = Agreement
     ordering = 'title'
+    paginate_by = 15
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -354,10 +354,10 @@ class AgreementList(LoginRequiredMixin, ListView):
 
 class AgreementRead(FormMixin, DetailView, ProcessFormView):
     """A view of an Agreement"""
-    model = Agreement
     context_object_name = 'agreement'
-    template_name_suffix = '_read'
     form_class = SignatureCreateForm
+    model = Agreement
+    template_name_suffix = '_read'
 
     def get_success_url(self):
         return reverse_lazy('agreements_read', kwargs={'slug': self.kwargs['slug']})
@@ -400,44 +400,44 @@ class AgreementRead(FormMixin, DetailView, ProcessFormView):
 
 class AgreementCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create an Agreement"""
+    form_class = AgreementCreateForm
     model = Agreement
-    template_name_suffix = '_create_form'
     permission_required = 'agreements.add_agreement'
     success_message = '%(title)s was created successfully.'
-    form_class = AgreementCreateForm
+    template_name_suffix = '_create_form'
 
 
 class AgreementUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update an Agreement"""
-    model = Agreement
     context_object_name = 'agreement'
-    template_name_suffix = '_update_form'
+    form_class = AgreementUpdateForm
+    model = Agreement
     permission_required = 'agreements.change_agreement'
     success_message = '%(title)s was updated successfully.'
-    form_class = AgreementUpdateForm
+    template_name_suffix = '_update_form'
 
 
 class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete an Agreement"""
-    model = Agreement
-    fields = '__all__'
     context_object_name = 'agreement'
-    template_name_suffix = '_delete_form'
+    fields = '__all__'
+    model = Agreement
     permission_required = 'agreements.delete_agreement'
     success_message = '%(title)s was deleted successfully.'
     success_url = reverse_lazy('agreements_list')
+    template_name_suffix = '_delete_form'
 
 
 # Signatures
 
 class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
     """A view to list and search through Signatures of an Agreement"""
-    model = Signature
     context_object_name = 'signatures'
-    permission_required = 'agreements.view_signature'
     form_class = SignatureSearchForm
-    paginate_by = 15
+    model = Signature
     ordering = '-signed_at'
+    paginate_by = 15
+    permission_required = 'agreements.view_signature'
 
     def get_queryset(self):
         qs = super().get_queryset()

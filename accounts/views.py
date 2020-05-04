@@ -39,8 +39,8 @@ class SuccessMessageIfChangedMixin:
 
 class StaffUserList(UserPassesTestMixin, ListView):
     """A view of all staff users"""
-    model = User
     context_object_name = 'staff'
+    model = User
     queryset = User.objects.filter(is_staff=True)
     template_name = 'accounts/staff_list.html'
 
@@ -50,11 +50,11 @@ class StaffUserList(UserPassesTestMixin, ListView):
 
 class StaffUserRead(UserPassesTestMixin, DetailView):
     """A view of a staff user"""
-    model = User
-    slug_field = 'username'
     context_object_name = 'staff_user'
-    template_name = 'accounts/staff_read.html'
+    model = User
     queryset = User.objects.filter(is_staff=True)
+    slug_field = 'username'
+    template_name = 'accounts/staff_read.html'
 
     def test_func(self):
         return self.request.user.is_staff
@@ -64,47 +64,47 @@ class StaffUserRead(UserPassesTestMixin, DetailView):
 
 class GroupDescriptionList(PermissionRequiredMixin, ListView):
     """A view of all GroupDescription"""
-    model = GroupDescription
     context_object_name = 'groupdescriptions'
+    model = GroupDescription
     permission_required = 'accounts.view_groupdescription'
 
 
 class GroupDescriptionRead(PermissionRequiredMixin, DetailView):
     """A view of a GroupDescription"""
-    model = GroupDescription
     context_object_name = 'groupdescription'
-    template_name_suffix = '_read'
+    model = GroupDescription
     permission_required = 'accounts.view_groupdescription'
+    template_name_suffix = '_read'
 
 
 class GroupDescriptionCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create a GroupDescription"""
+    form_class = GroupDescriptionCreateForm
     model = GroupDescription
-    template_name_suffix = '_create_form'
     permission_required = 'accounts.add_groupdescription'
     success_message = '%(name)s was created successfully.'
-    form_class = GroupDescriptionCreateForm
+    template_name_suffix = '_create_form'
 
 
 class GroupDescriptionUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a GroupDescription"""
-    model = GroupDescription
-    template_name_suffix = '_update_form'
     context_object_name = 'groupdescription'
+    form_class = GroupDescriptionUpdateForm
+    model = GroupDescription
     permission_required = 'accounts.change_groupdescription'
     success_message = '%(name)s was updated successfully.'
-    form_class = GroupDescriptionUpdateForm
+    template_name_suffix = '_update_form'
 
 
 class GroupDescriptionUpdatePermissions(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a GroupDescription"""
-    model = Group
-    template_name = 'accounts/groupdescription_update_permissions_form.html'
     context_object_name = 'group'
-    permission_required = 'accounts.change_groupdescription'
-    success_message = 'Permissions for %(name)s updated successfully.'
-    queryset = GroupDescription.objects.all()
     form_class = GroupPermissionsForm
+    model = Group
+    permission_required = 'accounts.change_groupdescription'
+    queryset = GroupDescription.objects.all()
+    success_message = 'Permissions for %(name)s updated successfully.'
+    template_name = 'accounts/groupdescription_update_permissions_form.html'
 
     def get_object(self, queryset=None):
         group_description = super().get_object(queryset)
@@ -119,13 +119,13 @@ class GroupDescriptionUpdatePermissions(PermissionRequiredMixin, SuccessMessageI
 
 class GroupDescriptionDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete a GroupDescription"""
-    model = GroupDescription
-    fields = '__all__'
     context_object_name = 'groupdescription'
-    template_name_suffix = '_delete_form'
+    fields = '__all__'
+    model = GroupDescription
     permission_required = 'accounts.delete_groupdescription'
     success_message = '%(name)s was deleted successfully.'
     success_url = reverse_lazy('group_descriptions_list')
+    template_name_suffix = '_delete_form'
 
 
 # Login and Logout
