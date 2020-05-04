@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}License Codes For Resource {{ resource.name }}{% endblock %}
+
+{% block main %}
+  <div class="breadcrumb"><a aria-label="Return to {{ resource.name }}" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
+  <h2>License Codes For {{ resource.name }}</h2>
+  {% if license_codes %}
+  <ul>
+    {% for license_code in license_codes %}
+    <li>{{ license_code.code }} {% if license_code.signature %}provided to {{ license_code.signature.username }} after signing {{ license_code.signature.agreement.title }} {% endif %}(Added: {{ license_code.added }}) </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No license codes found.</p>
+  {% endif %}
+  {% include "pagination.html" %}
+  <div class="actions">
+    <a class="ok" href="{% url 'resources_codes_add' resource.slug %}">Add new license codes</a>
+  </div>
+{% endblock %}

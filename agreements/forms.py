@@ -6,7 +6,7 @@ https://docs.djangoproject.com/en/3.0/topics/forms/
 
 from django import forms
 from django.forms import Form, ModelForm, SlugField, URLField, Textarea
-from .models import Resource, Faculty, Department, Agreement, Signature, DEFAULT_ALLOWED_TAGS
+from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, DEFAULT_ALLOWED_TAGS
 from .fields import GroupedModelChoiceField
 
 
@@ -55,6 +55,49 @@ class ResourceUpdateForm(ModelForm):
                 'data-allowed-tags': ','.join(DEFAULT_ALLOWED_TAGS)
             }),
         }
+
+
+# License Codes
+
+class LicenseCodesField(forms.CharField):
+    """A subclass of CharField which splits each line of input"""
+    widget = Textarea
+
+    def __init__(self, *args, **kwargs):
+        self.resource = kwargs.pop('resource')
+        super().__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        value = super().to_python(value)
+        if not value:
+            return []
+        return list(filter(None, map(lambda x: x.strip(), value.splitlines())))
+
+    def validate(self, value):
+        super().validate(value)
+        seen = []
+        for code in value:
+            if LicenseCode.objects.filter(resource=self.resource, code=code).exists():
+                raise forms.ValidationError(
+                    'Invalid code: %(code)s is already associated with this resource.',
+                    code='duplicate_access_code_in_database',
+                    params={'code': code},
+                )
+            if code in seen:
+                raise forms.ValidationError(
+                    'Invalid code: %(code)s is a duplicate license code.',
+                    code='duplicate_access_code_in_input',
+                    params={'code': code},
+                )
+            seen.append(code)
+
+
+class LicenseCodeAddForm(Form):
+    """A form for searching for Signatures"""
+    def __init__(self, *args, **kwargs):
+        self.resource = kwargs.pop('resource')
+        super().__init__(*args, **kwargs)
+        self.fields['codes'] = LicenseCodesField(resource=self.resource, label='', help_text='One line per code')
 
 
 # Faculties

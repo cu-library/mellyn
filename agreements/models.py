@@ -17,7 +17,6 @@ DEFAULT_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
 
 class Resource(models.Model):
     """Resources which are protected by Agreements"""
-
     name = models.CharField(max_length=300, unique=True)
     slug = models.SlugField(max_length=300, unique=True,
                             validators=[RegexValidator(regex="^create$",
@@ -81,7 +80,6 @@ class Department(models.Model):
 
 class Agreement(models.Model):
     """Agreements are documents which are signed by patrons to access resources"""
-
     title = models.CharField(max_length=300, unique=True)
     slug = models.SlugField(max_length=300, unique=True,
                             validators=[RegexValidator(regex="^create$",
@@ -130,4 +128,18 @@ class Signature(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['agreement', 'signatory'], name='unique_signature')
+        ]
+
+
+class LicenseCode(models.Model):
+    """License Codes are provided to patrons after they sign an agreement."""
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    code = models.CharField(max_length=300)
+    added = models.DateTimeField(auto_now_add=True)
+    signature = models.OneToOneField(Signature, on_delete=models.SET_NULL,
+                                     related_name='license_code', blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['resource', 'code'], name='unique_codes_per_resource')
         ]

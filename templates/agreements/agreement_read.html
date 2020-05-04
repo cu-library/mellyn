@@ -11,6 +11,7 @@
   {% if associated_signature %}
   <div class="signature">
     <p>You signed this agreement on {{ associated_signature.signed_at | date:"Y-m-d" }}.</p>
+    {% if associated_signature.license_code %}<p>License Code: {{ associated_signature.license_code.code }}</p>{% endif %}
     <p>Return to <a href="{{ agreement.redirect_url }}">{{ agreement.redirect_text }}</a></p>
   </div>
   {% else %}

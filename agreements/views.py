@@ -22,8 +22,9 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
                                       FormMixin, ProcessFormView
 from django_sendfile import sendfile
 import humanize
-from .models import Resource, Faculty, Department, Agreement, Signature
+from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature
 from .forms import ResourceCreateForm, ResourceUpdateForm, \
+                   LicenseCodeAddForm, \
                    FacultyCreateForm, FacultyUpdateForm, \
                    DepartmentCreateForm, DepartmentUpdateForm, \
                    AgreementCreateForm, AgreementUpdateForm, \
@@ -170,6 +171,61 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
                 parentdir = ''
             context['parentdir'] = parentdir
         return context
+
+
+# License Codes
+
+class ResourceLicenseCode(PermissionRequiredMixin, ListView):
+    """A view of a Resource"""
+    model = LicenseCode
+    context_object_name = 'license_codes'
+    template_name_suffix = '_list_for_resource'
+    paginate_by = 15
+    permission_required = 'agreements.view_licensecode'
+    ordering = 'name'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        self.resource = get_object_or_404(Resource, slug=self.kwargs['slug'])  # NOQA # pylint: disable=attribute-defined-outside-init
+        return qs.filter(resource=self.resource).order_by('signature', 'added')
+
+    def get_context_data(self, **kwargs):  # pylint: disable=arguments-differ
+        context = super().get_context_data(**kwargs)
+        context['resource'] = self.resource
+        return context
+
+
+class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
+    """A view where a staff user can add more License Codes to a Resource"""
+    model = Resource
+    context_object_name = 'resource'
+    template_name = 'agreements/licensecode_add_form.html'
+    form_class = LicenseCodeAddForm
+
+    def get_success_url(self):
+        return reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'resource': self.get_object()})
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()  # pylint: disable=attribute-defined-outside-init
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        codes = form.cleaned_data['codes']
+        for code in codes:
+            license_code = LicenseCode(resource=self.get_object(), code=code)
+            try:
+                license_code.full_clean()
+            except ValidationError:
+                messages.error(self.request, f'Error when saving license code {code}, possible duplicate.')
+                return redirect(reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']}))
+            license_code.save()
+        messages.success(self.request, f'{len(codes)} new access codes added to {self.get_object().name}.')
+        return super().form_valid(form)
 
 
 # Faculties
@@ -320,9 +376,18 @@ class AgreementRead(FormMixin, DetailView, ProcessFormView):
             messages.error(self.request, 'Agreement already signed.')
             return redirect(self.get_object())
         signature.save()
+        license_code = (
+            LicenseCode.objects.select_for_update(skip_locked=True)
+            .filter(signature=None, resource=self.get_object().resource)
+            .order_by('added').first()
+            )
+        if license_code:
+            license_code.signature = signature
+            license_code.save()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
+        self.object = self.get_object()  # pylint: disable=attribute-defined-outside-init
         context = super().get_context_data(**kwargs)
         try:
             context['associated_signature'] = (

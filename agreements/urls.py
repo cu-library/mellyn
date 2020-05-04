@@ -14,6 +14,8 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('resources/<slug:slug>/', views.ResourceRead.as_view(), name='resources_read'),
     path('resources/<slug:slug>/update/', views.ResourceUpdate.as_view(), name='resources_update'),
     path('resources/<slug:slug>/delete/', views.ResourceDelete.as_view(), name='resources_delete'),
+    path('resources/<slug:slug>/codes/', views.ResourceLicenseCode.as_view(), name='resources_codes'),
+    path('resources/<slug:slug>/codes/add/', views.ResourceLicenseCodeAdd.as_view(), name='resources_codes_add'),
     path('resources/<slug:slug>/access/', views.ResourceAccess.as_view(), {'accesspath': ''}, name='resources_access'),
     path('resources/<slug:slug>/access/<path:accesspath>', views.ResourceAccess.as_view(), name='resources_access'),
     path('faculties/', views.FacultyList.as_view(), name='faculties_list'),

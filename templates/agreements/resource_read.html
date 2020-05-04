@@ -7,6 +7,7 @@
   <h2>{{ resource.name }}</h2>
   <section class="htmlfield">{{ resource.description | safe}}</section>
   <p><a href="{% url 'resources_access' resource.slug %}">File Access</a></p>
+  <p><a href="{% url 'resources_codes' resource.slug %}">Access Codes</a></p>
   {% if agreements %}
   <h3>Associated Agreements</h3>
   <ul class="objectlist">
