@@ -10,6 +10,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator
 from guardian.mixins import GuardianUserMixin
 from django_bleach.models import BleachField
+from simple_history.models import HistoricalRecords
 
 DEFAULT_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
                         'small', 'em', 'strong', 'sub', 'sup',
@@ -38,6 +39,7 @@ class GroupDescription(models.Model):
                               strip_comments=True,
                               help_text=f'An HTML description of the group. '
                                         f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
+    history = HistoricalRecords()
 
     def get_absolute_url(self):
         """Returns the canonical URL for a Group Description"""

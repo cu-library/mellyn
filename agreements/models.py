@@ -9,6 +9,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import RegexValidator, URLValidator, validate_email
 from django_bleach.models import BleachField
+from simple_history.models import HistoricalRecords
 
 DEFAULT_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
                         'small', 'em', 'strong', 'sub', 'sup',
@@ -31,6 +32,7 @@ class Resource(models.Model):
                               strip_comments=True,
                               help_text=f'An HTML description of the resource. '
                                         f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
+    history = HistoricalRecords()
 
     def get_absolute_url(self):
         """Returns the canonical URL for a Faculty"""
@@ -49,6 +51,7 @@ class Faculty(models.Model):
                                                        message="The slug cannot be 'create'.",
                                                        inverse_match=True)],
                             help_text='URL-safe identifier for the faculty.')
+    history = HistoricalRecords()
 
     def get_absolute_url(self):
         """Returns the canonical URL for a Faculty"""
@@ -68,6 +71,7 @@ class Department(models.Model):
                                                        inverse_match=True)],
                             help_text='URL-safe identifier for the department.')
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+    history = HistoricalRecords()
 
     def get_absolute_url(self):
         """Returns the canonical URL for a Department"""
@@ -104,6 +108,7 @@ class Agreement(models.Model):
     redirect_text = models.CharField(max_length=300, help_text='The text of the URL redirect link.')
     hidden = models.BooleanField(default=False,
                                  help_text='Hidden agreements do not appear in the list of active agreements.')
+    history = HistoricalRecords()
 
     def get_absolute_url(self):
         """Returns the canonical URL for an Agreement"""
@@ -124,6 +129,7 @@ class Signature(models.Model):
     email = models.CharField(max_length=200, validators=[validate_email])
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
     signed_at = models.DateTimeField(auto_now_add=True)
+    history = HistoricalRecords()
 
     class Meta:
         constraints = [
@@ -138,6 +144,7 @@ class LicenseCode(models.Model):
     added = models.DateTimeField(auto_now_add=True)
     signature = models.OneToOneField(Signature, on_delete=models.SET_NULL,
                                      related_name='license_code', blank=True, null=True)
+    history = HistoricalRecords()
 
     class Meta:
         constraints = [
