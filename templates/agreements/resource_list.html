@@ -14,6 +14,7 @@
   {% else %}
     <p>No resources found.</p>
   {% endif %}
+  {% include "pagination.html" %}
   <div class="actions">
     <a class="ok" href="{% url 'resources_create' %}">Create a new resource</a>
   </div>

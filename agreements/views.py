@@ -56,6 +56,8 @@ class ResourceList(LoginRequiredMixin, ListView):
     """A view of all Resources"""
     model = Resource
     context_object_name = 'resources'
+    paginate_by = 15
+    ordering = 'name'
 
 
 class ResourceRead(LoginRequiredMixin, DetailView):
@@ -285,6 +287,7 @@ class AgreementList(LoginRequiredMixin, ListView):
     model = Agreement
     context_object_name = 'agreements'
     paginate_by = 15
+    ordering = 'title'
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -369,9 +372,10 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
     permission_required = 'agreements.view_signature'
     form_class = SignatureSearchForm
     paginate_by = 15
+    ordering = '-signed_at'
 
     def get_queryset(self):
-        qs = Signature.objects.all()
+        qs = super().get_queryset()
         if 'agreementslug' in self.kwargs:
             self.agreement = get_object_or_404(  # pylint: disable=attribute-defined-outside-init
                 Agreement, slug=self.kwargs['agreementslug']
