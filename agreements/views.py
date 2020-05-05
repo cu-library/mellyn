@@ -149,7 +149,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
             newest_associated_agreement = Agreement.objects.filter(hidden=False, resource=resource) \
                                                            .order_by('-created')[0]
         except IndexError:
-            raise Http404("Unable to find associated, unhidden agreement.")
+            raise Http404('Unable to find associated, unhidden agreement.')
         try:
             newest_associated_agreement.signature_set.filter(signatory=self.request.user).get()
         except Signature.DoesNotExist:
@@ -162,7 +162,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
         try:
             self.path = default_storage.path(resource_scoped_path)  # pylint: disable=attribute-defined-outside-init
             if not os.path.exists(self.path):
-                raise Http404("File not found at access path.")
+                raise Http404('File not found at access path.')
             if os.path.isfile(self.path):
                 return sendfile(request, self.path)
         except SuspiciousFileOperation:
