@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Permissions for {{ resource.name }}{% endblock %}
+
+{% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the resource associated with this list of permissions" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
+  <h2>{{ resource.name }}</h2>
+  {% if global_permissions %}
+  <h3>All Resources</h3>
+  <p>Members of these groups have permissions on any resource.</p>
+  <ul>
+    {% for groupdescription, permissions in global_permissions %}
+    <li>
+      <a href="{% url 'groupdescriptions_read' groupdescription.slug %}">{{ groupdescription.name }}</a>
+      <ul>
+        {% for permission in permissions %}
+        <li>{{ permission.name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <div class="actions">
+
+  </div>
+{% endblock %}

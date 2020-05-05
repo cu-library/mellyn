@@ -22,6 +22,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
                                       FormMixin, ProcessFormView
 from django_sendfile import sendfile
 import humanize
+from accounts.models import GroupDescription
 from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature
 from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    LicenseCodeAddForm, \
@@ -104,6 +105,34 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     success_message = '%(name)s was deleted successfully.'
     success_url = reverse_lazy('resource_list')
     template_name_suffix = '_delete_form'
+
+
+class ResourcePermissions(PermissionRequiredMixin, SuccessMessageMixin, DetailView):
+    """A view which provides view and edit functionality for permissions on this resource"""
+    context_object_name = 'resource'
+    model = Resource
+    permission_required = 'agreements.add_resource'
+    template_name = 'agreements/resource_permissions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['global_permissions'] = []
+        related_group_permissions = (
+            GroupDescription.objects
+            .filter(group__permissions__content_type__model='resource')
+            .distinct()
+            .order_by('name')
+        )
+        for groupdescription in related_group_permissions:
+            permissions = (
+                groupdescription
+                .group
+                .permissions
+                .filter(content_type__model='resource')
+                .distinct()
+            )
+            context['global_permissions'].append((groupdescription, permissions))
+        return context
 
 
 class ResourceAccess(LoginRequiredMixin, DetailView):

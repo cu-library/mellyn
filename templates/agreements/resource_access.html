@@ -10,7 +10,7 @@
   <div class="breadcrumb"><a aria-label="Navigate up to the parent directory" href="{% url 'resources_access' resource.slug %}">&uarr; Parent Directory</a></div>
   {% endif %}
   {% else %}
-  <div class="breadcrumb"><a aria-label="Return to the resource associted with these files" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }} </a></div>
+  <div class="breadcrumb"><a aria-label="Return to the resource associted with these files" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
   {% endif %}
   <h2>File Access for {{ resource.name }}</h2>
   {% if directories %}
