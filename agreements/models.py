@@ -98,7 +98,7 @@ class Agreement(models.Model):
                        strip_comments=True,
                        help_text=f'HTML content of the Agreement. '
                                  f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
-    created = models.DateField(auto_now=True)
+    created = models.DateField(auto_now_add=True)
     redirect_url = models.URLField(validators=[URLValidator(schemes=['https'],
                                                             message="Enter a valid URL. "
                                                                     "It must start with 'https://'.",
