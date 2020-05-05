@@ -91,6 +91,7 @@ class Agreement(models.Model):
                                                        inverse_match=True)],
                             help_text='URL-safe identifier for the agreement.')
     resource = models.ForeignKey(Resource, on_delete=models.PROTECT)
+    created = models.DateField(auto_now_add=True)
     body = BleachField(allowed_tags=DEFAULT_ALLOWED_TAGS,
                        allowed_attributes={'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title']},
                        allowed_protocols=['https', 'mailto'],
@@ -100,7 +101,7 @@ class Agreement(models.Model):
                                  f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}. '
                                  'Changing this field after the agreement has been signed '
                                  'by patrons is strongly discouraged.')
-    created = models.DateField(auto_now_add=True)
+
     redirect_url = models.URLField(validators=[URLValidator(schemes=['https'],
                                                             message="Enter a valid URL. "
                                                                     "It must start with 'https://'.",
