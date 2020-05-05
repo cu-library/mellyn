@@ -96,8 +96,10 @@ class Agreement(models.Model):
                        allowed_protocols=['https', 'mailto'],
                        strip_tags=False,
                        strip_comments=True,
-                       help_text=f'HTML content of the Agreement. '
-                                 f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
+                       help_text='HTML content of the agreement. '
+                                 f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}. '
+                                 'Changing this field after the agreement has been signed '
+                                 'by patrons is strongly discouraged.')
     created = models.DateField(auto_now_add=True)
     redirect_url = models.URLField(validators=[URLValidator(schemes=['https'],
                                                             message="Enter a valid URL. "
