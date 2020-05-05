@@ -83,9 +83,16 @@ class GroupPermissionsForm(ModelForm):
 
     permissions = PermissionsChoiceField(widget=CheckboxSelectMultiple,
                                          label='Global permissions associated with this group.',
-                                         queryset=Permission.objects.filter(
-                                             Q(content_type__app_label='agreements') |
-                                             Q(content_type__model='groupdescription')))
+                                         queryset=(
+                                             Permission.objects
+                                             .filter(
+                                                 Q(content_type__app_label='agreements') |
+                                                 Q(content_type__model='groupdescription')
+                                             )
+                                             .exclude(
+                                                 Q(content_type__model__icontains='historical')
+                                             ))
+                                         )
 
     class Meta:
         model = Group
