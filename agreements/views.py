@@ -154,7 +154,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
             newest_associated_agreement.signature_set.filter(signatory=self.request.user).get()
         except Signature.DoesNotExist:
             messages.error(self.request,
-                           'You must sign an agreement before accessing files associated with this resource.')
+                           f'You must sign this agreement before accessing files associated with {resource.name}.')
             return redirect(newest_associated_agreement)
 
         # Access is granted, is the access path a file or a directory?
