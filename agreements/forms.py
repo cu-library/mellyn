@@ -22,13 +22,8 @@ class ModelFormSetLabelSuffix(ModelForm):
 
 # Resources
 
-class ResourceCreateForm(ModelForm):
+class ResourceCreateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for creating Resources"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     class Meta:
         model = Resource
@@ -44,13 +39,8 @@ class ResourceCreateForm(ModelForm):
         }
 
 
-class ResourceUpdateForm(ModelForm):
+class ResourceUpdateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for updating Resources"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
                      help_text='URL-safe identifier for the resource. It has been set and cannot be changed.',
@@ -112,13 +102,8 @@ class LicenseCodeAddForm(Form):
 
 # Faculties
 
-class FacultyCreateForm(ModelForm):
+class FacultyCreateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for creating Faculties"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     class Meta:
         model = Faculty
@@ -128,13 +113,8 @@ class FacultyCreateForm(ModelForm):
         }
 
 
-class FacultyUpdateForm(ModelForm):
+class FacultyUpdateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for updating Faculties"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
                      help_text='URL-safe identifier for the faculty. It has been set and cannot be changed.',
@@ -147,13 +127,8 @@ class FacultyUpdateForm(ModelForm):
 
 # Departments
 
-class DepartmentCreateForm(ModelForm):
+class DepartmentCreateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for creating Departments"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     class Meta:
         model = Department
@@ -163,13 +138,8 @@ class DepartmentCreateForm(ModelForm):
         }
 
 
-class DepartmentUpdateForm(ModelForm):
+class DepartmentUpdateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for updating Departments"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
                      help_text='URL-safe identifier for the department. It has been set and cannot be changed.',
@@ -237,13 +207,8 @@ class AgreementUpdateForm(AgreementBaseForm):
 
 # Signatures
 
-class SignatureCreateForm(ModelForm):
+class SignatureCreateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for Signatures"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     sign = forms.BooleanField(label='I have read and accepted this agreement')
     department = GroupedModelChoiceField(
