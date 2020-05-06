@@ -77,6 +77,11 @@ class Department(models.Model):
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
     history = HistoricalRecords()
 
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['name', 'faculty'], name='%(app_label)s_%(class)s_unique_depts_in_faculty')
+        ]
+
     def get_absolute_url(self):
         """Returns the canonical URL for a Department"""
         return reverse('departments_read', args=[self.slug])
