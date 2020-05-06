@@ -23,7 +23,24 @@
       <input class="ok" type="submit" value="Submit">
     </div>
   </form>
+  {% if count_per_department %}
+  <h3>Per Department</h3>
+  <ul>
+    {% for count in count_per_department %}
+    <li>{{ count.department__name }}: {{ count.num_sigs }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if count_per_faculty %}
+  <h3>Per Faculty</h3>
+  <ul>
+    {% for count in count_per_faculty %}
+    <li>{{ count.department__faculty__name }}: {{ count.num_sigs }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   {% if signatures %}
+  <h3>Signature List</h3>
   <ul class="objectlist">
     {% for signature in signatures %}
     <li>{{ signature.signed_at | date:"Y-m-d" }} - {{ signature.username }} - {{ signature.email }} - {{ signature.first_name }} {{ signature.last_name }} - {{ signature.department }}</li>

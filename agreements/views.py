@@ -12,7 +12,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, \
                                        PermissionRequiredMixin, \
@@ -504,4 +504,12 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
         except AttributeError:
             context['agreement'] = None
         context['form'].fields['search'].initial = self.request.GET.get('search', default='')
+        context['count_per_department'] = (self.get_queryset()
+                                           .values('department', 'department__name', 'department__faculty')
+                                           .annotate(num_sigs=Count('department'))
+                                           .order_by('-num_sigs'))
+        context['count_per_faculty'] = (self.get_queryset()
+                                        .values('department__faculty', 'department__faculty__name')
+                                        .annotate(num_sigs=Count('department__faculty'))
+                                        .order_by('-num_sigs'))
         return context
