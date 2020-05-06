@@ -4,10 +4,14 @@ This module defines the models used by this application.
 https://docs.djangoproject.com/en/3.0/topics/db/models/
 """
 
+from datetime import timedelta
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.core.validators import RegexValidator, URLValidator, validate_email
+from django.db.models import Q, F, UniqueConstraint, CheckConstraint
+from django.utils.timezone import now
+from django.db.models.query import QuerySet
 from django_bleach.models import BleachField
 from simple_history.models import HistoricalRecords
 
@@ -82,6 +86,24 @@ class Department(models.Model):
         return self.name
 
 
+class AgreementQuerySet(QuerySet):
+    """A subclas of QuerySet with a new chainable method to find valid agreements"""
+    def valid(self):
+        """Filter out posts that aren't valid right now"""
+        return (self
+                .filter(start__lte=now())
+                .filter(
+                    Q(end__gte=now()) |
+                    Q(end__isnull=True)
+                )
+                .exclude(hidden=True))
+
+
+def date_121_days_from_now():
+    """Return the current date plus approx one third of a year"""
+    return now() + timedelta(days=121)
+
+
 class Agreement(models.Model):
     """Agreements are documents which are signed by patrons to access resources"""
     title = models.CharField(max_length=300, unique=True)
@@ -92,6 +114,14 @@ class Agreement(models.Model):
                             help_text='URL-safe identifier for the agreement.')
     resource = models.ForeignKey(Resource, on_delete=models.PROTECT)
     created = models.DateField(auto_now_add=True)
+    start = models.DateTimeField(default=now,
+                                 help_text='The agreement is valid starting at this date and time. '
+                                           'Format (UTC timezone): YYYY-MM-DD HH:MM:SS')
+    end = models.DateTimeField(null=True,
+                               blank=True,
+                               default=date_121_days_from_now,
+                               help_text='The agreement is valid until this date and time. '
+                                         'Format (UTC timezone): YYYY-MM-DD HH:MM:SS')
     body = BleachField(allowed_tags=DEFAULT_ALLOWED_TAGS,
                        allowed_attributes={'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title']},
                        allowed_protocols=['https', 'mailto'],
@@ -113,9 +143,27 @@ class Agreement(models.Model):
                                  help_text='Hidden agreements do not appear in the list of active agreements.')
     history = HistoricalRecords()
 
+    objects = AgreementQuerySet.as_manager()
+
+    class Meta:
+        constraints = [
+            CheckConstraint(check=Q(end__isnull=True) | Q(end__gt=F("start")),
+                            name="%(app_label)s_%(class)s_end_null_or_gt_start")
+        ]
+
     def get_absolute_url(self):
         """Returns the canonical URL for an Agreement"""
         return reverse('agreements_read', args=[self.slug])
+
+    def valid(self):
+        """Is this agreement not hidden, and currently valid?"""
+        if not self.hidden:
+            if now() >= self.start:
+                if self.end is None:
+                    return True
+                if now() <= self.end:
+                    return True
+        return False
 
 
 class Signature(models.Model):
@@ -136,7 +184,7 @@ class Signature(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['agreement', 'signatory'], name='unique_signature')
+            UniqueConstraint(fields=['agreement', 'signatory'], name='%(app_label)s_%(class)s_unique_signature')
         ]
 
 
@@ -151,5 +199,5 @@ class LicenseCode(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['resource', 'code'], name='unique_codes_per_resource')
+            UniqueConstraint(fields=['resource', 'code'], name='%(app_label)s_%(class)s_unique_codes_per_resource')
         ]

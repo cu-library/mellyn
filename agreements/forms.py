@@ -10,6 +10,16 @@ from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signa
 from .fields import GroupedModelChoiceField
 
 
+# Base Class
+
+class ModelFormSetLabelSuffix(ModelForm):
+    """A ModelForm which overrides their label_suffix to the empty string"""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("label_suffix", "")
+        super().__init__(*args, **kwargs)
+
+
 # Resources
 
 class ResourceCreateForm(ModelForm):
@@ -172,13 +182,22 @@ class DepartmentUpdateForm(ModelForm):
 
 # Agreements
 
-class AgreementCreateForm(ModelForm):
-    """A custom ModelForm for creating Agreements"""
+class AgreementBaseForm(ModelFormSetLabelSuffix):
+    """The base class of agreement forms"""
 
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
+    def clean(self):
+        super().clean()
+        if self.cleaned_data['end'] is not None:
+            if self.cleaned_data['start'] > self.cleaned_data['end']:
+                self.add_error(None,
+                               forms.ValidationError(
+                                   '"End" date and time is before "Start" date and time.',
+                                   code='start_date_after_end_date',
+                               ))
+
+
+class AgreementCreateForm(AgreementBaseForm):
+    """A custom ModelForm for creating Agreements"""
 
     redirect_url = URLField(help_text="URL where patrons will be redirected to after signing the agreement. "
                                       "It must start with 'https://'.",
@@ -186,7 +205,7 @@ class AgreementCreateForm(ModelForm):
 
     class Meta:
         model = Agreement
-        fields = ['title', 'slug', 'resource', 'body', 'hidden', 'redirect_url', 'redirect_text']
+        fields = ['title', 'slug', 'resource', 'start', 'end', 'body', 'hidden', 'redirect_url', 'redirect_text']
         help_texts = {
             'slug': 'URL-safe identifier for the Agreement. It cannot be changed after the Agreement is created.'
         }
@@ -198,13 +217,8 @@ class AgreementCreateForm(ModelForm):
         }
 
 
-class AgreementUpdateForm(ModelForm):
+class AgreementUpdateForm(AgreementBaseForm):
     """A custom ModelForm for updating Departments"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     slug = SlugField(required=False,
                      help_text='URL-safe identifier for the agreement. It has been set and cannot be changed.',
@@ -212,7 +226,7 @@ class AgreementUpdateForm(ModelForm):
 
     class Meta:
         model = Agreement
-        fields = ['title', 'slug', 'resource', 'body', 'hidden', 'redirect_url', 'redirect_text']
+        fields = ['title', 'slug', 'resource', 'start', 'end', 'body', 'hidden', 'redirect_url', 'redirect_text']
         widgets = {
             'body': Textarea(attrs={
                 'cols': 80, 'rows': 20, 'wrap': 'off',

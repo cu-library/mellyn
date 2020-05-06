@@ -15,7 +15,8 @@ from django.core.exceptions import ValidationError, SuspiciousFileOperation, Per
 from django.db.models import Q
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, \
-                                       PermissionRequiredMixin
+                                       PermissionRequiredMixin, \
+                                       UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
@@ -142,14 +143,16 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
     template_name_suffix = '_access'
 
     def get(self, request, *args, **kwargs):
-        # Has the user signed the newest, unhidden agreement associated with this
+        # Has the user signed the currently valid, unhidden agreement associated with this
         # resource?
         resource = self.get_object()
         try:
-            newest_associated_agreement = Agreement.objects.filter(hidden=False, resource=resource) \
-                                                           .order_by('-created')[0]
+            newest_associated_agreement = (Agreement.objects
+                                           .filter(resource=resource)
+                                           .valid()
+                                           .order_by('-created')[0])
         except IndexError:
-            raise Http404('Unable to find associated, unhidden agreement.')
+            raise Http404('Unable to find valid and unhidden agreement.')
         try:
             newest_associated_agreement.signature_set.filter(signatory=self.request.user).get()
         except Signature.DoesNotExist:
@@ -381,12 +384,18 @@ class AgreementList(LoginRequiredMixin, ListView):
         return qs
 
 
-class AgreementRead(LoginRequiredMixin, FormMixin, DetailView, ProcessFormView):
+class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailView, ProcessFormView):
     """A view of an Agreement"""
     context_object_name = 'agreement'
     form_class = SignatureCreateForm
     model = Agreement
     template_name_suffix = '_read'
+
+    def test_func(self):
+        # If the agreement isn't valid to see, you have to have the right permissions.
+        if self.get_object().valid():
+            return True
+        return self.request.user.has_perm('agreements.view_agreement')
 
     def get_success_url(self):
         return reverse_lazy('agreements_read', kwargs={'slug': self.kwargs['slug']})
