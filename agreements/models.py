@@ -206,3 +206,11 @@ class LicenseCode(models.Model):
         constraints = [
             UniqueConstraint(fields=['resource', 'code'], name='%(app_label)s_%(class)s_unique_codes_per_resource')
         ]
+
+
+class FileDownloadEvent(models.Model):
+    """Store information about each file download request"""
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    path = models.CharField(max_length=300)
+    session_key = models.CharField(max_length=50)
+    at = models.DateTimeField(auto_now_add=True)

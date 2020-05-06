@@ -6,6 +6,7 @@ https://docs.djangoproject.com/en/3.0/topics/http/views/
 
 import operator
 import os
+from datetime import timedelta
 from pathlib import Path
 from django.contrib import messages
 from django.http import Http404
@@ -13,6 +14,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
 from django.db.models import Q, Count
+from django.utils.timezone import now
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, \
                                        PermissionRequiredMixin, \
@@ -24,7 +26,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
 from django_sendfile import sendfile
 import humanize
 from accounts.models import GroupDescription
-from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature
+from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
 from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    LicenseCodeAddForm, \
                    FacultyCreateForm, FacultyUpdateForm, \
@@ -167,6 +169,13 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
             if not os.path.exists(self.path):
                 raise Http404('File not found at access path.')
             if os.path.isfile(self.path):
+                if not FileDownloadEvent.objects.filter(resource=resource,
+                                                        path=self.kwargs['accesspath'],
+                                                        session_key=request.session.session_key,
+                                                        at__gte=now()-timedelta(minutes=5)).exists():
+                    FileDownloadEvent.objects.create(resource=resource,
+                                                     path=self.kwargs['accesspath'],
+                                                     session_key=request.session.session_key)
                 return sendfile(request, self.path)
         except SuspiciousFileOperation:
             raise PermissionDenied('SuspiciousFileOperation on file access.')
@@ -202,6 +211,23 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
             if parentdir == '.':
                 parentdir = ''
             context['parentdir'] = parentdir
+        return context
+
+
+class ResourceAccessFileStats(PermissionRequiredMixin, DetailView):
+    """A view which provides download stats for a resources's files"""
+    context_object_name = 'resource'
+    model = Resource
+    permission_required = 'agreements.view_resource'
+    template_name = 'agreements/resource_file_stats.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['file_stats'] = (FileDownloadEvent.objects
+                                 .filter(resource=self.object)
+                                 .values('path')
+                                 .annotate(downloads=Count('path'))
+                                 .order_by('-downloads'))
         return context
 
 
