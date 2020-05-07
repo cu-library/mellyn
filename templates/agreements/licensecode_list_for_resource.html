@@ -5,10 +5,11 @@
 {% block main %}
   <div class="breadcrumb"><a aria-label="Return to {{ resource.name }}" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
   <h2>License Codes For {{ resource.name }}</h2>
+  <p>When a patron signs an agreement associated with this resource, they will be assigned a license code if one is unassigned.</p>
   {% if license_codes %}
   <ul>
     {% for license_code in license_codes %}
-    <li>{{ license_code.code }} {% if license_code.signature %}provided to {{ license_code.signature.username }} after signing {{ license_code.signature.agreement.title }} {% endif %}(Added: {{ license_code.added|date:"Y-m-d \a\t g:i a e" }}) </li>
+    <li>{{ license_code.code }} {% if license_code.signature %}assigned to {{ license_code.signature.username }} after signing {{ license_code.signature.agreement.title }} {% endif %}(Added: {{ license_code.added|date:"Y-m-d \a\t g:i a e" }}) </li>
     {% endfor %}
   </ul>
   {% else %}

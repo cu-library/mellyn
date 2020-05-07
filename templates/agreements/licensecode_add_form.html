@@ -3,7 +3,7 @@
 {% block sitetitle %}Add License Codes For Resource {{ resource.name }}{% endblock %}
 
 {% block main %}
-  <div class="breadcrumb"><a aria-label="Return to {{ resource.name }} list of access codes" href="{% url 'resources_codes' resource.slug %}">&larr; Access Codes</a></div>
+  <div class="breadcrumb"><a aria-label="Return to the list of license codes for {{ resource.name }}" href="{% url 'resources_codes' resource.slug %}">&larr; License Codes</a></div>
   <h2>Add License Codes For {{ resource.name }}</h2>
   <form method="post">{% csrf_token %}
     {{ form.non_field_errors }}

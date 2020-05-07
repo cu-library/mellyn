@@ -8,7 +8,7 @@
   <section class="htmlfield">{{ resource.description | safe}}</section>
   <p><a href="{% url 'resources_access' resource.slug %}">File Access</a></p>
   <p><a href="{% url 'resources_file_stats' resource.slug %}">File Access Stats</a></p>
-  <p><a href="{% url 'resources_codes' resource.slug %}">Access Codes</a></p>
+  <p><a href="{% url 'resources_codes' resource.slug %}">License Codes</a></p>
   <p><a href="{% url 'resources_permissions' resource.slug %}">Permissions</a></p>
   {% if agreements %}
   <h3>Associated Agreements</h3>

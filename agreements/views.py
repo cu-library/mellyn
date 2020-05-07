@@ -288,10 +288,10 @@ class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
                 successes += 1
         if successes > 1:
             messages.success(self.request,
-                             f'{humanize.apnumber(successes).capitalize()} new access codes '
+                             f'{humanize.apnumber(successes).capitalize()} new license codes '
                              f'added to {self.get_object().name}.')
         elif successes == 1:
-            messages.success(self.request, f'One new access code added to {self.get_object().name}.')
+            messages.success(self.request, f'One new license code added to {self.get_object().name}.')
         return super().form_valid(form)
 
 
@@ -316,10 +316,10 @@ class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
         deleted, _ = codes_to_delete.delete()
         if deleted > 1:
             messages.warning(self.request,
-                             f'{humanize.apnumber(deleted).capitalize()} access codes '
+                             f'{humanize.apnumber(deleted).capitalize()} license codes '
                              f'removed from {self.get_object().name}.')
         elif deleted == 1:
-            messages.warning(self.request, f'One access code deleted from {self.get_object().name}.')
+            messages.warning(self.request, f'One license code deleted from {self.get_object().name}.')
         return super().form_valid(form)
 
 
