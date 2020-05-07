@@ -17,6 +17,13 @@
     <li {% if agreement.hidden %}class="hidden"{% endif %}>
       <a href="{% url 'agreements_read' agreement.slug %}"><h3>{{ agreement.title }}{% if agreement.hidden %} (Hidden){% endif %}</h3></a>
       <div class="agreementcreated">Created {{ agreement.created | date:"Y-m-d"}}</div>
+      <p class="valid">Valid from {{ agreement.start | date:"Y-m-d" }}{% if agreement.end %} until {{ agreement.end | date:"Y-m-d" }}{% endif %}</p>
+      {% if agreement.associated_signature %}
+      <div class="signature">
+        <p>You signed this agreement on {{ agreement.associated_signature.signed_at | date:"Y-m-d" }}.</p>
+        {% if agreement.associated_signature.license_code %}<p>License Code: {{ agreement.associated_signature.license_code.code }}</p>{% endif %}
+      </div>
+      {% endif %}
     </li>
     {% endfor %}
   </ul>

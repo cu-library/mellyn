@@ -13,7 +13,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Prefetch
 from django.utils.timezone import now
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, \
@@ -73,9 +73,18 @@ class ResourceRead(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        agreements = Agreement.objects.filter(resource=self.get_object()).order_by('-created')
+        signature_prefetch = Prefetch('signature_set',
+                                      queryset=Signature.objects.filter(signatory=self.request.user),
+                                      to_attr='associated_signature_list')
+        agreements = (Agreement.objects
+                      .filter(resource=self.get_object())
+                      .prefetch_related(signature_prefetch)
+                      .order_by('-created'))
         if not self.request.user.has_perm('agreements.view_agreement'):
             agreements = agreements.exclude(hidden=True)
+        for agreement in agreements:
+            if len(agreement.associated_signature_list) > 0:
+                agreement.associated_signature = agreement.associated_signature_list[0]
         context['agreements'] = agreements
         return context
 
