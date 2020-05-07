@@ -160,6 +160,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
         except Signature.DoesNotExist:
             messages.error(self.request,
                            f'You must sign this agreement before accessing files associated with {resource.name}.')
+            request.session['access_attempt'] = (resource.slug, self.kwargs['accesspath'])
             return redirect(newest_associated_agreement)
 
         # Access is granted, is the access path a file or a directory?
@@ -448,6 +449,9 @@ class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailVi
         if license_code:
             license_code.signature = signature
             license_code.save()
+        if 'access_attempt' in self.request.session:
+            slug, accesspath = self.request.session.pop('access_attempt', (self.get_object().resource.slug, ''))
+            return redirect(reverse_lazy('resources_access', kwargs={'slug': slug, 'accesspath': accesspath}))
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
