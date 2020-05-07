@@ -6,7 +6,7 @@ https://docs.djangoproject.com/en/3.0/topics/forms/
 
 from django import forms
 from django.forms import Form, ModelForm, SlugField, URLField, Textarea
-from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, DEFAULT_ALLOWED_TAGS
+from .models import Resource, Faculty, Department, Agreement, Signature, DEFAULT_ALLOWED_TAGS
 from .fields import GroupedModelChoiceField
 
 
@@ -77,12 +77,6 @@ class LicenseCodesField(forms.CharField):
         super().validate(value)
         seen = []
         for code in value:
-            if LicenseCode.objects.filter(resource=self.resource, code=code).exists():
-                raise forms.ValidationError(
-                    'Invalid code: %(code)s is already associated with this resource.',
-                    code='duplicate_access_code_in_database',
-                    params={'code': code},
-                )
             if code in seen:
                 raise forms.ValidationError(
                     'Invalid code: %(code)s is a duplicate license code.',
@@ -97,7 +91,10 @@ class LicenseCodeAddForm(Form):
     def __init__(self, *args, **kwargs):
         self.resource = kwargs.pop('resource')
         super().__init__(*args, **kwargs)
-        self.fields['codes'] = LicenseCodesField(resource=self.resource, label='', help_text='One line per code')
+        self.fields['codes'] = LicenseCodesField(resource=self.resource,
+                                                 label='',
+                                                 help_text='One line per code',
+                                                 required=False)
 
 
 # Faculties

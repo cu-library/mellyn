@@ -275,15 +275,51 @@ class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
 
     def form_valid(self, form):
         codes = form.cleaned_data['codes']
+        successes = 0
         for code in codes:
-            license_code = LicenseCode(resource=self.get_object(), code=code)
-            try:
-                license_code.full_clean()
-            except ValidationError:
-                messages.error(self.request, f'Error when saving license code {code}, possible duplicate.')
-                return redirect(reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']}))
-            license_code.save()
-        messages.success(self.request, f'{len(codes)} new access codes added to {self.get_object().name}.')
+            if not LicenseCode.objects.filter(resource=self.get_object(), code=code).exists():
+                license_code = LicenseCode(resource=self.get_object(), code=code)
+                try:
+                    license_code.full_clean()
+                except ValidationError:
+                    messages.error(self.request, f'Error when saving license code {code}, possible duplicate.')
+                    return redirect(reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']}))
+                license_code.save()
+                successes += 1
+        if successes > 1:
+            messages.success(self.request,
+                             f'{humanize.apnumber(successes).capitalize()} new access codes '
+                             f'added to {self.get_object().name}.')
+        elif successes == 1:
+            messages.success(self.request, f'One new access code added to {self.get_object().name}.')
+        return super().form_valid(form)
+
+
+class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
+    """A view where a staff user can update the License Codes attached to a Resource"""
+    context_object_name = 'resource'
+    form_class = LicenseCodeAddForm
+    model = Resource
+    template_name = 'agreements/licensecode_update_form.html'
+
+    def get_initial(self):
+        codes = ""
+        for license_code in LicenseCode.objects.filter(resource=self.get_object(), signature__isnull=True):
+            codes += f'{license_code.code}\n'
+        return {'codes': codes}
+
+    def form_valid(self, form):
+        codes = form.cleaned_data['codes']
+        codes_to_delete = LicenseCode.objects.filter(resource=self.get_object(), signature__isnull=True)
+        for code in codes:
+            codes_to_delete = codes_to_delete.exclude(code=code)
+        deleted, _ = codes_to_delete.delete()
+        if deleted > 1:
+            messages.warning(self.request,
+                             f'{humanize.apnumber(deleted).capitalize()} access codes '
+                             f'removed from {self.get_object().name}.')
+        elif deleted == 1:
+            messages.warning(self.request, f'One access code deleted from {self.get_object().name}.')
         return super().form_valid(form)
 
 
