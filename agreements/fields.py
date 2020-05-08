@@ -1,4 +1,8 @@
 """
+This module defines fields used by forms in this application.
+
+https://docs.djangoproject.com/en/3.0/ref/forms/fields/
+
 Thanks to:
 Vitor Freitas
 https://simpleisbetterthancomplex.com/tutorial/2019/01/02/how-to-implement-grouped-model-choice-field.html
@@ -10,7 +14,31 @@ from functools import partial
 from itertools import groupby
 from operator import attrgetter
 
+from django.forms import CharField, Textarea, ValidationError
 from django.forms.models import ModelChoiceIterator, ModelChoiceField
+
+
+class SplitLineField(CharField):
+    """A subclass of CharField which splits each line of input"""
+    widget = Textarea
+
+    def to_python(self, value):
+        value = super().to_python(value)
+        if not value:
+            return []
+        return list(filter(None, map(lambda x: x.strip(), value.splitlines())))
+
+    def validate(self, value):
+        super().validate(value)
+        seen = []
+        for code in value:
+            if code in seen:
+                raise ValidationError(
+                    'Invalid: %(code)s is a duplicate line.',
+                    code='duplicate_line_in_input',
+                    params={'code': code},
+                )
+            seen.append(code)
 
 
 class GroupedModelChoiceIterator(ModelChoiceIterator):

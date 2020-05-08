@@ -29,7 +29,7 @@ import humanize
 from accounts.models import GroupDescription
 from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
 from .forms import ResourceCreateForm, ResourceUpdateForm, \
-                   LicenseCodeAddForm, \
+                   LicenseCodeForm, \
                    FacultyCreateForm, FacultyUpdateForm, \
                    DepartmentCreateForm, DepartmentUpdateForm, \
                    AgreementCreateForm, AgreementUpdateForm, \
@@ -267,17 +267,12 @@ class ResourceLicenseCode(PermissionRequiredMixin, ListView):
 class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
     """A view where a staff user can add more License Codes to a Resource"""
     context_object_name = 'resource'
-    form_class = LicenseCodeAddForm
+    form_class = LicenseCodeForm
     model = Resource
     template_name = 'agreements/licensecode_add_form.html'
 
     def get_success_url(self):
         return reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']})
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'resource': self.get_object()})
-        return kwargs
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()  # pylint: disable=attribute-defined-outside-init
@@ -308,7 +303,7 @@ class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
 class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
     """A view where a staff user can update the License Codes attached to a Resource"""
     context_object_name = 'resource'
-    form_class = LicenseCodeAddForm
+    form_class = LicenseCodeForm
     model = Resource
     template_name = 'agreements/licensecode_update_form.html'
 

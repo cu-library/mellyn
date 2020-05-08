@@ -4,16 +4,15 @@ This module defines any custom forms used by this application.
 https://docs.djangoproject.com/en/3.0/topics/forms/
 """
 
-from django import forms
-from django.forms import Form, ModelForm, SlugField, URLField, Textarea
+from django.forms import Form, ModelForm, BooleanField, CharField, SlugField, URLField, Textarea, ValidationError
 from .models import Resource, Faculty, Department, Agreement, Signature, DEFAULT_ALLOWED_TAGS
-from .fields import GroupedModelChoiceField
+from .fields import GroupedModelChoiceField, SplitLineField
 
 
 # Base Class
 
 class ModelFormSetLabelSuffix(ModelForm):
-    """A ModelForm which overrides their label_suffix to the empty string"""
+    """A ModelForm which overrides label_suffix to the empty string"""
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("label_suffix", "")
@@ -59,42 +58,9 @@ class ResourceUpdateForm(ModelFormSetLabelSuffix):
 
 # License Codes
 
-class LicenseCodesField(forms.CharField):
-    """A subclass of CharField which splits each line of input"""
-    widget = Textarea
-
-    def __init__(self, *args, **kwargs):
-        self.resource = kwargs.pop('resource')
-        super().__init__(*args, **kwargs)
-
-    def to_python(self, value):
-        value = super().to_python(value)
-        if not value:
-            return []
-        return list(filter(None, map(lambda x: x.strip(), value.splitlines())))
-
-    def validate(self, value):
-        super().validate(value)
-        seen = []
-        for code in value:
-            if code in seen:
-                raise forms.ValidationError(
-                    'Invalid code: %(code)s is a duplicate license code.',
-                    code='duplicate_access_code_in_input',
-                    params={'code': code},
-                )
-            seen.append(code)
-
-
-class LicenseCodeAddForm(Form):
-    """A form for searching for Signatures"""
-    def __init__(self, *args, **kwargs):
-        self.resource = kwargs.pop('resource')
-        super().__init__(*args, **kwargs)
-        self.fields['codes'] = LicenseCodesField(resource=self.resource,
-                                                 label='',
-                                                 help_text='One line per code',
-                                                 required=False)
+class LicenseCodeForm(Form):
+    """A form for adding and updating License Codes"""
+    codes = SplitLineField(label='', help_text='One line per code', required=False)
 
 
 # Faculties
@@ -157,7 +123,7 @@ class AgreementBaseForm(ModelFormSetLabelSuffix):
         if self.cleaned_data['end'] is not None:
             if self.cleaned_data['start'] > self.cleaned_data['end']:
                 self.add_error(None,
-                               forms.ValidationError(
+                               ValidationError(
                                    '"End" date and time is before "Start" date and time.',
                                    code='start_date_after_end_date',
                                ))
@@ -207,7 +173,7 @@ class AgreementUpdateForm(AgreementBaseForm):
 class SignatureCreateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for Signatures"""
 
-    sign = forms.BooleanField(label='I have read and accepted this agreement')
+    sign = BooleanField(label='I have read and accepted this agreement')
     department = GroupedModelChoiceField(
         label='Your Department',
         queryset=Department.objects.all(),
@@ -222,4 +188,4 @@ class SignatureCreateForm(ModelFormSetLabelSuffix):
 
 class SignatureSearchForm(Form):
     """A form for searching for Signatures"""
-    search = forms.CharField(label='', max_length=100, required=False)
+    search = CharField(label='', max_length=100, required=False)
