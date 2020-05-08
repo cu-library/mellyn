@@ -24,6 +24,7 @@ from django.core.files.storage import default_storage
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
                                       FormMixin, ProcessFormView
 from django_sendfile import sendfile
+from csv_export.views import CSVExportView
 import humanize
 from accounts.models import GroupDescription
 from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
@@ -588,3 +589,32 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
                                         .annotate(num_sigs=Count('department__faculty'))
                                         .order_by('-num_sigs'))
         return context
+
+
+class SignatureCSV(PermissionRequiredMixin, CSVExportView):
+    """A view to download the signatures associated with an agreement as a CSV file"""
+    fields = ('agreement__title', 'username', 'first_name',
+              'last_name', 'email', 'department__name',
+              'department__faculty__name', 'signed_at')
+    model = Signature
+    permission_required = 'agreements.view_signature'
+
+    def get_header_name(self, model, field_name):
+        if field_name == 'agreement__title':
+            return 'Agreement'
+        if field_name == 'department__name':
+            return 'Department'
+        if field_name == 'department__faculty__name':
+            return 'Faculty'
+        return super().get_header_name(model, field_name)
+
+    def get_filename(self, queryset):
+        return f"{now().strftime('%Y-%m-%d')}-{self.agreement.slug}-signatures.csv"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        self.agreement = get_object_or_404(  # pylint: disable=attribute-defined-outside-init
+            Agreement, slug=self.kwargs['agreementslug']
+        )
+        qs = qs.filter(agreement=self.agreement)
+        return qs

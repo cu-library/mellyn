@@ -4,6 +4,7 @@ bleach==3.1.4
 coverage==5.0.4
 Django==3.0.4
 django-bleach==0.6.1
+django-csv-export-view @ git+https://github.com/cu-library/django-csv-export-view.git@2738517f905e1efe4596b9e8cca5bffe41162e54
 django-guardian==2.2.0
 django-js-asset==1.2.2
 django-sendfile2==0.5.1

@@ -50,4 +50,9 @@
   <p>No signatures found.</p>
   {% endif %}
   {% include "pagination.html" %}
+  <div class="actions">
+    {% if agreement %}
+    <a class="bonus" href="{% url 'signatures_for_agreement_csv' agreement.slug %}">Download CSV file of signatures</a>
+    {% endif %}
+  </div>
 {% endblock %}

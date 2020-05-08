@@ -45,4 +45,7 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('signatures/on/<slug:agreementslug>/',
          views.SignatureList.as_view(),
          name='signatures_for_agreement_list'),
+    path('signatures/on/<slug:agreementslug>/csv/',
+         views.SignatureCSV.as_view(),
+         name='signatures_for_agreement_csv'),
 ]
