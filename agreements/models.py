@@ -36,6 +36,15 @@ class Resource(models.Model):
                               strip_comments=True,
                               help_text=f'An HTML description of the resource. '
                                         f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
+    low_codes_threshold = models.PositiveSmallIntegerField(default=51,
+                                                           help_text='If the number of unassigned license codes '
+                                                                     'associated with this resource falls below this '
+                                                                     'threshold, start emailing warnings.')
+    low_codes_email = models.CharField(blank=True,
+                                       max_length=200,
+                                       validators=[validate_email],
+                                       help_text='The recipient of email warnings about low numbers of '
+                                                 'remaning unassigned license codes.')
     history = HistoricalRecords()
 
     def get_absolute_url(self):
