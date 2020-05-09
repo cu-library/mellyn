@@ -176,7 +176,7 @@ class SignatureCreateForm(ModelFormSetLabelSuffix):
     sign = BooleanField(label='I have read and accepted this agreement')
     department = GroupedModelChoiceField(
         label='Your Department',
-        queryset=Department.objects.all(),
+        queryset=Department.objects.all().order_by('faculty__name'),
         choices_groupby='faculty'
     )
 

@@ -18,29 +18,6 @@ from django.forms import CharField, Textarea, ValidationError
 from django.forms.models import ModelChoiceIterator, ModelChoiceField
 
 
-class SplitLineField(CharField):
-    """A subclass of CharField which splits each line of input"""
-    widget = Textarea
-
-    def to_python(self, value):
-        value = super().to_python(value)
-        if not value:
-            return []
-        return list(filter(None, map(lambda x: x.strip(), value.splitlines())))
-
-    def validate(self, value):
-        super().validate(value)
-        seen = []
-        for code in value:
-            if code in seen:
-                raise ValidationError(
-                    'Invalid: %(code)s is a duplicate line.',
-                    code='duplicate_line_in_input',
-                    params={'code': code},
-                )
-            seen.append(code)
-
-
 class GroupedModelChoiceIterator(ModelChoiceIterator):
     """An iterator which groups items"""
     def __init__(self, field, choices_groupby):
@@ -55,7 +32,7 @@ class GroupedModelChoiceIterator(ModelChoiceIterator):
         if not queryset._prefetch_related_lookups:
             queryset = queryset.iterator()
         for group, objs in groupby(queryset, self.choices_groupby):
-            yield (group, [self.choice(obj) for obj in objs])
+            yield (str(group), [self.choice(obj) for obj in objs])
 
 
 class GroupedModelChoiceField(ModelChoiceField):
@@ -67,3 +44,32 @@ class GroupedModelChoiceField(ModelChoiceField):
             raise TypeError('choices_groupby must either be a str or a callable accepting a single argument')
         self.iterator = partial(GroupedModelChoiceIterator, choices_groupby=choices_groupby)
         super().__init__(*args, **kwargs)
+
+
+class SplitLineField(CharField):
+    """A subclass of CharField which splits each line of input"""
+
+    # We want the widget to be a textarea, so the input can be
+    # delimited on newlines.
+    widget = Textarea
+
+    def to_python(self, value):
+        """Return a list from the value, split on newlines"""
+        value = super().to_python(value)
+        if not value:
+            return []
+        # Split the values on newline, remove surrounding whitespace, and filter out empty lines.
+        return list(filter(None, map(lambda x: x.strip(), value.splitlines())))
+
+    def validate(self, value):
+        """Ensure every line in the input is unique"""
+        super().validate(value)
+        seen = []
+        for line in value:
+            if line in seen:
+                raise ValidationError(
+                    '%(line)s is a duplicate line.',
+                    code='duplicate_line_in_input',
+                    params={'line': line},
+                )
+            seen.append(line)
