@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.core.validators import RegexValidator, URLValidator, validate_email
-from django.db.models import Q, F, UniqueConstraint, CheckConstraint
+from django.db.models import Q, F, Prefetch, UniqueConstraint, CheckConstraint
 from django.utils.timezone import now
 from django.db.models.query import QuerySet
 
@@ -103,7 +103,8 @@ class Department(models.Model):
 
 
 class AgreementQuerySet(QuerySet):
-    """A subclas of QuerySet with a new chainable method to find valid agreements"""
+    """A custom queryset for Agreements"""
+
     def valid(self):
         """Filter out posts that aren't valid right now"""
         return (self
@@ -113,6 +114,28 @@ class AgreementQuerySet(QuerySet):
                     Q(end__isnull=True)
                 )
                 .exclude(hidden=True))
+
+    def for_resource_with_signature(self, resource, signatory):
+        """Return a list of agreements with the associated signature for a resource and user"""
+        if resource is None:
+            raise TypeError('resource cannot be none')
+        if signatory is None:
+            raise TypeError('signatory cannot be none')
+
+        signature_prefetch = Prefetch('signature_set',
+                                      queryset=Signature.objects.filter(signatory=signatory),
+                                      to_attr='associated_signature_list')
+        agreements = (self
+                      .filter(resource=resource)
+                      .prefetch_related(signature_prefetch)
+                      .order_by('-created'))
+
+        # Because of database constraints, the associated_signature_list will always be 0 or 1 elements long.
+        for agreement in agreements:
+            if len(agreement.associated_signature_list) > 0:
+                agreement.associated_signature = agreement.associated_signature_list[0]
+
+        return agreements
 
 
 def date_121_days_from_now():

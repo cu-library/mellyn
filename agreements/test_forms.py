@@ -6,7 +6,6 @@ https://docs.djangoproject.com/en/3.0/topics/testing/
 
 from datetime import datetime, timezone
 
-from django.forms import ValidationError
 from django.test import TestCase
 
 from .forms import AgreementBaseForm
