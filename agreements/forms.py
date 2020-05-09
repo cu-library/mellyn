@@ -119,6 +119,10 @@ class DepartmentUpdateForm(ModelFormSetLabelSuffix):
 class AgreementBaseForm(ModelFormSetLabelSuffix):
     """The base class of agreement forms"""
 
+    class Meta:
+        model = Agreement
+        fields = []
+
     def clean(self):
         super().clean()
         if self.cleaned_data['end'] is not None:
