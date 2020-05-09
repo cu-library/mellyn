@@ -8,6 +8,7 @@ import operator
 import os
 from datetime import timedelta
 from pathlib import Path
+
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -23,9 +24,11 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
                                       FormMixin, ProcessFormView
+
 from django_sendfile import sendfile
 from csv_export.views import CSVExportView
 import humanize
+
 from accounts.models import GroupDescription
 from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
 from .forms import ResourceCreateForm, ResourceUpdateForm, \

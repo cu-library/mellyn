@@ -5,6 +5,7 @@ https://docs.djangoproject.com/en/3.0/topics/forms/
 """
 
 from django.forms import Form, ModelForm, BooleanField, CharField, SlugField, URLField, Textarea, ValidationError
+
 from .models import Resource, Faculty, Department, Agreement, Signature, DEFAULT_ALLOWED_TAGS
 from .fields import GroupedModelChoiceField, SplitLineField
 

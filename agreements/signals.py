@@ -6,6 +6,7 @@ https://docs.djangoproject.com/en/3.0/topics/signals/
 
 from django.conf import settings
 from django.core.mail import send_mail
+
 from .models import LicenseCode
 
 
