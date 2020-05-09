@@ -21,7 +21,7 @@ class SplitLineFieldTestCase(TestCase):
         self.assertEqual(field.clean('1 '), ['1'])
         self.assertEqual(field.clean('   1   \n   2\n3   \n\n\n\n\n\n4\n\n\n\n\t5\t\n\n\n6'),
                          ['1', '2', '3', '4', '5', '6'])
-        with self.assertRaisesMessage(ValidationError, "1 is a duplicate line."):
+        with self.assertRaisesMessage(ValidationError, '1 is a duplicate line.'):
             field.clean('1\n2\n3\n   1     ')
 
 
