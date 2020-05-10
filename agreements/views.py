@@ -381,11 +381,11 @@ class DepartmentCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView)
 
 class DepartmentCreateUnderFaculty(DepartmentCreate):
     """A view to create a Department under a given Faculty"""
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        faculty = get_object_or_404(Faculty, slug=self.kwargs['facultyslug'])
-        context['form'].fields['faculty'].initial = faculty.id
-        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['initial'] = {'faculty': get_object_or_404(Faculty, slug=self.kwargs['facultyslug'])}
+        return kwargs
 
 
 class DepartmentUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
