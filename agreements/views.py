@@ -115,7 +115,7 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
 
 
 class ResourcePermissions(PermissionRequiredMixin, SuccessMessageMixin, DetailView):
-    """A view which provides view and edit functionality for permissions on this resource"""
+    """A view which provides view and edit functionality for permissions on this Resource"""
     context_object_name = 'resource'
     model = Resource
     permission_required = 'agreements.add_resource'
@@ -123,22 +123,8 @@ class ResourcePermissions(PermissionRequiredMixin, SuccessMessageMixin, DetailVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['global_permissions'] = []
-        related_group_permissions = (
-            GroupDescription.objects
-            .filter(group__permissions__content_type__model='resource')
-            .distinct()
-            .order_by('name')
-        )
-        for groupdescription in related_group_permissions:
-            permissions = (
-                groupdescription
-                .group
-                .permissions
-                .filter(content_type__model='resource')
-                .distinct()
-            )
-            context['global_permissions'].append((groupdescription, permissions))
+        context['global_permissions'] = (GroupDescription.objects
+                                         .for_model_with_permissions('resource'))
         return context
 
 

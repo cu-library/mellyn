@@ -5,21 +5,23 @@
 {% block main %}
   <div class="breadcrumb"><a aria-label="Return to the resource associated with this list of permissions" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
   <h2>Permissions for {{ resource.name }}</h2>
-  {% if global_permissions %}
   <h3>All Resources</h3>
+  {% if global_permissions %}
   <p>Members of these groups have permissions on any resource.</p>
   <ul>
-    {% for groupdescription, permissions in global_permissions %}
+    {% for groupdescription in global_permissions %}
     <li>
       <a href="{% url 'groupdescriptions_read' groupdescription.slug %}">{{ groupdescription.name }}</a>
       <ul>
-        {% for permission in permissions %}
+        {% for permission in groupdescription.group.permissions_on_model %}
         <li>{{ permission.name }}</li>
         {% endfor %}
       </ul>
     </li>
     {% endfor %}
   </ul>
+  {% else %}
+  <p>No groups have been given permissions on all resources</p>
   {% endif %}
   <div class="actions">
 

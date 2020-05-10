@@ -6,8 +6,11 @@ https://docs.djangoproject.com/en/3.0/topics/db/models/
 
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator
+from django.db.models import Prefetch
+from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.db.models.query import QuerySet
+
 from guardian.mixins import GuardianUserMixin
 from django_bleach.models import BleachField
 from simple_history.models import HistoricalRecords
@@ -17,13 +20,31 @@ DEFAULT_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
                         'u', 'ul', 'ol', 'li']
 
 
+class GroupDescriptionQuerySet(QuerySet):
+    """A custom queryset for GroupDescriptions"""
+
+    def for_model_with_permissions(self, model):
+        """Return group descriptions with permissions related to the model"""
+        if model is None:
+            raise TypeError('model cannot be none')
+
+        permissions_prefetch = Prefetch('group__permissions',
+                                        queryset=(Permission.objects
+                                                  .filter(content_type__model=model)
+                                                  .distinct()
+                                                  .order_by('name')),
+                                        to_attr='permissions_on_model')
+
+        return (self
+                .filter(group__permissions__content_type__model=model)
+                .distinct()
+                .prefetch_related(permissions_prefetch)
+                .order_by('name'))
+
+
 class GroupDescription(models.Model):
     """Descriptions and slugs for Django's built in groups"""
-    group = models.OneToOneField(
-        Group,
-        on_delete=models.CASCADE,
-        primary_key=True,
-    )
+    group = models.OneToOneField(Group, on_delete=models.CASCADE, blank=True)
     # This duplication makes class based views much easier to impliment.
     name = models.CharField(max_length=300, unique=True)
     slug = models.SlugField(max_length=300, unique=True,
@@ -41,6 +62,8 @@ class GroupDescription(models.Model):
                                         f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
     history = HistoricalRecords()
 
+    objects = GroupDescriptionQuerySet.as_manager()
+
     def get_absolute_url(self):
         """Returns the canonical URL for a Group Description"""
         return reverse('groupdescriptions_read', args=[self.slug])
@@ -49,10 +72,9 @@ class GroupDescription(models.Model):
         """Returns the string representation of a Group Description"""
         return self.group.name
 
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
-        """A custom save method which creates or gets the group with the provided name"""
+    def clean(self):
+        """Create or get the group with the provided name"""
         self.group, _ = Group.objects.get_or_create(name=self.name)
-        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ
         super().delete(*args, **kwargs)

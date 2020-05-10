@@ -15,7 +15,7 @@ class ResourceModelTestCase(TestCase):
     """Tests for the Resource model."""
 
     def setUp(self):
-        """Initially, create an Resource which passes validation."""
+        """Create test model instances"""
         self.test_resource = Resource(name='Test', slug='test', description='')
         self.test_resource.full_clean()
         self.test_resource.save()
@@ -49,7 +49,7 @@ class FacultyModelTestCase(TestCase):
     """Tests for the Faculty model."""
 
     def setUp(self):
-        """Initially, create an Faculty which passes all validation."""
+        """Create test model instances"""
         self.test_faculty = Faculty(name='Test', slug='test')
         self.test_faculty.full_clean()
         self.test_faculty.save()
@@ -76,7 +76,7 @@ class DepartmentModelTestCase(TestCase):
     """Tests for the Department model."""
 
     def setUp(self):
-        """Initially, create an Department which passes all validation."""
+        """Create test model instances"""
         self.test_faculty = Faculty(name='Test', slug='test')
         self.test_faculty.full_clean()
         self.test_faculty.save()
@@ -106,7 +106,7 @@ class AgreementModelTestCase(TestCase):
     """Tests for the Agreement model."""
 
     def setUp(self):
-        """Initially, create an Agreement which passes all validation."""
+        """Create test model instances"""
         self.test_faculty = Faculty(name='Test', slug='test')
         self.test_faculty.full_clean()
         self.test_faculty.save()
