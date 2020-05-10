@@ -8,6 +8,7 @@ import operator
 import os
 from pathlib import Path
 
+from django.db import transaction
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -455,14 +456,14 @@ class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailVi
             messages.error(self.request, 'Agreement already signed.')
             return redirect(self.get_object())
         signature.save()
-        license_code = (
-            LicenseCode.objects.select_for_update(skip_locked=True)
-            .filter(signature=None, resource=self.get_object().resource)
-            .order_by('added').first()
-            )
-        if license_code:
-            license_code.signature = signature
-            license_code.save()
+        with transaction.atomic():
+            license_code = (LicenseCode.objects
+                            .select_for_update(skip_locked=True)
+                            .filter(signature=None, resource=self.get_object().resource)
+                            .order_by('added').first())
+            if license_code:
+                license_code.signature = signature
+                license_code.save()
         if 'access_attempt' in self.request.session:
             slug, accesspath = self.request.session.pop('access_attempt', (self.get_object().resource.slug, ''))
             return redirect(reverse_lazy('resources_access', kwargs={'slug': slug, 'accesspath': accesspath}))
