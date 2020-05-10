@@ -531,13 +531,14 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
             qs = qs.search(q_param)
         return qs
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['initial'] = {'search': self.request.GET.get('search', default='')}
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            context['agreement'] = self.agreement
-        except AttributeError:
-            context['agreement'] = None
-        context['form'].fields['search'].initial = self.request.GET.get('search', default='')
+        context['agreement'] = getattr(self, 'agreement', None)
         context['count_per_department'] = (self.get_queryset()
                                            .values('department', 'department__name', 'department__faculty')
                                            .annotate(num_sigs=Count('department'))
