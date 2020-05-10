@@ -267,8 +267,8 @@ class FileDownloadEventTestCase(TestCase):
                                                                                              'test', 'test')
         self.assertFalse(created)
 
-        now_plus_10_minutes = now()+timedelta(minutes=5)
-        with patch('django.utils.timezone.now', return_value=now_plus_10_minutes):
+        now_plus_10_minutes = now()+timedelta(minutes=10)
+        with patch('agreements.models.now', return_value=now_plus_10_minutes):
             _, created = FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(self.test_resource,
                                                                                                  'test', 'test')
             self.assertTrue(created)
