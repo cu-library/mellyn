@@ -7,9 +7,9 @@ https://docs.djangoproject.com/en/3.0/topics/testing/
 from datetime import timedelta
 from unittest.mock import patch
 
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 from django.utils.timezone import now
 
 from .models import Resource, Faculty, Department, Agreement, Signature, FileDownloadEvent

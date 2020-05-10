@@ -4,40 +4,36 @@ This module defines the views provided by this application.
 https://docs.djangoproject.com/en/3.0/topics/http/views/
 """
 
+from pathlib import Path
 import operator
 import os
-from pathlib import Path
 
-from django.db import transaction
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
+from django.core.files.storage import default_storage
+from django.db import transaction
+from django.db.models import Q, Count
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
-from django.db.models import Q, Count
 from django.utils.timezone import now
 from django.views.generic import ListView, DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin, \
-                                       PermissionRequiredMixin, \
-                                       UserPassesTestMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from django.core.files.storage import default_storage
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
-                                      FormMixin, ProcessFormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin, ProcessFormView
 
-from django_sendfile import sendfile
 from csv_export.views import CSVExportView
+from django_sendfile import sendfile
 import humanize
 
 from accounts.models import GroupDescription
-from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
 from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    LicenseCodeForm, \
                    FacultyCreateForm, FacultyUpdateForm, \
                    DepartmentCreateForm, DepartmentUpdateForm, \
                    AgreementCreateForm, AgreementUpdateForm, \
                    SignatureCreateForm, SignatureSearchForm
-
+from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
 
 # Custom Mixins
 

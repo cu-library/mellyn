@@ -7,12 +7,12 @@ https://docs.djangoproject.com/en/3.0/topics/db/models/
 from datetime import timedelta
 
 from django.conf import settings
-from django.db import models
-from django.urls import reverse
 from django.core.validators import RegexValidator, URLValidator, validate_email
+from django.db import models
 from django.db.models import Q, F, Count, Prefetch, UniqueConstraint, CheckConstraint
-from django.utils.timezone import now
 from django.db.models.query import QuerySet
+from django.urls import reverse
+from django.utils.timezone import now
 
 from django_bleach.models import BleachField
 from simple_history.models import HistoricalRecords

@@ -4,9 +4,9 @@ This module defines tests to run against this application.
 https://docs.djangoproject.com/en/3.0/topics/testing/
 """
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 
 from .models import Resource, Faculty, Department, Agreement
 
