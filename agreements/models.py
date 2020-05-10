@@ -247,7 +247,6 @@ class FileDownloadEventQuerySet(QuerySet):
 
     def get_or_create_if_no_duplicates_past_5_minutes(self, resource, accesspath, session_key):
         """Has a FileDownloadEvent for the same path and session been added in the past 5 minutes?"""
-        # TODO add tests
         if resource is None:
             raise TypeError('resource cannot be none')
         if accesspath is None:

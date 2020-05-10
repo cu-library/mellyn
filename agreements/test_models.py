@@ -4,11 +4,15 @@ This module defines tests to run against the fields module.
 https://docs.djangoproject.com/en/3.0/topics/testing/
 """
 
+from datetime import timedelta
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 
-from .models import Resource, Faculty, Department, Agreement, Signature
+from .models import Resource, Faculty, Department, Agreement, Signature, FileDownloadEvent
 
 
 class ResourceModelTestCase(TestCase):
@@ -245,3 +249,26 @@ class SignatureModelTestCase(TestCase):
                                      email=self.test_user.email,
                                      department=self.test_department)
             new_test_sig.full_clean()
+
+
+class FileDownloadEventTestCase(TestCase):
+    """Tests for the FileDownloadEvent model."""
+
+    def setUp(self):
+        """Create test model instances"""
+        self.test_resource = Resource(name='Test', slug='test', description='')
+        self.test_resource.full_clean()
+        self.test_resource.save()
+
+    def get_or_create_if_no_duplicates_past_5_minutes(self):
+        """Check that get_or_create_if_no_duplicates_past_5_minutes doesn't create objects when it shouldn't."""
+        FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(self.test_resource, 'test', 'test')
+        _, created = FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(self.test_resource,
+                                                                                             'test', 'test')
+        self.assertFalse(created)
+
+        now_plus_10_minutes = now()+timedelta(minutes=5)
+        with patch('django.utils.timezone.now', return_value=now_plus_10_minutes):
+            _, created = FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(self.test_resource,
+                                                                                                 'test', 'test')
+            self.assertTrue(created)
