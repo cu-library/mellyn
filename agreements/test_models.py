@@ -272,3 +272,17 @@ class FileDownloadEventTestCase(TestCase):
             _, created = FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(self.test_resource,
                                                                                                  'test', 'test')
             self.assertTrue(created)
+
+    def test_download_count_per_path_for_resource(self):
+        """Does the download_count_per_path_for_resource method count the right number of download events?"""
+
+        for path, count in [('test1', 1), ('test2', 2), ('test3', 3), ('test40', 40), ('testten', 10)]:
+            for i in range(count):
+                FileDownloadEvent.objects.create(resource=self.test_resource, path=path, session_key=f'{path}{i}')
+
+        test_file_stats = FileDownloadEvent.objects.download_count_per_path_for_resource(self.test_resource)
+        self.assertEqual({'path': 'test40', 'downloads': 40}, test_file_stats[0])
+        self.assertEqual({'path': 'testten', 'downloads': 10}, test_file_stats[1])
+        self.assertEqual({'path': 'test3', 'downloads': 3}, test_file_stats[2])
+        self.assertEqual({'path': 'test2', 'downloads': 2}, test_file_stats[3])
+        self.assertEqual({'path': 'test1', 'downloads': 1}, test_file_stats[4])

@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.core.validators import RegexValidator, URLValidator, validate_email
-from django.db.models import Q, F, Prefetch, UniqueConstraint, CheckConstraint
+from django.db.models import Q, F, Count, Prefetch, UniqueConstraint, CheckConstraint
 from django.utils.timezone import now
 from django.db.models.query import QuerySet
 
@@ -260,6 +260,17 @@ class FileDownloadEventQuerySet(QuerySet):
                                   path=accesspath,
                                   session_key=session_key,
                                   at__gte=now()-timedelta(minutes=5))
+
+    def download_count_per_path_for_resource(self, resource):
+        """Group by and count on path for FileDownloadEvents"""
+        if resource is None:
+            raise TypeError('resource cannot be none')
+
+        return (self
+                .filter(resource=resource)
+                .values('path')
+                .annotate(downloads=Count('path'))
+                .order_by('-downloads'))
 
 
 class FileDownloadEvent(models.Model):

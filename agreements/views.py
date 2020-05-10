@@ -211,11 +211,7 @@ class ResourceAccessFileStats(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['file_stats'] = (FileDownloadEvent.objects
-                                 .filter(resource=self.object)
-                                 .values('path')
-                                 .annotate(downloads=Count('path'))
-                                 .order_by('-downloads'))
+        context['file_stats'] = FileDownloadEvent.objects.download_count_per_path_for_resource(self.get_object())
         return context
 
 
