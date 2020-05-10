@@ -205,6 +205,23 @@ class Agreement(models.Model):
         return False
 
 
+class SignatureQuerySet(QuerySet):
+    """A custom queryset for Signatures"""
+
+    def search(self, query):
+        """Search signatures for the query"""
+        if query is None:
+            raise TypeError('query cannot be none')
+        return self.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(department__name__icontains=query) |
+            Q(department__faculty__name__icontains=query)
+            )
+
+
 class Signature(models.Model):
     """
     Signatures define information about who agreed to what on what data.
@@ -220,6 +237,8 @@ class Signature(models.Model):
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
     signed_at = models.DateTimeField(auto_now_add=True)
     history = HistoricalRecords()
+
+    objects = SignatureQuerySet.as_manager()
 
     class Meta:
         constraints = [

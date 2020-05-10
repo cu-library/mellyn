@@ -14,7 +14,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import transaction
-from django.db.models import Q, Count
+from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -34,6 +34,7 @@ from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    AgreementCreateForm, AgreementUpdateForm, \
                    SignatureCreateForm, SignatureSearchForm
 from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
+
 
 # Custom Mixins
 
@@ -525,17 +526,9 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
                 Agreement, slug=self.kwargs['agreementslug']
             )
             qs = qs.filter(agreement=self.agreement)
-        if 'search' in self.request.GET:
-            q_param = self.request.GET['search']
-            if q_param != '':
-                qs = qs.filter(
-                    Q(username__icontains=q_param) |
-                    Q(first_name__icontains=q_param) |
-                    Q(last_name__icontains=q_param) |
-                    Q(email__icontains=q_param) |
-                    Q(department__name__icontains=q_param) |
-                    Q(department__faculty__name__icontains=q_param)
-                )
+        q_param = self.request.GET.get('search', '')
+        if q_param != '':
+            qs = qs.search(q_param)
         return qs
 
     def get_context_data(self, **kwargs):
