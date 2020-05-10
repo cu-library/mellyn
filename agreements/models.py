@@ -242,9 +242,37 @@ class LicenseCode(models.Model):
         ]
 
 
+class FileDownloadEventQuerySet(QuerySet):
+    """A custom queryset for FileDownloadEvents"""
+
+    def get_or_create_if_no_duplicates_past_5_minutes(self, resource, accesspath, session_key):
+        """Has a FileDownloadEvent for the same path and session been added in the past 5 minutes?"""
+        # TODO add tests
+        if resource is None:
+            raise TypeError('resource cannot be none')
+        if accesspath is None:
+            raise TypeError('accesspath cannot be none')
+        if session_key is None:
+            raise TypeError('session_key cannot be none')
+
+        # Because the Unique Constraint on FileDownloadEvent doesn't enforce the time window
+        # it might be possible that the same user might be able to add two events within the time window.
+        return self.get_or_create(resource=resource,
+                                  path=accesspath,
+                                  session_key=session_key,
+                                  at__gte=now()-timedelta(minutes=5))
+
+
 class FileDownloadEvent(models.Model):
     """Store information about each file download request"""
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
     path = models.CharField(max_length=300)
     session_key = models.CharField(max_length=50)
     at = models.DateTimeField(auto_now_add=True)
+
+    objects = FileDownloadEventQuerySet.as_manager()
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['resource', 'path', 'session_key', 'at'], name='%(app_label)s_%(class)s_unique')
+        ]

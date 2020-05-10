@@ -6,7 +6,6 @@ https://docs.djangoproject.com/en/3.0/topics/http/views/
 
 import operator
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from django.contrib import messages
@@ -135,38 +134,36 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
     template_name_suffix = '_access'
 
     def get(self, request, *args, **kwargs):
-        # Has the user signed the currently valid, unhidden agreement associated with this
-        # resource?
         resource = self.get_object()
-        try:
-            newest_associated_agreement = (Agreement.objects
-                                           .filter(resource=resource)
-                                           .valid()
-                                           .order_by('-created')[0])
-        except IndexError:
+        # Does a valid associated agreement exist for this resource?
+        associated_agreement = (Agreement.objects
+                                .filter(resource=resource)
+                                .valid()
+                                .order_by('-created')
+                                .first())
+        if associated_agreement is None:
             raise Http404('Unable to find valid and unhidden agreement.')
+
+        # Has the user signed that agreement?
         try:
-            newest_associated_agreement.signature_set.filter(signatory=self.request.user).get()
+            associated_agreement.signature_set.filter(signatory=self.request.user).get()
         except Signature.DoesNotExist:
             messages.error(self.request,
                            f'You must sign this agreement before accessing files associated with {resource.name}.')
+            # Attach some data to the session so that we can redirect back to this request later
             request.session['access_attempt'] = (resource.slug, self.kwargs['accesspath'])
-            return redirect(newest_associated_agreement)
+            return redirect(associated_agreement)
 
         # Access is granted, is the access path a file or a directory?
         resource_scoped_path = os.path.join(resource.slug, self.kwargs['accesspath'])
         try:
             self.path = default_storage.path(resource_scoped_path)  # pylint: disable=attribute-defined-outside-init
             if not os.path.exists(self.path):
-                raise Http404('File not found at access path.')
+                raise Http404('File or directory not found at access path.')
             if os.path.isfile(self.path):
-                if not FileDownloadEvent.objects.filter(resource=resource,
-                                                        path=self.kwargs['accesspath'],
-                                                        session_key=request.session.session_key,
-                                                        at__gte=now()-timedelta(minutes=5)).exists():
-                    FileDownloadEvent.objects.create(resource=resource,
-                                                     path=self.kwargs['accesspath'],
-                                                     session_key=request.session.session_key)
+                FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(resource,
+                                                                                        self.kwargs['accesspath'],
+                                                                                        request.session.session_key)
                 return sendfile(request, self.path)
         except SuspiciousFileOperation:
             raise PermissionDenied('SuspiciousFileOperation on file access.')
