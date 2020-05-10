@@ -260,7 +260,7 @@ class FileDownloadEventTestCase(TestCase):
         self.test_resource.full_clean()
         self.test_resource.save()
 
-    def get_or_create_if_no_duplicates_past_5_minutes(self):
+    def test_get_or_create_if_no_duplicates_past_5_minutes(self):
         """Check that get_or_create_if_no_duplicates_past_5_minutes doesn't create objects when it shouldn't."""
         FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(self.test_resource, 'test', 'test')
         _, created = FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(self.test_resource,
