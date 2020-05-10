@@ -203,7 +203,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
 
 
 class ResourceAccessFileStats(PermissionRequiredMixin, DetailView):
-    """A view which provides download stats for a resources's files"""
+    """A view which provides download stats for a Resources's files"""
     context_object_name = 'resource'
     model = Resource
     permission_required = 'agreements.view_resource'
@@ -218,7 +218,7 @@ class ResourceAccessFileStats(PermissionRequiredMixin, DetailView):
 # License Codes
 
 class ResourceLicenseCode(PermissionRequiredMixin, ListView):
-    """A view of a Resource"""
+    """A view of LicenseCodes associated with a Resource"""
     context_object_name = 'license_codes'
     model = LicenseCode
     ordering = 'name'
@@ -238,7 +238,7 @@ class ResourceLicenseCode(PermissionRequiredMixin, ListView):
 
 
 class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
-    """A view where a staff user can add more License Codes to a Resource"""
+    """A view to add more License Codes to a Resource"""
     context_object_name = 'resource'
     form_class = LicenseCodeForm
     model = Resource
@@ -274,7 +274,7 @@ class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
 
 
 class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
-    """A view where a staff user can update the License Codes attached to a Resource"""
+    """A view to update the License Codes of a Resource"""
     context_object_name = 'resource'
     form_class = LicenseCodeForm
     model = Resource
@@ -560,7 +560,7 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
 
 
 class SignatureCSV(PermissionRequiredMixin, CSVExportView):
-    """A view to download the signatures associated with an agreement as a CSV file"""
+    """A view to download the Signatures associated with an agreement as a CSV file"""
     fields = ('agreement__title', 'username', 'first_name',
               'last_name', 'email', 'department__name',
               'department__faculty__name', 'signed_at')
