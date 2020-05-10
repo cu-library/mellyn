@@ -6,7 +6,7 @@
   <div class="breadcrumb"><a aria-label="Return to the list of groups" href="{% url 'groupdescriptions_list' %}">&larr; Groups</a></div>
   <h2>{{ groupdescription.name }}</h2>
   <section class="htmlfield">{{ groupdescription.description | safe}}</section>
-  <h3>Permissions</h3>
+  <h3>Global Permissions</h3>
   <p>These permissions allow members of the group to add, change, delete, or view ANY object of a particular type. <br> This permission is checked before permissions on individual objects are checked.</p>
   {% if groupdescription.group.permissions.all %}
   <ul>
@@ -32,8 +32,8 @@
   <p>No users in this group.</p>
   {% endif %}
   <div class="actions">
-    <a class="bonus" href="{% url 'groupdescriptions_update_permissions' groupdescription.slug %}">Edit Permissions</a>
+    <a class="bonus" href="{% url 'groupdescriptions_update_permissions' groupdescription.slug %}">Edit Global Permissions</a>
     <a class="ok" href="{% url 'groupdescriptions_update' groupdescription.slug %}">Edit</a>
-    <a class="warning" href="{% url 'groupdescriptions_update' groupdescription.slug %}">Delete</a>
+    <a class="warning" href="{% url 'groupdescriptions_delete' groupdescription.slug %}">Delete</a>
   </div>
 {% endblock %}

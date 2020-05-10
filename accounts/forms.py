@@ -4,11 +4,10 @@ This module defines any custom forms used by this application.
 https://docs.djangoproject.com/en/3.0/topics/forms/
 """
 
-from django.forms import ModelForm, SlugField, \
-                         CharField, Textarea, CheckboxSelectMultiple, \
-                         ModelMultipleChoiceField
-from django.db.models import Q
 from django.contrib.auth.models import Group, Permission
+from django.db.models import Q
+from django.forms import ModelForm, SlugField, CharField, Textarea, CheckboxSelectMultiple, ModelMultipleChoiceField
+
 from .models import GroupDescription, DEFAULT_ALLOWED_TAGS
 
 

@@ -5,6 +5,7 @@ https://docs.djangoproject.com/en/3.0/topics/testing/
 """
 
 from django.test import TestCase
+
 from .apps import AccountsConfig
 
 

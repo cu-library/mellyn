@@ -5,12 +5,13 @@ https://docs.djangoproject.com/en/3.0/topics/http/views/
 """
 
 from django.contrib import messages
-from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.contrib.auth.models import Group
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
+
 from .models import User, GroupDescription
 from .forms import GroupDescriptionCreateForm, GroupDescriptionUpdateForm, GroupPermissionsForm
 

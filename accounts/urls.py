@@ -15,7 +15,7 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('groups/create/', views.GroupDescriptionCreate.as_view(), name='groupdescriptions_create'),
     path('groups/<slug:slug>/', views.GroupDescriptionRead.as_view(), name='groupdescriptions_read'),
     path('groups/<slug:slug>/update/', views.GroupDescriptionUpdate.as_view(), name='groupdescriptions_update'),
-    path('groups/<slug:slug>/update/permissions/',
+    path('groups/<slug:slug>/permissions/',
          views.GroupDescriptionUpdatePermissions.as_view(),
          name='groupdescriptions_update_permissions'),
     path('groups/<slug:slug>/delete/', views.GroupDescriptionDelete.as_view(), name='groupdescriptions_delete'),

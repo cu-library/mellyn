@@ -7,11 +7,11 @@ https://docs.djangoproject.com/en/3.0/topics/testing/
 import random
 import string
 
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 
 from .models import GroupDescription
 

@@ -4,12 +4,12 @@ This module defines the models used by this application.
 https://docs.djangoproject.com/en/3.0/topics/db/models/
 """
 
-from django.db import models
-from django.urls import reverse
-from django.core.validators import RegexValidator
-from django.db.models import Prefetch
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.core.validators import RegexValidator
+from django.db import models
+from django.db.models import Prefetch
 from django.db.models.query import QuerySet
+from django.urls import reverse
 
 from guardian.mixins import GuardianUserMixin
 from django_bleach.models import BleachField
