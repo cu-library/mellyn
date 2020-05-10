@@ -221,6 +221,20 @@ class SignatureQuerySet(QuerySet):
             Q(department__faculty__name__icontains=query)
             )
 
+    def count_per_department(self):
+        """Return a group by and count by department"""
+        return (self
+                .values('department', 'department__name', 'department__faculty')
+                .annotate(num_sigs=Count('department'))
+                .order_by('-num_sigs'))
+
+    def count_per_faculty(self):
+        """Return a group by and count by faculty"""
+        return (self
+                .values('department__faculty', 'department__faculty__name')
+                .annotate(num_sigs=Count('department__faculty'))
+                .order_by('-num_sigs'))
+
 
 class Signature(models.Model):
     """

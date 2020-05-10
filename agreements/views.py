@@ -14,7 +14,6 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import transaction
-from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -539,14 +538,8 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['agreement'] = getattr(self, 'agreement', None)
-        context['count_per_department'] = (self.get_queryset()
-                                           .values('department', 'department__name', 'department__faculty')
-                                           .annotate(num_sigs=Count('department'))
-                                           .order_by('-num_sigs'))
-        context['count_per_faculty'] = (self.get_queryset()
-                                        .values('department__faculty', 'department__faculty__name')
-                                        .annotate(num_sigs=Count('department__faculty'))
-                                        .order_by('-num_sigs'))
+        context['count_per_department'] = self.get_queryset().count_per_department()
+        context['count_per_faculty'] = self.get_queryset().count_per_faculty()
         return context
 
 
