@@ -379,10 +379,10 @@ class DepartmentCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView)
 class DepartmentCreateUnderFaculty(DepartmentCreate):
     """A view to create a Department under a given Faculty"""
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['initial'] = {'faculty': get_object_or_404(Faculty, slug=self.kwargs['facultyslug'])}
-        return kwargs
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['faculty'] = get_object_or_404(Faculty, slug=self.kwargs['facultyslug'])
+        return initial
 
 
 class DepartmentUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
@@ -530,10 +530,10 @@ class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
             qs = qs.search(q_param)
         return qs
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['initial'] = {'search': self.request.GET.get('search', default='')}
-        return kwargs
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['search'] = self.request.GET.get('search', default='')
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
