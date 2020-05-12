@@ -330,7 +330,7 @@ class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
     template_name = 'agreements/licensecode_update_form.html'
 
     def get_initial(self):
-        codes = ""
+        codes = ''
         for license_code in LicenseCode.objects.filter(resource=self.get_object(), signature__isnull=True):
             codes += f'{license_code.code}\n'
         return {'codes': codes}

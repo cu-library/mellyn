@@ -16,7 +16,7 @@ class ModelFormSetLabelSuffix(ModelForm):
     """A ModelForm which overrides label_suffix to the empty string"""
 
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault("label_suffix", "")
+        kwargs.setdefault('label_suffix', '')
         super().__init__(*args, **kwargs)
 
 

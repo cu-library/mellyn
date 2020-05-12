@@ -186,7 +186,7 @@ class Agreement(models.Model):
 
     class Meta:
         constraints = [
-            CheckConstraint(check=Q(end__isnull=True) | Q(end__gt=F("start")),
+            CheckConstraint(check=Q(end__isnull=True) | Q(end__gt=F('start')),
                             name="%(app_label)s_%(class)s_end_null_or_gt_start")
         ]
 

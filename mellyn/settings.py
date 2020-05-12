@@ -147,4 +147,4 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 # MEDIA_ROOT = '/var/sign/storage/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mellyn', 'fixtures', 'test_media_root')
-SENDFILE_BACKEND = "django_sendfile.backends.simple"
+SENDFILE_BACKEND = 'django_sendfile.backends.simple'
