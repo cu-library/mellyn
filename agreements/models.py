@@ -189,6 +189,9 @@ class Agreement(models.Model):
             CheckConstraint(check=Q(end__isnull=True) | Q(end__gt=F('start')),
                             name="%(app_label)s_%(class)s_end_null_or_gt_start")
         ]
+        permissions = [
+            ('search_signatures', 'Can search signatures associated with this agreement')
+        ]
 
     def get_absolute_url(self):
         """Returns the canonical URL for an Agreement"""
@@ -257,9 +260,6 @@ class Signature(models.Model):
     class Meta:
         constraints = [
             UniqueConstraint(fields=['agreement', 'signatory'], name='%(app_label)s_%(class)s_unique_signature')
-        ]
-        permissions = [
-            ('search_signatures', 'Can search signatures')
         ]
 
 
