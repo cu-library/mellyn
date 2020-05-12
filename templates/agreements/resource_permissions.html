@@ -5,9 +5,8 @@
 {% block main %}
   <div class="breadcrumb"><a aria-label="Return to the resource associated with this list of permissions" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
   <h2>Permissions for {{ resource.name }}</h2>
-  <h3>All Resources</h3>
   {% if global_permissions %}
-  <p>Members of these groups have permissions on any resource.</p>
+  <p>Members of these groups have permissions on <strong>any</strong> resource.</p>
   <ul>
     {% for groupdescription in global_permissions %}
     <li>
@@ -21,9 +20,26 @@
     {% endfor %}
   </ul>
   {% else %}
-  <p>No groups have been given permissions on all resources</p>
+  <p>No groups have been given permissions on all resources.</p>
+  {% endif %}
+  {% if object_permissions %}
+  <p>Members of these groups have permissions on <strong>this</strong> resource.</p>
+  <ul>
+    {% for groupdescription in object_permissions %}
+    <li>
+      <a href="{% url 'groupdescriptions_read' groupdescription.slug %}">{{ groupdescription.name }}</a>
+      <ul>
+        {% for groupobjectpermission in groupdescription.group.groupobjectpermissions_on_object %}
+        <li>{{ groupobjectpermission.permission.name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No groups have been given permissions on this specific resource.</p>
   {% endif %}
   <div class="actions">
-
+    <a class="ok" href="{% url 'resources_permissions_groups' resource.slug %}">Group permissions for this resource</a>
   </div>
 {% endblock %}

@@ -8,6 +8,8 @@ from django.contrib.auth.models import Group, Permission
 from django.db.models import Q
 from django.forms import ModelForm, SlugField, CharField, Textarea, CheckboxSelectMultiple, ModelMultipleChoiceField
 
+from guardian.forms import GroupObjectPermissionsForm
+
 from .models import GroupDescription, DEFAULT_ALLOWED_TAGS
 
 
@@ -96,3 +98,10 @@ class GroupPermissionsForm(ModelForm):
     class Meta:
         model = Group
         fields = ['permissions']
+
+
+class CheckboxGroupObjectPermissionsForm(GroupObjectPermissionsForm):
+    """A custom ModelForm for updating the permissions associated with a group"""
+
+    def get_obj_perms_field_widget(self):
+        return CheckboxSelectMultiple

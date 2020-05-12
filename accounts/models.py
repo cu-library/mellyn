@@ -11,8 +11,9 @@ from django.db.models import Prefetch
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
-from guardian.mixins import GuardianUserMixin
 from django_bleach.models import BleachField
+from guardian.mixins import GuardianUserMixin
+from guardian.models import GroupObjectPermission
 from simple_history.models import HistoricalRecords
 
 DEFAULT_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
@@ -39,6 +40,27 @@ class GroupDescriptionQuerySet(QuerySet):
                 .filter(group__permissions__content_type__model=model)
                 .distinct()
                 .prefetch_related(permissions_prefetch)
+                .order_by('name'))
+
+    def for_object_with_groupobjectpermissions(self, model, object_pk):
+        """Return group descriptions with GroupObjectPermissions related to the object"""
+        if model is None:
+            raise TypeError('model cannot be none')
+        if object_pk is None:
+            raise TypeError('object_pk cannot be none')
+
+        groupobjectpermission_prefetch = Prefetch('group__groupobjectpermission_set',
+                                                  queryset=(GroupObjectPermission.objects
+                                                            .filter(content_type__model=model, object_pk=object_pk)
+                                                            .distinct()
+                                                            .select_related('permission')),
+                                                  to_attr='groupobjectpermissions_on_object')
+
+        return (self
+                .filter(group__groupobjectpermission__content_type__model=model,
+                        group__groupobjectpermission__object_pk=object_pk)
+                .distinct()
+                .prefetch_related(groupobjectpermission_prefetch)
                 .order_by('name'))
 
 

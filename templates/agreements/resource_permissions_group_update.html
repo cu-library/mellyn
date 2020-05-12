@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Update permissions on {{ resource.name }} for {{ groupdescription.name }}{% endblock %}
+
+{% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the list of groups" href="{% url 'resources_permissions_groups' resource.slug %}">&larr; Groups</a></div>
+  <h2>Edit the permissions on {{ resource.name }} for {{ groupdescription.name }}</h2>
+  <form class="update" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div {% if field.errors %}class="errors"{% endif %}>
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+      {% if field.help_text %}
+      <p class="help">{{ field.help_text|safe }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="actions">
+      <input type="submit" value="Save">
+      <a class="warning" href="{% url 'resources_permissions_groups' resource.slug %}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}
