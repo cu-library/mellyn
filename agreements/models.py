@@ -259,7 +259,7 @@ class Signature(models.Model):
             UniqueConstraint(fields=['agreement', 'signatory'], name='%(app_label)s_%(class)s_unique_signature')
         ]
         permissions = [
-            ('search_signatures', 'Search signatures')
+            ('search_signatures', 'Can search signatures')
         ]
 
 
