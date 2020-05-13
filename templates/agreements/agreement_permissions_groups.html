@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Groups to select from for updating permissions on {{ agreement.title }}{% endblock %}
+
+{% block main %}
+  <div class="breadcrumb"><a aria-label="Return to the list of permissions associated with {{ agreement.name }}" href="{% url 'agreements_permissions' agreement.slug %}">&larr; Permissions for {{ agreement.title }}</a></div>
+  <h2>Update group permissions for {{ agreement.title }}</h2>
+  <h3>Groups with existing permissions</h3>
+  {% if object_permissions %}
+  <p>Members of these groups have permissions on <strong>this</strong> agreement.</p>
+  <ul>
+    {% for groupdescription in object_permissions %}
+    <li>
+      <a href="{% url 'agreements_permissions_groups_update' agreement.slug groupdescription.slug %}">{{ groupdescription.name }}</a>
+      <ul>
+        {% for groupobjectpermission in groupdescription.group.groupobjectpermissions_on_object %}
+        <li>{{ groupobjectpermission.permission.name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No groups have been given permissions on this specific agreement.</p>
+  {% endif %}
+  {% if object_permissions %}
+  <h3>Other Groups</h3>
+  {% else %}
+  <h3>Groups</h3>
+  {% endif %}
+  {% if groupdescriptions %}
+  <ul>
+    {% for groupdescription in groupdescriptions %}
+    <li>
+      <a href="{% url 'agreements_permissions_groups_update' agreement.slug groupdescription.slug %}">{{ groupdescription.name }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No groups have been created yet.</p>
+  {% endif %}
+  <div class="actions">
+
+  </div>
+{% endblock %}

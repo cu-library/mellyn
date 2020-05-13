@@ -100,8 +100,19 @@ class GroupPermissionsForm(ModelForm):
         fields = ['permissions']
 
 
-class CheckboxGroupObjectPermissionsForm(GroupObjectPermissionsForm):
+class CustomGroupObjectPermissionsForm(GroupObjectPermissionsForm):
     """A custom ModelForm for updating the permissions associated with a group"""
 
     def get_obj_perms_field_widget(self):
         return CheckboxSelectMultiple
+
+    def get_obj_perms_field_choices(self):
+        choices = super().get_obj_perms_field_choices()
+        return [(codename, name) for (codename, name) in choices
+                if not (codename.startswith('delete_') or codename.startswith('add_'))]
+
+    def clean_permissions(self):
+        """Remove unused permissions on form submission"""
+        permissions = self.cleaned_data['permissions']
+        return [permission for permission in permissions
+                if not (permission.startswith('delete_') or permission.startswith('add_'))]

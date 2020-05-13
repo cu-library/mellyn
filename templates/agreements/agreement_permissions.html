@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block sitetitle %}Permissions for {{ resource.name }}{% endblock %}
+{% block sitetitle %}Permissions for {{ agreement.name }}{% endblock %}
 
 {% block main %}
-  <div class="breadcrumb"><a aria-label="Return to the resource associated with this list of permissions" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
-  <h2>Permissions for {{ resource.name }}</h2>
+  <div class="breadcrumb"><a aria-label="Return to the agreement associated with this list of permissions" href="{% url 'agreements_read' agreement.slug %}">&larr; {{ agreement.title }}</a></div>
+  <h2>Permissions for {{ agreement.title }}</h2>
   {% if global_permissions %}
-  <p>Members of these groups have permissions on <strong>any</strong> resource.</p>
+  <p>Members of these groups have permissions on <strong>any</strong> agreement.</p>
   <ul>
     {% for groupdescription in global_permissions %}
     <li>
@@ -20,10 +20,10 @@
     {% endfor %}
   </ul>
   {% else %}
-  <p>No groups have been given permissions on all resources.</p>
+  <p>No groups have been given permissions on all agreements.</p>
   {% endif %}
   {% if object_permissions %}
-  <p>Members of these groups have permissions on <strong>this</strong> resource.</p>
+  <p>Members of these groups have permissions on <strong>this</strong> agreement.</p>
   <ul>
     {% for groupdescription in object_permissions %}
     <li>
@@ -37,9 +37,9 @@
     {% endfor %}
   </ul>
   {% else %}
-  <p>No groups have been given permissions on this specific resource.</p>
+  <p>No groups have been given permissions on this specific agreement.</p>
   {% endif %}
   <div class="actions">
-    <a class="permissions" href="{% url 'resources_permissions_groups' resource.slug %}">Group permissions for this resource</a>
+    <a class="permissions" href="{% url 'agreements_permissions_groups' agreement.slug %}">Group permissions for this agreement</a>
   </div>
 {% endblock %}

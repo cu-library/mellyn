@@ -26,7 +26,7 @@ from django_sendfile import sendfile
 import humanize
 
 from accounts.models import GroupDescription
-from accounts.forms import CheckboxGroupObjectPermissionsForm
+from accounts.forms import CustomGroupObjectPermissionsForm
 from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    LicenseCodeForm, \
                    FacultyCreateForm, FacultyUpdateForm, \
@@ -149,7 +149,7 @@ class ResourcePermissionsGroups(PermissionRequiredMixin, DetailView):
 class ResourcePermissionsGroupUpdate(FormMixin, PermissionRequiredMixin, DetailView, ProcessFormView):
     """A view which updates the per-object permissions of a resource for a group"""
     context_object_name = 'resource'
-    form_class = CheckboxGroupObjectPermissionsForm
+    form_class = CustomGroupObjectPermissionsForm
     model = Resource
     permission_required = 'agreements.add_resource'
     template_name = 'agreements/resource_permissions_group_update.html'
@@ -557,6 +557,71 @@ class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     success_message = '%(title)s was deleted successfully.'
     success_url = reverse_lazy('agreements_list')
     template_name_suffix = '_delete_form'
+
+
+class AgreementPermissions(PermissionRequiredMixin, DetailView):
+    """A view which reports on the permissions on this Agreement"""
+    context_object_name = 'agreement'
+    model = Agreement
+    permission_required = 'agreements.add_agreement'
+    template_name = 'agreements/agreement_permissions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['global_permissions'] = GroupDescription.objects.for_model_with_permissions('agreement')
+        context['object_permissions'] = (GroupDescription.objects
+                                         .for_object_with_groupobjectpermissions('agreement', self.get_object().id))
+        return context
+
+
+class AgreementPermissionsGroups(PermissionRequiredMixin, DetailView):
+    """A view which lists groups"""
+    context_object_name = 'agreement'
+    model = Agreement
+    permission_required = 'agreements.add_agreement'
+    template_name = 'agreements/agreement_permissions_groups.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object_permissions'] = (GroupDescription.objects
+                                         .for_object_with_groupobjectpermissions('agreement', self.get_object().id))
+        context['groupdescriptions'] = []
+        groupdescriptions = GroupDescription.objects.all().order_by('name')
+        # .difference() would be better here but it causes an error.
+        for groupdescription in groupdescriptions:
+            if groupdescription not in context['object_permissions']:
+                context['groupdescriptions'].append(groupdescription)
+        return context
+
+
+class AgreementPermissionsGroupUpdate(FormMixin, PermissionRequiredMixin, DetailView, ProcessFormView):
+    """A view which updates the per-object permissions of an Agreement for a group"""
+    context_object_name = 'agreement'
+    form_class = CustomGroupObjectPermissionsForm
+    model = Agreement
+    permission_required = 'agreements.add_agreement'
+    template_name = 'agreements/agreement_permissions_group_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy('agreements_permissions_groups', kwargs={'slug': self.kwargs['slug']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'group': get_object_or_404(GroupDescription, slug=self.kwargs['groupdescriptionslug']).group,
+            'obj': self.get_object(),
+        })
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()  # pylint: disable=attribute-defined-outside-init
+        context = super().get_context_data(**kwargs)
+        context['groupdescription'] = get_object_or_404(GroupDescription, slug=self.kwargs['groupdescriptionslug'])
+        return context
+
+    def form_valid(self, form):
+        form.save_obj_perms()
+        return super().form_valid(form)
 
 
 # Signatures

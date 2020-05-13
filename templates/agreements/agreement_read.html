@@ -34,6 +34,7 @@
   </form>
   {% endif %}
   <div class="actions">
+    <a class="permissions" href="{% url 'agreements_permissions' agreement.slug %}">Permissions</a>
     <a class="bonus" href="{% url 'signatures_for_agreement_list' agreement.slug %}">Search Signatures</a>
     <a class="ok" href="{% url 'agreements_update' agreement.slug %}">Edit</a>
     <a class="warning" href="{% url 'agreements_delete' agreement.slug %}">Delete</a>

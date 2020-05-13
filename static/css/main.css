@@ -24,6 +24,8 @@ code {
   --warning-button-hover-background: #ffa8a8;
   --bonus-button-background: #ffc5f6;
   --bonus-button-hover-background: #ffb8f4;
+  --permissions-button-background: #c5ffc9;
+  --permissions-button-hover-background: #baffb8;
   --debug-message-background: #fafafa;
   --info-message-background: #f5fdff;
   --success-message-background: #f5fff6;
@@ -406,6 +408,16 @@ form div.errors p.help {
 
 .actions a.bonus:hover {
   background-color: var(--bonus-button-hover-background);
+  transition-property: background-color;
+  transition-duration: 0.1s;
+}
+
+.actions a.permissions {
+  background-color: var(--permissions-button-background);
+}
+
+.actions a.permissions:hover {
+  background-color: var(--permissions-button-hover-background);
   transition-property: background-color;
   transition-duration: 0.1s;
 }

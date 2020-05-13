@@ -23,12 +23,12 @@
   {% else %}
   <p>No groups have been given permissions on this specific resource.</p>
   {% endif %}
-  {% if groupdescriptions %}
   {% if object_permissions %}
   <h3>Other Groups</h3>
   {% else %}
   <h3>Groups</h3>
   {% endif %}
+  {% if groupdescriptions %}
   <ul>
     {% for groupdescription in groupdescriptions %}
     <li>
@@ -36,6 +36,8 @@
     </li>
     {% endfor %}
   </ul>
+  {% else %}
+  <p>No groups have been created yet.</p>
   {% endif %}
   <div class="actions">
 

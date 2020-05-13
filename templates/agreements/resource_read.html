@@ -9,7 +9,6 @@
   <p><a href="{% url 'resources_access' resource.slug %}">File Access</a></p>
   <p><a href="{% url 'resources_file_stats' resource.slug %}">File Access Stats</a></p>
   <p><a href="{% url 'resources_codes' resource.slug %}">License Codes</a></p>
-  <p><a href="{% url 'resources_permissions' resource.slug %}">Permissions</a></p>
   {% if agreements %}
   <h3>Associated Agreements</h3>
   <ul class="objectlist">
@@ -29,6 +28,7 @@
   </ul>
   {% endif %}
   <div class="actions">
+    <a class="permissions" href="{% url 'resources_permissions' resource.slug %}">Permissions</a>
     <a class="ok" href="{% url 'resources_update' resource.slug %}">Edit</a>
     <a class="warning" href="{% url 'resources_delete' resource.slug %}">Delete</a>
   </div>
