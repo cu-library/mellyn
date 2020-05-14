@@ -3,7 +3,7 @@
 {% block sitetitle %}User {{ user_detail.first_name }} {{ user_detail.last_name }}{% endblock %}
 
 {% block main %}
-  <div class="breadcrumb"><a aria-label="Return to the list of users" href="{% url 'user_list' %}">&larr; Users</a></div>
+  <div class="breadcrumb"><a aria-label="Return to the list of users" href="{% url 'users_list' %}">&larr; Users</a></div>
   <h2>{{ user_detail.first_name }} {{ user_detail.last_name }}</h2>
   <p><strong>Username: </strong>{{ user_detail.username }}</p>
   <p><strong>First Name: </strong>{{ user_detail.first_name }}</p>
@@ -19,6 +19,6 @@
   </p>
   {% endif %}
   <div class="actions">
-    <a class="ok" href="{% url 'user_update' user_detail.username %}">Edit</a>
+    <a class="ok" href="{% url 'users_update' user_detail.username %}">Edit</a>
   </div>
 {% endblock %}

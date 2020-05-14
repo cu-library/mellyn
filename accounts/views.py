@@ -87,7 +87,7 @@ class UserUpdate(UserPassesTestMixin, SuccessMessageIfChangedMixin, UpdateView):
     template_name_suffix = '_update_form'
 
     def get_success_url(self):
-        return reverse_lazy('user_read', kwargs={'slug': self.kwargs['slug']})
+        return reverse_lazy('users_read', kwargs={'slug': self.kwargs['slug']})
 
     def test_func(self):
         return self.request.user.is_staff

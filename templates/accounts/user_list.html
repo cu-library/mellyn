@@ -23,7 +23,7 @@
   {% if users %}
   <ul class="objectlist">
     {% for user_listing in users %}
-    <li><a href="{% url 'user_read' user_listing.username %}" title="{{ user_listing.first_name }}{{ user_listing.last_name }}">{{ user_listing.username }}</a>{% if user_listing.is_staff %} (Staff){% endif %}</li>
+    <li><a href="{% url 'users_read' user_listing.username %}" title="{{ user_listing.first_name }}{{ user_listing.last_name }}">{{ user_listing.username }}</a>{% if user_listing.is_staff %} (Staff){% endif %}</li>
     {% endfor %}
   </ul>
   {% else %}
