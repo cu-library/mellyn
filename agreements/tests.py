@@ -75,7 +75,7 @@ class TemplatesandViewsTestCase(TestCase):
                 self.assertContains(response,
                                     f'<a class="warning" href="{reverse(lowercase_plural+"_list")}">Cancel</a>',
                                     html=True)
-                self.assertContains(response, f'<input type="submit" value="Create">', html=True)
+                self.assertContains(response, '<input type="submit" value="Create">', html=True)
 
         self.create_test_models()
 
@@ -97,8 +97,8 @@ class TemplatesandViewsTestCase(TestCase):
             # Visit the read view.
             response = self.client.get(reverse(lowercase_plural+'_read', args=['test']))
             with self.subTest(msg=lowercase_plural+'_read'):
-                self.assertContains(response, f'<title>Sign - Test</title>', html=True)
-                self.assertContains(response, f'<h2>Test</h2>', html=True)
+                self.assertContains(response, '<title>Sign - Test</title>', html=True)
+                self.assertContains(response, '<h2>Test</h2>', html=True)
                 self.assertContains(response, f'<a class="warning" '
                                               f'href="{reverse(lowercase_plural+"_delete", args=["test"])}">Delete</a>',
                                     html=True)
@@ -109,35 +109,35 @@ class TemplatesandViewsTestCase(TestCase):
             # Visit the update view.
             response = self.client.get(reverse(lowercase_plural+'_update', args=['test']))
             with self.subTest(msg=lowercase_plural+'_update'):
-                self.assertContains(response, f'<title>Sign - Update Test</title>', html=True)
-                self.assertContains(response, f'<h2>Update Test</h2>', html=True)
+                self.assertContains(response, '<title>Sign - Update Test</title>', html=True)
+                self.assertContains(response, '<h2>Update Test</h2>', html=True)
                 self.assertContains(response, f'<a class="warning" '
                                               f'href="{reverse(lowercase_plural+"_read", args=["test"])}">Cancel</a>',
                                     html=True)
-                self.assertContains(response, f'<input type="submit" value="Save">', html=True)
-                self.assertContains(response, f'<input type="text" name="slug" value="test" disabled id="id_slug">',
+                self.assertContains(response, '<input type="submit" value="Save">', html=True)
+                self.assertContains(response, '<input type="text" name="slug" value="test" disabled id="id_slug">',
                                     html=True)
 
             # Visit the delete view.
             response = self.client.get(reverse(lowercase_plural+'_delete', args=['test']))
             with self.subTest(msg=lowercase_plural+'_delete'):
-                self.assertContains(response, f'<title>Sign - Delete Test</title>', html=True)
-                self.assertContains(response, f'<h2>Delete Test</h2>', html=True)
+                self.assertContains(response, '<title>Sign - Delete Test</title>', html=True)
+                self.assertContains(response, '<h2>Delete Test</h2>', html=True)
                 self.assertContains(response, f'<p>Are you sure you want to delete this {lowercase_singular}?</p>',
                                     html=True)
                 self.assertContains(response, f'<a class="warning" '
                                               f'href="{reverse(lowercase_plural+"_read", args=["test"])}">No</a>',
                                     html=True)
-                self.assertContains(response, f'<input type="submit" value="Yes">', html=True)
+                self.assertContains(response, '<input type="submit" value="Yes">', html=True)
 
     def test_skip_link(self):
         """Check that the skip link is present on all templates for basic CRUD actions a user can perform"""
 
         def check_skip_link(response):
             # The body element's first child should be the skip link.
-            self.assertContains(response, f'<body>\n    <div id="skip"><a href="#main">Skip to main content</a></div>')
+            self.assertContains(response, '<body>\n    <div id="skip"><a href="#main">Skip to main content</a></div>')
             # The skip link target should be valid.
-            self.assertContains(response, f'<main id="main">')
+            self.assertContains(response, '<main id="main">')
 
         response = self.client.get(reverse('index'))
         with self.subTest(msg='index'):

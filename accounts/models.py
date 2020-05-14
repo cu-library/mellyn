@@ -98,7 +98,7 @@ class GroupDescription(models.Model):
         """Create or get the group with the provided name"""
         self.group, _ = Group.objects.get_or_create(name=self.name)
 
-    def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ,signature-differs
         super().delete(*args, **kwargs)
         self.group.delete()
 
