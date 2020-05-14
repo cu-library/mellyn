@@ -24,15 +24,15 @@
   <h3>Members</h3>
   {% if groupdescription.group.user_set.all %}
   <ul>
-    {% for staff_user in groupdescription.group.user_set.all %}
-    <li><a href="{% url 'staff_read' staff_user.username %}" title="{{ staff_user.first_name }}{{ staff_user.last_name }}">{{ staff_user.username }}</a></li>
+    {% for user_detail in groupdescription.group.user_set.all %}
+    <li><a href="{% url 'user_read' user_detail.username %}" title="{{ user_detail.first_name }}{{ user_detail.last_name }}">{{ user_detail.username }}</a></li>
     {% endfor %}
   </ul>
   {% else %}
   <p>No users in this group.</p>
   {% endif %}
   <div class="actions">
-    <a class="bonus" href="{% url 'groupdescriptions_update_permissions' groupdescription.slug %}">Edit Global Permissions</a>
+    <a class="permissions" href="{% url 'groupdescriptions_update_permissions' groupdescription.slug %}">Edit Global Permissions</a>
     <a class="ok" href="{% url 'groupdescriptions_update' groupdescription.slug %}">Edit</a>
     <a class="warning" href="{% url 'groupdescriptions_delete' groupdescription.slug %}">Delete</a>
   </div>

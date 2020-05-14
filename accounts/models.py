@@ -4,10 +4,10 @@ This module defines the models used by this application.
 https://docs.djangoproject.com/en/3.0/topics/db/models/
 """
 
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import UserManager, AbstractUser, Group, Permission
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
@@ -103,6 +103,33 @@ class GroupDescription(models.Model):
         self.group.delete()
 
 
+class UserQuerySet(QuerySet):
+    """A custom queryset for Users"""
+
+    def search(self, query):
+        """Search users for the query"""
+        if query is None:
+            raise TypeError('query cannot be none')
+        return self.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query)
+            )
+
+
+class CustomUserManager(UserManager):
+    """A custom User model manager"""
+
+    def get_queryset(self):
+        """Return our custom User queryset"""
+        return UserQuerySet(self.model, using=self._db)
+
+    def search(self, query):
+        """Wire the queryset and manager methods together"""
+        return self.get_queryset().search(query)
+
+
 class User(GuardianUserMixin, AbstractUser):
     """
     A custom user which inherits behaviour from Django's built in User class.
@@ -111,3 +138,5 @@ class User(GuardianUserMixin, AbstractUser):
     recommended in the docs:
     https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
     """
+
+    objects = CustomUserManager()

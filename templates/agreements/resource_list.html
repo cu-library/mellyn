@@ -8,7 +8,9 @@
   {% if resources %}
   <ul class="objectlist">
     {% for resource in resources %}
-    <li><a href="{% url 'resources_read' resource.slug %}">{{ resource.name }}</a></li>
+    <li {% if resource.hidden %}class="hidden"{% endif %}>
+      <a href="{% url 'resources_read' resource.slug %}">{{ resource.name }}{% if agreement.hidden %} (Hidden){% endif %}</a>
+    </li>
     {% endfor %}
   </ul>
   {% else %}

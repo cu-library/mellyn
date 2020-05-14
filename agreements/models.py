@@ -47,6 +47,8 @@ class Resource(models.Model):
                                        validators=[validate_email],
                                        help_text='The recipient of email warnings about low numbers of '
                                                  'remaning unassigned license codes.')
+    hidden = models.BooleanField(default=False,
+                                 help_text='Hidden resources do not appear in the list of active resources.')
     history = HistoricalRecords()
 
     def get_absolute_url(self):

@@ -23,6 +23,8 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMi
 
 from csv_export.views import CSVExportView
 from django_sendfile import sendfile
+from guardian.mixins import PermissionRequiredMixin as GuardianPermissionRequiredMixin
+from guardian.shortcuts import get_objects_for_user
 import humanize
 
 from accounts.models import GroupDescription
@@ -56,6 +58,11 @@ class SuccessMessageIfChangedMixin:
         return self.success_message % cleaned_data
 
 
+class PermissionRequiredCheckGlobalMixin(GuardianPermissionRequiredMixin):
+    """A subclass of Guardian's PermissionRequiredMixin that checks the global permissions first"""
+    accept_global_perms = True
+
+
 # Resources
 
 class ResourceList(LoginRequiredMixin, ListView):
@@ -64,6 +71,11 @@ class ResourceList(LoginRequiredMixin, ListView):
     model = Resource
     ordering = 'name'
     paginate_by = 15
+
+    def get_queryset(self):
+        qs = super().get_queryset().filter(hidden=False)
+        qs.union(get_objects_for_user(self.request.user, 'agreements.view_agreement'))
+        return qs
 
 
 class ResourceRead(LoginRequiredMixin, DetailView):
@@ -90,7 +102,7 @@ class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     template_name_suffix = '_create_form'
 
 
-class ResourceUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
+class ResourceUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a Resource"""
     context_object_name = 'resource'
     form_class = ResourceUpdateForm

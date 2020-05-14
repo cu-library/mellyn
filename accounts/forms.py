@@ -6,22 +6,28 @@ https://docs.djangoproject.com/en/3.0/topics/forms/
 
 from django.contrib.auth.models import Group, Permission
 from django.db.models import Q
-from django.forms import ModelForm, SlugField, CharField, Textarea, CheckboxSelectMultiple, ModelMultipleChoiceField
+from django.forms import Form, ModelForm, \
+                         SlugField, CharField, Textarea, CheckboxSelectMultiple, ModelMultipleChoiceField
 
 from guardian.forms import GroupObjectPermissionsForm
 
-from .models import GroupDescription, DEFAULT_ALLOWED_TAGS
+from .models import User, GroupDescription, DEFAULT_ALLOWED_TAGS
+
+
+# Base Class
+
+class ModelFormSetLabelSuffix(ModelForm):
+    """A ModelForm which overrides label_suffix to the empty string"""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super().__init__(*args, **kwargs)
 
 
 # Group Descriptions
 
-class GroupDescriptionCreateForm(ModelForm):
+class GroupDescriptionCreateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for creating a GroupDescription"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     class Meta:
         model = GroupDescription
@@ -38,13 +44,8 @@ class GroupDescriptionCreateForm(ModelForm):
         }
 
 
-class GroupDescriptionUpdateForm(ModelForm):
+class GroupDescriptionUpdateForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for updating a GroupDescription"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     name = CharField(required=False,
                      help_text='The name of the group. It has been set and cannot be changed.',
@@ -74,13 +75,8 @@ class PermissionsChoiceField(ModelMultipleChoiceField):
         return obj.name.replace('group description', 'group')
 
 
-class GroupPermissionsForm(ModelForm):
+class GroupPermissionsForm(ModelFormSetLabelSuffix):
     """A custom ModelForm for updating the permissions associated with a group"""
-
-    def __getattribute__(self, name):
-        if name == 'label_suffix':
-            return ''
-        return object.__getattribute__(self, name)
 
     permissions = PermissionsChoiceField(widget=CheckboxSelectMultiple,
                                          label='Global permissions associated with this group.',
@@ -103,16 +99,54 @@ class GroupPermissionsForm(ModelForm):
 class CustomGroupObjectPermissionsForm(GroupObjectPermissionsForm):
     """A custom ModelForm for updating the permissions associated with a group"""
 
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super().__init__(*args, **kwargs)
+
     def get_obj_perms_field_widget(self):
         return CheckboxSelectMultiple
 
     def get_obj_perms_field_choices(self):
         choices = super().get_obj_perms_field_choices()
-        return [(codename, name) for (codename, name) in choices
-                if not (codename.startswith('delete_') or codename.startswith('add_'))]
+        filtered_choices = []
+        for codename, name in choices:
+            if codename.startswith('delete_') or codename.startswith('add_'):
+                continue
+            if codename.startswith('view_'):
+                filtered_choices.append((codename, name+" even if hidden"))
+            else:
+                filtered_choices.append((codename, name))
+        return filtered_choices
 
     def clean_permissions(self):
         """Remove unused permissions on form submission"""
         permissions = self.cleaned_data['permissions']
         return [permission for permission in permissions
                 if not (permission.startswith('delete_') or permission.startswith('add_'))]
+
+
+class UserSearchForm(Form):
+    """A form for searching for Users"""
+    search = CharField(label='', max_length=100, required=False)
+
+
+class UserUpdateForm(ModelFormSetLabelSuffix):
+    """A custom ModelForm for updating users"""
+
+    class Meta:
+        model = User
+        fields = ['groups']
+        widgets = {
+            'groups': CheckboxSelectMultiple
+        }
+
+
+class UserUberUpdateForm(ModelFormSetLabelSuffix):
+    """A custom ModelForm for updating users with all fields enabled"""
+
+    class Meta:
+        model = User
+        fields = '__all__'
+        widgets = {
+            'groups': CheckboxSelectMultiple
+        }

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Update {{ user_detail.name }}{% endblock %}
+
+{% block main %}
+  {% include "base_update_form.html" with name=user_detail.username form=form csrf_token=csrf_token urlname='user_read' urlslug=user_detail.username %}
+{% endblock %}

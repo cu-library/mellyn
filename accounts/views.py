@@ -10,10 +10,13 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import FormMixin, UpdateView, CreateView, DeleteView
 
 from .models import User, GroupDescription
-from .forms import GroupDescriptionCreateForm, GroupDescriptionUpdateForm, GroupPermissionsForm
+from .forms import GroupDescriptionCreateForm, GroupDescriptionUpdateForm, \
+                   GroupPermissionsForm, \
+                   UserSearchForm, UserUpdateForm, UserUberUpdateForm
 
 
 # Custom Mixins
@@ -38,27 +41,61 @@ class SuccessMessageIfChangedMixin:
 
 # Staff
 
-class StaffUserList(UserPassesTestMixin, ListView):
+class UserList(UserPassesTestMixin, FormMixin, ListView):
     """A view of all staff users"""
-    context_object_name = 'staff'
+    context_object_name = 'users'
+    form_class = UserSearchForm
     model = User
-    queryset = User.objects.filter(is_staff=True)
-    template_name = 'accounts/staff_list.html'
+    ordering = ['-is_staff', '-date_joined']
+    paginate_by = 15
+    template_name = 'accounts/user_list.html'
 
     def test_func(self):
         return self.request.user.is_staff
 
+    def get_queryset(self):
+        qs = super().get_queryset().exclude(username='AnonymousUser')
+        q_param = self.request.GET.get('search', '')
+        if q_param != '':
+            qs = qs.search(q_param)
+        return qs
 
-class StaffUserRead(UserPassesTestMixin, DetailView):
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['search'] = self.request.GET.get('search', default='')
+        return initial
+
+
+class UserRead(UserPassesTestMixin, DetailView):
     """A view of a staff user"""
-    context_object_name = 'staff_user'
+    context_object_name = 'user_detail'
     model = User
-    queryset = User.objects.filter(is_staff=True)
     slug_field = 'username'
-    template_name = 'accounts/staff_read.html'
+    template_name = 'accounts/user_read.html'
 
     def test_func(self):
         return self.request.user.is_staff
+
+
+class UserUpdate(UserPassesTestMixin, SuccessMessageIfChangedMixin, UpdateView):
+    """A view to update a GroupDescription"""
+    context_object_name = 'user_detail'
+    model = User
+    form_class = UserUpdateForm
+    slug_field = 'username'
+    success_message = 'User was updated successfully.'
+    template_name_suffix = '_update_form'
+
+    def get_success_url(self):
+        return reverse_lazy('user_read', kwargs={'slug': self.kwargs['slug']})
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_form_class(self):
+        if self.request.user.is_superuser:
+            return UserUberUpdateForm
+        return self.form_class
 
 
 # GroupDescriptions

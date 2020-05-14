@@ -295,16 +295,19 @@ form textarea {
   font-weight: 300;
 }
 
-#id_permissions {
+#id_permissions,
+#id_groups {
   padding-left: 0;
 }
 
-#id_permissions li {
+#id_permissions li,
+#id_groups li {
   list-style: none;
   padding: 16px 0;
 }
 
-#id_permissions li input {
+#id_permissions li input,
+#id_groups li input {
   margin-right: 8px;
 }
 

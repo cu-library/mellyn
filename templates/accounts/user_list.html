@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block sitetitle %}Users{% endblock %}
+
+{% block main %}
+  <h2>Users</h2>
+  <form class="search" method="get">
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div id="{{ field.html_name }}_wrapper" {% if field.errors %}class="errors"{% endif %}>
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+      {% if field.help_text %}
+      <p class="help">{{ field.help_text|safe }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="actions">
+      <input class="ok" type="submit" value="Submit">
+    </div>
+  </form>
+  {% if users %}
+  <ul class="objectlist">
+    {% for user_listing in users %}
+    <li><a href="{% url 'user_read' user_listing.username %}" title="{{ user_listing.first_name }}{{ user_listing.last_name }}">{{ user_listing.username }}</a>{% if user_listing.is_staff %} (Staff){% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No users found.</p>
+  {% endif %}
+  {% include "pagination.html" %}
+{% endblock %}
