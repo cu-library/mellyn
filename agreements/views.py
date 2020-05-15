@@ -73,9 +73,9 @@ class ResourceList(LoginRequiredMixin, ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        queryset = self.model._default_manager.filter(hidden=False)
+        queryset = Resource.objects.filter(hidden=False)
         if self.request.user.is_superuser:
-            queryset = queryset.union(self.model._default_manager.filter(hidden=True))
+            queryset = queryset.union(Resource.objects.filter(hidden=True))
         # Add back resources to which the user has the view_resource permission.
         queryset = queryset.union(get_objects_for_user(self.request.user, 'agreements.view_resource'))
         ordering = self.get_ordering()
@@ -166,7 +166,8 @@ class ResourcePermissionsGroups(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ResourcePermissionsGroupUpdate(SuccessMessageIfChangedMixin, FormMixin, PermissionRequiredMixin, DetailView, ProcessFormView):
+class ResourcePermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRequiredMixin,
+                                     FormMixin, DetailView, ProcessFormView):
     """A view which updates the per-object permissions of a resource for a group"""
     context_object_name = 'resource'
     form_class = CustomGroupObjectPermissionsForm
