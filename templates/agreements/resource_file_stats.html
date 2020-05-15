@@ -3,17 +3,15 @@
 {% block sitetitle %}File Stats for {{ resource.name }}{% endblock %}
 
 {% block main %}
-  <div class="breadcrumb"><a aria-label="Return to the resource associated with these file stats" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
-  <h2>File Stats for {{ resource.name }}</h2>
+  <div class="breadcrumb"><a aria-label="Return to the resource associated with these file access statistics" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
+  <h2>File Access Statistics for {{ resource.name }}</h2>
   {% if file_stats %}
-  <h3>All Resources</h3>
   <ul>
     {% for file_stat in file_stats %}
     <li>{{ file_stat.downloads }} {{ file_stat.path }}</li>
     {% endfor %}
   </ul>
+  {% else %}
+  <p>No file access statistics.</p>
   {% endif %}
-  <div class="actions">
-
-  </div>
 {% endblock %}
