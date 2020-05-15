@@ -100,6 +100,9 @@ class ResourceRead(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         agreements = Agreement.objects.for_resource_with_signature(self.get_object(), self.request.user)
         context['can_edit'] = has_perm(self.request.user, 'agreements.change_resource', self.get_object())
+        context['can_view_file_access_stats'] = has_perm(self.request.user,
+                                                         'agreements.resource_view_file_access_stats',
+                                                         self.get_object())
         context['agreements'] = [a for a in agreements
                                  if (not a.hidden) or
                                  has_perm(self.request.user, 'agreements.view_agreement', a)]
@@ -284,7 +287,7 @@ class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which provides download stats for a Resources's files"""
     context_object_name = 'resource'
     model = Resource
-    permission_required = 'agreements.view_resource'
+    permission_required = 'agreements.view_file_access_stats'
     template_name = 'agreements/resource_file_stats.html'
 
     def get_context_data(self, **kwargs):
