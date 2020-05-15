@@ -39,9 +39,17 @@ class SuccessMessageIfChangedMixin:
         return self.success_message % cleaned_data
 
 
+class IsStaffMixin(UserPassesTestMixin):
+    """A custom access mixin which ensures the user is a staff member"""
+    raise_exception = True
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
 # Staff
 
-class UserList(UserPassesTestMixin, FormMixin, ListView):
+class UserList(IsStaffMixin, FormMixin, ListView):
     """A view of all staff users"""
     context_object_name = 'users'
     form_class = UserSearchForm
@@ -49,9 +57,6 @@ class UserList(UserPassesTestMixin, FormMixin, ListView):
     ordering = ['-is_staff', '-date_joined']
     paginate_by = 15
     template_name = 'accounts/user_list.html'
-
-    def test_func(self):
-        return self.request.user.is_staff
 
     def get_queryset(self):
         qs = super().get_queryset().exclude(username='AnonymousUser')

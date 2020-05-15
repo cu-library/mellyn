@@ -1,0 +1,14 @@
+  <form class="search" method="get">
+    {{ form.non_field_errors }}
+    <div id="search_wrapper" {% if form.search.errors %}class="errors"{% endif %}>
+      {{ form.search.label_tag }}
+      <div class="input_button_wrapper">
+        {{ form.search }}
+        <input class="ok" type="submit" value="Search">
+      </div>
+      {{ form.search.errors }}
+      {% if form.search.help_text %}
+      <p class="help">{{ form.search.help_text|safe }}</p>
+      {% endif %}
+    </div>
+  </form>

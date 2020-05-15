@@ -14,6 +14,19 @@ from guardian.forms import GroupObjectPermissionsForm
 from .models import User, GroupDescription, DEFAULT_ALLOWED_TAGS
 
 
+class UserSearchForm(Form):
+    """A form for searching for Users"""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super().__init__(*args, **kwargs)
+
+    search = CharField(label='Search Users', max_length=100, required=False,
+                       help_text='Find users who have a username, first name, last name, or '
+                                 'email containing this term. The search is case-insensitive. '
+                                 'It does not support boolean searches.')
+
+
 # Base Class
 
 class ModelFormSetLabelSuffix(ModelForm):
@@ -123,11 +136,6 @@ class CustomGroupObjectPermissionsForm(GroupObjectPermissionsForm):
         permissions = self.cleaned_data['permissions']
         return [permission for permission in permissions
                 if not (permission.startswith('delete_') or permission.startswith('add_'))]
-
-
-class UserSearchForm(Form):
-    """A form for searching for Users"""
-    search = CharField(label='', max_length=100, required=False)
 
 
 class UserUpdateForm(ModelFormSetLabelSuffix):

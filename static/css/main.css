@@ -104,7 +104,7 @@ main li {
   width: auto;
   height: 3em;
   line-height: 2em;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 4px 4px;
   z-index: 1;
   background: var(--skip-link-background);
   color: white;
@@ -333,12 +333,34 @@ form ul.errorlist.nonfield {
 
 form p.help {
   font-size: 0.9em;
-  margin-top: 8px;
+  margin: 8px 0;
   font-weight: 350;
 }
 
 form div.errors p.help {
   margin-top: 4px;
+}
+
+form div.input_button_wrapper {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+form div.input_button_wrapper input[type=submit] {
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  background-color: var(--ok-button-background);
+  padding: 8px 16px;
+  margin-left: 8px;
+}
+
+form div.input_button_wrapper input[type=submit]:hover {
+  background-color: var(--ok-button-hover-background);
+  transition-property: background-color;
+  transition-duration: 0.1s;
 }
 
 .actions {
@@ -353,7 +375,7 @@ form div.errors p.help {
 .actions a,
 .actions input[type=submit] {
   padding: 16px 32px;
-  border-radius: 10px;
+  border-radius: 4px;
   text-decoration: none;
   border: none;
   cursor: pointer;
