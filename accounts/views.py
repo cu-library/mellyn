@@ -82,7 +82,6 @@ class UserUpdate(IsStaffMixin, SuccessMessageIfChangedMixin, UpdateView):
     form_class = UserUpdateForm
     model = User
     slug_field = 'username'
-    success_message = 'User was updated successfully.'
     template_name_suffix = '_update_form'
 
     def get_success_message(self, cleaned_data):

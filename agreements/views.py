@@ -73,9 +73,17 @@ class ResourceList(LoginRequiredMixin, ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        qs = super().get_queryset().filter(hidden=False)
-        qs.union(get_objects_for_user(self.request.user, 'agreements.view_agreement'))
-        return qs
+        queryset = self.model._default_manager.filter(hidden=False)
+        if self.request.user.is_superuser:
+            queryset = queryset.union(self.model._default_manager.filter(hidden=True))
+        # Add back resources to which the user has the view_resource permission.
+        queryset = queryset.union(get_objects_for_user(self.request.user, 'agreements.view_resource'))
+        ordering = self.get_ordering()
+        if ordering:
+            if isinstance(ordering, str):
+                ordering = (ordering,)
+            queryset = queryset.order_by(*ordering)
+        return queryset
 
 
 class ResourceRead(LoginRequiredMixin, DetailView):
@@ -158,7 +166,7 @@ class ResourcePermissionsGroups(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ResourcePermissionsGroupUpdate(FormMixin, PermissionRequiredMixin, DetailView, ProcessFormView):
+class ResourcePermissionsGroupUpdate(SuccessMessageIfChangedMixin, FormMixin, PermissionRequiredMixin, DetailView, ProcessFormView):
     """A view which updates the per-object permissions of a resource for a group"""
     context_object_name = 'resource'
     form_class = CustomGroupObjectPermissionsForm
@@ -168,6 +176,9 @@ class ResourcePermissionsGroupUpdate(FormMixin, PermissionRequiredMixin, DetailV
 
     def get_success_url(self):
         return reverse_lazy('resources_permissions_groups', kwargs={'slug': self.kwargs['slug']})
+
+    def get_success_message(self, cleaned_data):
+        return f'Object permissions on {self.get_object().name} have been updated successfully.'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

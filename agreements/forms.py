@@ -27,7 +27,7 @@ class ResourceCreateForm(ModelFormSetLabelSuffix):
 
     class Meta:
         model = Resource
-        fields = ['name', 'slug', 'low_codes_threshold', 'low_codes_email', 'description']
+        fields = ['name', 'slug', 'low_codes_threshold', 'low_codes_email', 'description', 'hidden']
         help_texts = {
             'slug': 'URL-safe identifier for the resource. It cannot be changed after the resource is created.'
         }
@@ -48,7 +48,7 @@ class ResourceUpdateForm(ModelFormSetLabelSuffix):
 
     class Meta:
         model = Resource
-        fields = ['name', 'slug', 'low_codes_threshold', 'low_codes_email', 'description']
+        fields = ['name', 'slug', 'low_codes_threshold', 'low_codes_email', 'description', 'hidden']
         widgets = {
             'description': Textarea(attrs={
                 'cols': 80, 'rows': 20, 'wrap': 'off',
