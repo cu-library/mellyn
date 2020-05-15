@@ -209,7 +209,7 @@ class ResourcePermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionReq
 
 
 class ResourceAccess(LoginRequiredMixin, DetailView):
-    """A view which allows access to files associated with a Resource"""
+    """A view which allows access to files associated with a resource"""
     context_object_name = 'resource'
     model = Resource
     template_name_suffix = '_access'
@@ -284,7 +284,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
 
 
 class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
-    """A view which provides download stats for a Resources's files"""
+    """A view which provides download stats for a resources's files"""
     context_object_name = 'resource'
     model = Resource
     permission_required = 'agreements.view_file_access_stats'
