@@ -70,6 +70,7 @@ class SuccessMessageIfChangedMixin:
 class PermissionRequiredCheckGlobalMixin(GuardianPermissionRequiredMixin):
     """A subclass of Guardian's PermissionRequiredMixin that checks the global permissions first"""
     accept_global_perms = True
+    raise_exception = True
 
 
 # Resources
@@ -98,6 +99,7 @@ class ResourceRead(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         agreements = Agreement.objects.for_resource_with_signature(self.get_object(), self.request.user)
+        context['can_edit'] = has_perm(self.request.user, 'agreements.change_resource', self.get_object())
         context['agreements'] = [a for a in agreements
                                  if (not a.hidden) or
                                  has_perm(self.request.user, 'agreements.view_agreement', a)]
@@ -134,11 +136,11 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name_suffix = '_delete_form'
 
 
-class ResourcePermissions(PermissionRequiredMixin, DetailView):
+class ResourcePermissions(PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which reports on the permissions on this resource"""
     context_object_name = 'resource'
     model = Resource
-    permission_required = 'agreements.add_resource'
+    permission_required = 'agreements.change_resource'
     template_name = 'agreements/resource_permissions.html'
 
     def get_context_data(self, **kwargs):
@@ -149,11 +151,11 @@ class ResourcePermissions(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ResourcePermissionsGroups(PermissionRequiredMixin, DetailView):
+class ResourcePermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which lists groups"""
     context_object_name = 'resource'
     model = Resource
-    permission_required = 'agreements.add_resource'
+    permission_required = 'agreements.change_resource'
     template_name = 'agreements/resource_permissions_groups.html'
 
     def get_context_data(self, **kwargs):
@@ -169,13 +171,13 @@ class ResourcePermissionsGroups(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ResourcePermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRequiredMixin,
+class ResourcePermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRequiredCheckGlobalMixin,
                                      FormMixin, DetailView, ProcessFormView):
     """A view which updates the per-object permissions of a resource for a group"""
     context_object_name = 'resource'
     form_class = CustomGroupObjectPermissionsForm
     model = Resource
-    permission_required = 'agreements.add_resource'
+    permission_required = 'agreements.change_resource'
     template_name = 'agreements/resource_permissions_group_update.html'
 
     def get_success_url(self):
@@ -278,7 +280,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
         return context
 
 
-class ResourceAccessFileStats(PermissionRequiredMixin, DetailView):
+class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which provides download stats for a Resources's files"""
     context_object_name = 'resource'
     model = Resource

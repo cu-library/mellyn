@@ -28,8 +28,8 @@
   </ul>
   {% endif %}
   <div class="actions">
-    <a class="permissions" href="{% url 'resources_permissions' resource.slug %}">Permissions</a>
-    <a class="ok" href="{% url 'resources_update' resource.slug %}">Edit</a>
-    <a class="warning" href="{% url 'resources_delete' resource.slug %}">Delete</a>
+    {% if can_edit %}<a class="permissions" href="{% url 'resources_permissions' resource.slug %}">Permissions</a>{% endif %}
+    {% if can_edit %}<a class="ok" href="{% url 'resources_update' resource.slug %}">Edit</a>{% endif %}
+    {% if perms.accounts.delete_resource %}<a class="warning" href="{% url 'resources_delete' resource.slug %}">Delete</a>{% endif %}
   </div>
 {% endblock %}
