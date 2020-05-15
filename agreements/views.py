@@ -75,7 +75,7 @@ class PermissionRequiredCheckGlobalMixin(GuardianPermissionRequiredMixin):
 # Resources
 
 class ResourceList(LoginRequiredMixin, ListView):
-    """A view of all Resources"""
+    """A view of all resources"""
     context_object_name = 'resources'
     model = Resource
     ordering = 'name'
@@ -90,7 +90,7 @@ class ResourceList(LoginRequiredMixin, ListView):
 
 
 class ResourceRead(LoginRequiredMixin, DetailView):
-    """A view of a Resource"""
+    """A view of a resource"""
     context_object_name = 'resource'
     model = Resource
     template_name_suffix = '_read'
@@ -105,7 +105,7 @@ class ResourceRead(LoginRequiredMixin, DetailView):
 
 
 class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
-    """A view to create a Resource"""
+    """A view to create a resource"""
     form_class = ResourceCreateForm
     model = Resource
     permission_required = 'agreements.add_resource'
@@ -114,7 +114,7 @@ class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 
 
 class ResourceUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChangedMixin, UpdateView):
-    """A view to update a Resource"""
+    """A view to update a resource"""
     context_object_name = 'resource'
     form_class = ResourceUpdateForm
     model = Resource
@@ -124,7 +124,7 @@ class ResourceUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChanged
 
 
 class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
-    """A view to delete a Resource"""
+    """A view to delete a resource"""
     context_object_name = 'resource'
     fields = '__all__'
     model = Resource
@@ -135,7 +135,7 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
 
 
 class ResourcePermissions(PermissionRequiredMixin, DetailView):
-    """A view which reports on the permissions on this Resource"""
+    """A view which reports on the permissions on this resource"""
     context_object_name = 'resource'
     model = Resource
     permission_required = 'agreements.add_resource'
