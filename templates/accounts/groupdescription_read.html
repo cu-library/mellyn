@@ -33,8 +33,8 @@
   <p>No users in this group.</p>
   {% endif %}
   <div class="actions">
-    <a class="permissions" href="{% url 'groupdescriptions_update_permissions' groupdescription.slug %}">Edit Global Permissions</a>
-    <a class="ok" href="{% url 'groupdescriptions_update' groupdescription.slug %}">Edit</a>
-    <a class="warning" href="{% url 'groupdescriptions_delete' groupdescription.slug %}">Delete</a>
+    {% if perms.accounts.change_groupdescription %}<a class="permissions" href="{% url 'groupdescriptions_update_permissions' groupdescription.slug %}">Edit Global Permissions</a>{% endif %}
+    {% if perms.accounts.change_groupdescription %}<a class="ok" href="{% url 'groupdescriptions_update' groupdescription.slug %}">Edit</a>{% endif %}
+    {% if perms.accounts.delete_groupdescription %}<a class="warning" href="{% url 'groupdescriptions_delete' groupdescription.slug %}">Delete</a>{% endif %}
   </div>
 {% endblock %}

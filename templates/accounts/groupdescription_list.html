@@ -14,6 +14,6 @@
     <p>No groups found.</p>
   {% endif %}
   <div class="actions">
-    <a class="ok" href="{% url 'groupdescriptions_create' %}">Create a new group</a>
+    {% if perms.accounts.add_groupdescription %}<a class="ok" href="{% url 'groupdescriptions_create' %}">Create a new group</a>{% endif %}
   </div>
 {% endblock %}

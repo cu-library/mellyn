@@ -11,7 +11,7 @@
     <li><h3><a href="{% url 'faculties_list' %}">Faculties</a></h3></li>
     <li><h3><a href="{% url 'departments_list' %}">Departments</a></h3></li>
     <li><h3><a href="{% url 'resources_list' %}">Resources</a></h3></li>
-    <li><h3><a href="{% url 'users_list' %}">Users</a></h3></li>
-    <li><h3><a href="{% url 'groupdescriptions_list' %}">Groups</a></h3></li>
+    {% if request.user.is_staff %}<li><h3><a href="{% url 'users_list' %}">Users</a></h3></li>{% endif %}
+    {% if perms.accounts.view_groupdescription %}<li><h3><a href="{% url 'groupdescriptions_list' %}">Groups</a></h3></li>{% endif %}
   </ul>
 {% endblock %}

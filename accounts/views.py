@@ -79,8 +79,8 @@ class UserRead(IsStaffMixin, DetailView):
 class UserUpdate(IsStaffMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a user"""
     context_object_name = 'user_detail'
-    model = User
     form_class = UserUpdateForm
+    model = User
     slug_field = 'username'
     success_message = 'User was updated successfully.'
     template_name_suffix = '_update_form'
@@ -105,14 +105,14 @@ class UserUpdate(IsStaffMixin, SuccessMessageIfChangedMixin, UpdateView):
 # GroupDescriptions
 
 class GroupDescriptionList(PermissionRequiredMixin, ListView):
-    """A view of all GroupDescription"""
+    """A view of all group descriptions"""
     context_object_name = 'groupdescriptions'
     model = GroupDescription
     permission_required = 'accounts.view_groupdescription'
 
 
 class GroupDescriptionRead(PermissionRequiredMixin, DetailView):
-    """A view of a GroupDescription"""
+    """A view of a group description"""
     context_object_name = 'groupdescription'
     model = GroupDescription
     permission_required = 'accounts.view_groupdescription'
@@ -129,7 +129,7 @@ class GroupDescriptionCreate(PermissionRequiredMixin, SuccessMessageMixin, Creat
 
 
 class GroupDescriptionUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
-    """A view to update a GroupDescription"""
+    """A view to update a group description"""
     context_object_name = 'groupdescription'
     form_class = GroupDescriptionUpdateForm
     model = GroupDescription
@@ -139,7 +139,7 @@ class GroupDescriptionUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMix
 
 
 class GroupDescriptionUpdatePermissions(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
-    """A view to update a GroupDescription"""
+    """A view to update a group description"""
     context_object_name = 'group'
     form_class = GroupPermissionsForm
     model = Group
@@ -160,7 +160,7 @@ class GroupDescriptionUpdatePermissions(PermissionRequiredMixin, SuccessMessageI
 
 
 class GroupDescriptionDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
-    """A view to delete a GroupDescription"""
+    """A view to delete a group description"""
     context_object_name = 'groupdescription'
     fields = '__all__'
     model = GroupDescription
@@ -173,10 +173,10 @@ class GroupDescriptionDelete(PermissionRequiredMixin, SuccessMessageMixin, Delet
 # Login and Logout
 
 class Login(LoginView):
-    """A the user authentication login view"""
+    """The user authentication login view"""
     template_name = 'accounts/login.html'
 
 
 class Logout(LogoutView):
-    """A the user authentication login view"""
+    """The user authentication login view"""
     template_name = 'accounts/logout.html'
