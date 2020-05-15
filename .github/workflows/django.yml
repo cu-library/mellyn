@@ -41,7 +41,7 @@ jobs:
       with:
         node-version: '12.x'
     - name: Install dependencies
-      run: npm install jshint stylelint stylelint-config-standard
+      run: npm -g install jshint stylelint stylelint-config-standard
     - name: Run jshunt and stylelint
       run: |
         jshint static/js/main.js
