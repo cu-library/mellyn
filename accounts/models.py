@@ -21,6 +21,45 @@ DEFAULT_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
                         'u', 'ul', 'ol', 'li']
 
 
+class UserQuerySet(QuerySet):
+    """A custom queryset for Users"""
+
+    def search(self, query):
+        """Search users for the query"""
+        if query is None:
+            raise TypeError('query cannot be none')
+        return self.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query)
+            )
+
+
+class CustomUserManager(UserManager):
+    """A custom User model manager"""
+
+    def get_queryset(self):
+        """Return our custom User queryset"""
+        return UserQuerySet(self.model, using=self._db)
+
+    def search(self, query):
+        """Wire the queryset and manager methods together"""
+        return self.get_queryset().search(query)
+
+
+class User(GuardianUserMixin, AbstractUser):
+    """
+    A custom user which inherits behaviour from Django's built in User class.
+
+    This is here as a placeholder in case we want to make changes in the future, as
+    recommended in the docs:
+    https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
+    """
+
+    objects = CustomUserManager()
+
+
 class GroupDescriptionQuerySet(QuerySet):
     """A custom queryset for GroupDescriptions"""
 
@@ -101,42 +140,3 @@ class GroupDescription(models.Model):
     def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ,signature-differs
         super().delete(*args, **kwargs)
         self.group.delete()
-
-
-class UserQuerySet(QuerySet):
-    """A custom queryset for Users"""
-
-    def search(self, query):
-        """Search users for the query"""
-        if query is None:
-            raise TypeError('query cannot be none')
-        return self.filter(
-            Q(username__icontains=query) |
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(email__icontains=query)
-            )
-
-
-class CustomUserManager(UserManager):
-    """A custom User model manager"""
-
-    def get_queryset(self):
-        """Return our custom User queryset"""
-        return UserQuerySet(self.model, using=self._db)
-
-    def search(self, query):
-        """Wire the queryset and manager methods together"""
-        return self.get_queryset().search(query)
-
-
-class User(GuardianUserMixin, AbstractUser):
-    """
-    A custom user which inherits behaviour from Django's built in User class.
-
-    This is here as a placeholder in case we want to make changes in the future, as
-    recommended in the docs:
-    https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
-    """
-
-    objects = CustomUserManager()

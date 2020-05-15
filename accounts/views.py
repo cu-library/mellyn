@@ -14,9 +14,8 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin, UpdateView, CreateView, DeleteView
 
 from .models import User, GroupDescription
-from .forms import GroupDescriptionCreateForm, GroupDescriptionUpdateForm, \
-                   GroupPermissionsForm, \
-                   UserSearchForm, UserUpdateForm, UserUberUpdateForm
+from .forms import UserSearchForm, UserUpdateForm, UserUberUpdateForm, \
+                   GroupDescriptionCreateForm, GroupDescriptionUpdateForm, GroupPermissionsForm
 
 
 # Custom Mixins

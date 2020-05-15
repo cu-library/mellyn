@@ -14,6 +14,18 @@ from guardian.forms import GroupObjectPermissionsForm
 from .models import User, GroupDescription, DEFAULT_ALLOWED_TAGS
 
 
+# Base Class
+
+class ModelFormSetLabelSuffix(ModelForm):
+    """A ModelForm which overrides label_suffix to the empty string"""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super().__init__(*args, **kwargs)
+
+
+# Users
+
 class UserSearchForm(Form):
     """A form for searching for Users"""
 
@@ -27,14 +39,26 @@ class UserSearchForm(Form):
                                  'It does not support boolean searches.')
 
 
-# Base Class
+class UserUpdateForm(ModelFormSetLabelSuffix):
+    """A custom ModelForm for updating users"""
 
-class ModelFormSetLabelSuffix(ModelForm):
-    """A ModelForm which overrides label_suffix to the empty string"""
+    class Meta:
+        model = User
+        fields = ['groups']
+        widgets = {
+            'groups': CheckboxSelectMultiple
+        }
 
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('label_suffix', '')
-        super().__init__(*args, **kwargs)
+
+class UserUberUpdateForm(ModelFormSetLabelSuffix):
+    """A custom ModelForm for updating users with all fields enabled"""
+
+    class Meta:
+        model = User
+        fields = '__all__'
+        widgets = {
+            'groups': CheckboxSelectMultiple
+        }
 
 
 # Group Descriptions
@@ -136,25 +160,3 @@ class CustomGroupObjectPermissionsForm(GroupObjectPermissionsForm):
         permissions = self.cleaned_data['permissions']
         return [permission for permission in permissions
                 if not (permission.startswith('delete_') or permission.startswith('add_'))]
-
-
-class UserUpdateForm(ModelFormSetLabelSuffix):
-    """A custom ModelForm for updating users"""
-
-    class Meta:
-        model = User
-        fields = ['groups']
-        widgets = {
-            'groups': CheckboxSelectMultiple
-        }
-
-
-class UserUberUpdateForm(ModelFormSetLabelSuffix):
-    """A custom ModelForm for updating users with all fields enabled"""
-
-    class Meta:
-        model = User
-        fields = '__all__'
-        widgets = {
-            'groups': CheckboxSelectMultiple
-        }
