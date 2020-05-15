@@ -9,8 +9,10 @@
   <p><strong>First Name: </strong>{{ user_detail.first_name }}</p>
   <p><strong>Last Name: </strong>{{ user_detail.last_name }}</p>
   <p><strong>Email: </strong>{{ user_detail.email }}</p>
+  <p><strong>Last login: </strong>{% if user_detail.last_login %}{{ user_detail.last_login|date:"Y-m-d \a\t g:i a e" }}{% else %}None{% endif %}</p>
+  <p><strong>Date joined: </strong>{{ user_detail.date_joined|date:"Y-m-d \a\t g:i a e" }}</p>
   {% if user_detail.groups.all %}
-  <p><strong>Groups: </strong>
+  <h3>Groups</h3>
   <ul>
     {% for group in user_detail.groups.all %}
     <li>{{group.name}}</li>
