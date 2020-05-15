@@ -24,7 +24,6 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMi
 from csv_export.views import CSVExportView
 from django_sendfile import sendfile
 from guardian.mixins import PermissionRequiredMixin as GuardianPermissionRequiredMixin
-from guardian.shortcuts import get_objects_for_user
 import humanize
 
 from accounts.models import GroupDescription
@@ -36,6 +35,16 @@ from .forms import ResourceCreateForm, ResourceUpdateForm, \
                    AgreementCreateForm, AgreementUpdateForm, \
                    SignatureCreateForm, SignatureSearchForm
 from .models import Resource, LicenseCode, Faculty, Department, Agreement, Signature, FileDownloadEvent
+
+
+# Library functions that should exist
+
+def has_perm(user, perm, obj):
+    """
+    Return true is has_perm on the user would return true for either the
+    object or global permission check.
+    """
+    return user.has_perm(perm) or user.has_perm(perm, obj)
 
 
 # Custom Mixins
@@ -71,19 +80,13 @@ class ResourceList(LoginRequiredMixin, ListView):
     model = Resource
     ordering = 'name'
     paginate_by = 15
+    template_name = 'agreements/resource_list.html'
 
     def get_queryset(self):
-        queryset = Resource.objects.filter(hidden=False)
-        if self.request.user.is_superuser:
-            queryset = queryset.union(Resource.objects.filter(hidden=True))
-        # Add back resources to which the user has the view_resource permission.
-        queryset = queryset.union(get_objects_for_user(self.request.user, 'agreements.view_resource'))
-        ordering = self.get_ordering()
-        if ordering:
-            if isinstance(ordering, str):
-                ordering = (ordering,)
-            queryset = queryset.order_by(*ordering)
-        return queryset
+        queryset = super().get_queryset()
+        return [r for r in queryset
+                if (not r.hidden) or
+                has_perm(self.request.user, 'agreements.view_resource', r)]
 
 
 class ResourceRead(LoginRequiredMixin, DetailView):
@@ -94,10 +97,10 @@ class ResourceRead(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        agreements = Agreement.objects.all()
-        if not self.request.user.has_perm('agreements.view_agreement'):
-            agreements = agreements.exclude(hidden=True)
-        context['agreements'] = agreements.for_resource_with_signature(self.get_object(), self.request.user)
+        agreements = Agreement.objects.for_resource_with_signature(self.get_object(), self.request.user)
+        context['agreements'] = [a for a in agreements
+                                 if (not a.hidden) or
+                                 has_perm(self.request.user, 'agreements.view_agreement', a)]
         return context
 
 
