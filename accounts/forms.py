@@ -109,7 +109,9 @@ class PermissionsChoiceField(ModelMultipleChoiceField):
     and drops 'description' from group description.
     """
     def label_from_instance(self, obj):
-        return obj.name.replace('group description', 'group')
+        if obj.codename.startswith('view_'):
+                obj.name += " even if hidden"
+        return obj.name.replace('group description', 'group').replace(' this ', ' any ')
 
 
 class GroupPermissionsForm(ModelFormSetLabelSuffix):
@@ -124,7 +126,10 @@ class GroupPermissionsForm(ModelFormSetLabelSuffix):
                                                  Q(content_type__model='groupdescription')
                                              )
                                              .exclude(
-                                                 Q(content_type__model__icontains='historical')
+                                                 Q(content_type__model__icontains='historical') |
+                                                 Q(content_type__model='licensecode') |
+                                                 Q(content_type__model='filedownloadevent') |
+                                                 Q(content_type__model='signature')
                                              ))
                                          )
 
