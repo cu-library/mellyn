@@ -21,9 +21,7 @@ from .forms import UserSearchForm, UserUpdateForm, UserUberUpdateForm, \
 # Custom Mixins
 
 class SuccessMessageIfChangedMixin:
-    """
-    Add a success message on successful form submission if the form has changed.
-    """
+    """Add a success message on successful form submission if the form has changed."""
     success_message = ''
 
     def form_valid(self, form):  # pylint: disable=missing-function-docstring
@@ -49,7 +47,7 @@ class IsStaffMixin(UserPassesTestMixin):
 # Staff
 
 class UserList(IsStaffMixin, FormMixin, ListView):
-    """A view of all staff users"""
+    """A view of all users"""
     context_object_name = 'users'
     form_class = UserSearchForm
     model = User
@@ -70,15 +68,12 @@ class UserList(IsStaffMixin, FormMixin, ListView):
         return initial
 
 
-class UserRead(UserPassesTestMixin, DetailView):
-    """A view of a staff user"""
+class UserRead(IsStaffMixin, DetailView):
+    """A view of a user"""
     context_object_name = 'user_detail'
     model = User
     slug_field = 'username'
     template_name = 'accounts/user_read.html'
-
-    def test_func(self):
-        return self.request.user.is_staff
 
 
 class UserUpdate(UserPassesTestMixin, SuccessMessageIfChangedMixin, UpdateView):
