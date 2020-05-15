@@ -76,8 +76,8 @@ class UserRead(IsStaffMixin, DetailView):
     template_name = 'accounts/user_read.html'
 
 
-class UserUpdate(UserPassesTestMixin, SuccessMessageIfChangedMixin, UpdateView):
-    """A view to update a GroupDescription"""
+class UserUpdate(IsStaffMixin, SuccessMessageIfChangedMixin, UpdateView):
+    """A view to update a user"""
     context_object_name = 'user_detail'
     model = User
     form_class = UserUpdateForm
@@ -85,11 +85,11 @@ class UserUpdate(UserPassesTestMixin, SuccessMessageIfChangedMixin, UpdateView):
     success_message = 'User was updated successfully.'
     template_name_suffix = '_update_form'
 
-    def get_success_url(self):
-        return reverse_lazy('users_read', kwargs={'slug': self.kwargs['slug']})
+    def get_success_message(self, cleaned_data):
+        return f'{self.get_object().username} has been updated successfully.'
 
-    def test_func(self):
-        return self.request.user.is_staff
+    def get_success_url(self):
+        return reverse_lazy('users_read', kwargs={'slug': self.get_object().username})
 
     def get_form_class(self):
         if self.request.user.is_superuser:
