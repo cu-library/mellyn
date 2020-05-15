@@ -5,12 +5,17 @@ from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 
 
-class AdminView(UserPassesTestMixin, TemplateView):
-    """A view to help admin staff access lists of Models"""
-    template_name = 'admin.html'
+class IsStaffMixin(UserPassesTestMixin):
+    """A custom access mixin which ensures the user is a staff member"""
+    raise_exception = True
 
     def test_func(self):
         return self.request.user.is_staff
+
+
+class AdminView(IsStaffMixin, TemplateView):
+    """A view to help admin staff access lists of Models"""
+    template_name = 'admin.html'
 
 
 def index(request):
