@@ -109,6 +109,7 @@ class GroupDescriptionList(PermissionRequiredMixin, ListView):
     context_object_name = 'groupdescriptions'
     model = GroupDescription
     ordering = 'name'
+    paginate_by = 15
     permission_required = 'accounts.view_groupdescription'
 
 

@@ -13,6 +13,7 @@
   {% else %}
     <p>No groups found.</p>
   {% endif %}
+  {% include "pagination.html" %}
   <div class="actions">
     {% if perms.accounts.add_groupdescription %}<a class="ok" href="{% url 'groupdescriptions_create' %}">Create a new group</a>{% endif %}
   </div>
