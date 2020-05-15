@@ -96,6 +96,11 @@ class UserUpdate(IsStaffMixin, SuccessMessageIfChangedMixin, UpdateView):
             return UserUberUpdateForm
         return self.form_class
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['fullname'] = f'{self.get_object().first_name} {self.get_object().last_name}'
+        return context
+
 
 # GroupDescriptions
 
