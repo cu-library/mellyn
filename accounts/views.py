@@ -108,6 +108,7 @@ class GroupDescriptionList(PermissionRequiredMixin, ListView):
     """A view of all group descriptions"""
     context_object_name = 'groupdescriptions'
     model = GroupDescription
+    ordering = 'name'
     permission_required = 'accounts.view_groupdescription'
 
 
