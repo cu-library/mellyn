@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block sitetitle %}Signatures{%if agreement %} for {{ agreement.title }}{% endif %}{% endblock %}
+{% block sitetitle %}Signatures{% if agreement %} for {{ agreement.title }}{% endif %}{% endblock %}
 
 {% block main %}
   <h2>Signatures</h2>
@@ -43,7 +43,7 @@
   <h3>Signature List</h3>
   <ul class="objectlist">
     {% for signature in signatures %}
-    <li>{{ signature.signed_at | date:"Y-m-d" }} - {{ signature.username }} - {{ signature.email }} - {{ signature.first_name }} {{ signature.last_name }} - {{ signature.department }}</li>
+    <li>{{ signature.signed_at|date:"Y-m-d" }} - {{ signature.username }} - {{ signature.email }} - {{ signature.first_name }} {{ signature.last_name }} - {{ signature.department }}</li>
     {% endfor %}
   </ul>
   {% else %}

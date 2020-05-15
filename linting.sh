@@ -15,6 +15,14 @@ pylint --load-plugins pylint_django mellyn
 flake8 mellyn
 
 echo ""
+echo "Template checks"
+grep -r '{%[^ ]' templates/
+grep -r '[^ ]%}' templates/
+grep -r '{{[^ ]' templates/
+grep -r '[^ ]}}' templates/
+grep -r ' | ' templates/
+
+echo ""
 echo "JSHint on static/js/main.js"
 jshint static/js/main.js
 

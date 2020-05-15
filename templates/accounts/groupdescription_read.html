@@ -5,9 +5,10 @@
 {% block main %}
   <div class="breadcrumb"><a aria-label="Return to the list of groups" href="{% url 'groupdescriptions_list' %}">&larr; Groups</a></div>
   <h2>{{ groupdescription.name }}</h2>
-  <section class="htmlfield">{{ groupdescription.description | safe}}</section>
+  <section class="htmlfield">{{ groupdescription.description|safe }}</section>
   <h3>Global Permissions</h3>
-  <p>These permissions allow members of the group to add, change, delete, or view ANY object of a particular type. <br> This permission is checked before permissions on individual objects are checked.</p>
+  <p>These permissions allow members of the group to add, change, delete, or view ANY object of a particular type. <br>
+  This permission is checked before permissions on individual objects are checked.</p>
   {% if groupdescription.group.permissions.all %}
   <ul>
     {% for permission in groupdescription.group.permissions.all %}
