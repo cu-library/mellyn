@@ -3,10 +3,8 @@
 {% block sitetitle %}Signatures{% if agreement %} for {{ agreement.title }}{% endif %}{% endblock %}
 
 {% block main %}
-  <h2>Signatures</h2>
-  {% if agreement %}
-  <p>For <a href="{% url 'agreements_read' agreement.slug %}">{{ agreement.title }}</a></p>
-  {% endif %}
+  <div class="breadcrumb"><a aria-label="Return to the agreement associated with this list of signatures" href="{% url 'agreements_read' agreement.slug %}">&larr; {{ agreement.title }}</a></div>
+  <h2>Signatures on {{ agreement.title }}</h2>
   <form class="search" method="get">
     {{ form.non_field_errors }}
     {% for field in form %}
@@ -51,8 +49,6 @@
   {% endif %}
   {% include "pagination.html" %}
   <div class="actions">
-    {% if agreement %}
-    <a class="bonus" href="{% url 'signatures_for_agreement_csv' agreement.slug %}">Download CSV file of signatures</a>
-    {% endif %}
+    {% can_download_signatures %}<a class="bonus" href="{% url 'signatures_for_agreement_csv' agreement.slug %}">Download CSV file of signatures</a>{% endif %}
   </div>
 {% endblock %}

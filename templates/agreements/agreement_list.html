@@ -19,6 +19,6 @@
   {% endif %}
   {% include "pagination.html" %}
   <div class="actions">
-    <a class="ok" href="{% url 'agreements_create' %}">Create a new agreement</a>
+    {% if perms.accounts.add_agreement %}<a class="ok" href="{% url 'agreements_create' %}">Create a new agreement</a>{% endif %}
   </div>
 {% endblock %}

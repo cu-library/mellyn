@@ -26,7 +26,7 @@
   </ul>
   {% endif %}
   <div class="actions">
-    {% if can_view_licensecodes %}<a class="bonus" href="{% url 'resources_codes' resource.slug %}">License Codes</a>{% endif %}
+    {% if can_view_licensecodes %}<a class="bonus" href="{% url 'resources_codes_list' resource.slug %}">License Codes</a>{% endif %}
     {% if can_view_file_access_stats %}<a class="bonus" href="{% url 'resources_file_stats' resource.slug %}">File Access Stats</a>{% endif %}
     {% if can_edit %}<a class="permissions" href="{% url 'resources_permissions' resource.slug %}">Permissions</a>{% endif %}
     {% if can_edit %}<a class="ok" href="{% url 'resources_update' resource.slug %}">Edit</a>{% endif %}

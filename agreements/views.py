@@ -86,16 +86,23 @@ class ResourceList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return [r for r in queryset
-                if (not r.hidden) or
-                has_perm(self.request.user, 'agreements.view_resource', r)]
+        return [resource for resource in queryset
+                if (not resource.hidden) or
+                has_perm(self.request.user, 'agreements.view_resource', resource)]
 
 
-class ResourceRead(LoginRequiredMixin, DetailView):
+class ResourceRead(UserPassesTestMixin, LoginRequiredMixin, DetailView):
     """A view of a resource"""
     context_object_name = 'resource'
     model = Resource
     template_name_suffix = '_read'
+
+    def test_func(self):
+        resource = self.get_object()
+        # If the resource is hidden, you have to have the right permissions.
+        if not resource.hidden:
+            return True
+        return has_perm(self.request.user, 'agreements.view_resource', resource)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -330,7 +337,7 @@ class ResourceLicenseCodeAdd(PermissionRequiredCheckGlobalMixin, FormMixin, Deta
     template_name = 'agreements/resource_licensecode_add_form.html'
 
     def get_success_url(self):
-        return reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']})
+        return reverse_lazy('resources_codes_list', kwargs={'slug': self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()  # pylint: disable=attribute-defined-outside-init
@@ -346,7 +353,7 @@ class ResourceLicenseCodeAdd(PermissionRequiredCheckGlobalMixin, FormMixin, Deta
                     license_code.full_clean()
                 except ValidationError:
                     messages.error(self.request, f'Error when saving license code {code}, possible duplicate.')
-                    return redirect(reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']}))
+                    return redirect(reverse_lazy('resources_codes_list', kwargs={'slug': self.kwargs['slug']}))
                 license_code.save()
                 successes += 1
         if successes > 1:
@@ -503,12 +510,13 @@ class AgreementList(LoginRequiredMixin, ListView):
     model = Agreement
     ordering = 'title'
     paginate_by = 15
+    template_name = 'agreements/agreement_list.html'
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        if not self.request.user.has_perm('agreements.view_agreement'):
-            qs = qs.exclude(hidden=True)
-        return qs
+        queryset = super().get_queryset()
+        return [agreement for agreement in queryset
+                if (not agreement.hidden) or
+                has_perm(self.request.user, 'agreements.view_agreement', agreement)]
 
 
 class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailView, ProcessFormView):
@@ -519,10 +527,11 @@ class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailVi
     template_name_suffix = '_read'
 
     def test_func(self):
+        agreement = self.get_object()
         # If the agreement isn't valid to see, you have to have the right permissions.
-        if self.get_object().valid():
+        if agreement.valid():
             return True
-        return self.request.user.has_perm('agreements.view_agreement')
+        return has_perm(self.request.user, 'agreements.view_agreement', agreement)
 
     def get_success_url(self):
         return reverse_lazy('agreements_read', kwargs={'slug': self.kwargs['slug']})
@@ -563,6 +572,10 @@ class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailVi
                 )
         except Signature.DoesNotExist:
             context['associated_signature'] = None
+        context['can_edit'] = has_perm(self.request.user, 'agreements.change_agreement', context['agreement'])
+        context['can_search_signatures'] = has_perm(self.request.user,
+                                                    'agreements.agreement_search_signatures',
+                                                    context['agreement'])
         return context
 
 
@@ -575,7 +588,7 @@ class AgreementCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     template_name_suffix = '_create_form'
 
 
-class AgreementUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
+class AgreementUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update an Agreement"""
     context_object_name = 'agreement'
     form_class = AgreementUpdateForm
@@ -596,32 +609,32 @@ class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name_suffix = '_delete_form'
 
 
-class AgreementPermissions(PermissionRequiredMixin, DetailView):
+class AgreementPermissions(PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which reports on the permissions on this Agreement"""
     context_object_name = 'agreement'
     model = Agreement
-    permission_required = 'agreements.add_agreement'
+    permission_required = 'agreements.change_agreement'
     template_name = 'agreements/agreement_permissions.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['global_permissions'] = GroupDescription.objects.for_model_with_permissions('agreement')
         context['object_permissions'] = (GroupDescription.objects
-                                         .for_object_with_groupobjectpermissions('agreement', self.get_object().id))
+                                         .for_object_with_groupobjectpermissions('agreement', context['agreement'].id))
         return context
 
 
-class AgreementPermissionsGroups(PermissionRequiredMixin, DetailView):
+class AgreementPermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which lists groups"""
     context_object_name = 'agreement'
     model = Agreement
-    permission_required = 'agreements.add_agreement'
+    permission_required = 'agreements.change_agreement'
     template_name = 'agreements/agreement_permissions_groups.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object_permissions'] = (GroupDescription.objects
-                                         .for_object_with_groupobjectpermissions('agreement', self.get_object().id))
+                                         .for_object_with_groupobjectpermissions('agreement', context['agreement'].id))
         context['groupdescriptions'] = []
         groupdescriptions = GroupDescription.objects.all().order_by('name')
         # .difference() would be better here but it causes an error.
@@ -631,7 +644,8 @@ class AgreementPermissionsGroups(PermissionRequiredMixin, DetailView):
         return context
 
 
-class AgreementPermissionsGroupUpdate(FormMixin, PermissionRequiredMixin, DetailView, ProcessFormView):
+class AgreementPermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRequiredCheckGlobalMixin,
+                                      FormMixin, DetailView, ProcessFormView):
     """A view which updates the per-object permissions of an Agreement for a group"""
     context_object_name = 'agreement'
     form_class = CustomGroupObjectPermissionsForm
@@ -663,47 +677,48 @@ class AgreementPermissionsGroupUpdate(FormMixin, PermissionRequiredMixin, Detail
 
 # Signatures
 
-class SignatureList(PermissionRequiredMixin, FormMixin, ListView):
-    """A view to list and search through Signatures of an Agreement"""
-    context_object_name = 'signatures'
+class AgreementSignatureList(PermissionRequiredCheckGlobalMixin, FormMixin, DetailView, MultipleObjectMixin):
+    """A view to list and search through signatures of an agreement"""
+    context_object_name = 'agreement'
     form_class = SignatureSearchForm
-    model = Signature
-    ordering = '-signed_at'
+    model = Agreement
     paginate_by = 15
-    permission_required = 'agreements.view_signature'
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if 'agreementslug' in self.kwargs:
-            self.agreement = get_object_or_404(  # pylint: disable=attribute-defined-outside-init
-                Agreement, slug=self.kwargs['agreementslug']
-            )
-            qs = qs.filter(agreement=self.agreement)
-        q_param = self.request.GET.get('search', '')
-        if q_param != '':
-            qs = qs.search(q_param)
-        return qs
+    permission_required = 'agreements.agreement_search_signatures'
+    template_name = 'agreements/agreement_signature_list.html'
 
     def get_initial(self):
         initial = super().get_initial()
         initial['search'] = self.request.GET.get('search', default='')
         return initial
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['agreement'] = getattr(self, 'agreement', None)
-        context['count_per_department'] = self.get_queryset().count_per_department()
-        context['count_per_faculty'] = self.get_queryset().count_per_faculty()
+    def get_context_data(self, **kwargs):  # pylint: disable=arguments-differ
+        agreement = self.get_object()
+        signatures = Signature.objects.filter(agreement=agreement).order_by('-signed_at')
+        q_param = self.request.GET.get('search', '')
+        if q_param != '':
+            signatures = signatures.search(q_param)
+        context = super().get_context_data(object_list=signatures, **kwargs)
+        context['signatures'] = context['object_list']
+        context['count_per_department'] = signatures.count_per_department()
+        context['count_per_faculty'] = signatures.count_per_faculty()
+        context['can_download_signatures'] = has_perm(self.request.user,
+                                                      'agreements.agreement_search_signatures',
+                                                      agreement)
         return context
 
 
-class SignatureCSV(PermissionRequiredMixin, CSVExportView):
+class AgreementSignatureCSV(UserPassesTestMixin, LoginRequiredMixin, CSVExportView):
     """A view to download the Signatures associated with an agreement as a CSV file"""
     fields = ('agreement__title', 'username', 'first_name',
               'last_name', 'email', 'department__name',
               'department__faculty__name', 'signed_at')
     model = Signature
-    permission_required = 'agreements.view_signature'
+
+    def test_func(self):
+        agreement = get_object_or_404(
+            Agreement, slug=self.kwargs['agreementslug']
+        )
+        return has_perm(self.request.user, 'agreements.agreement_search_signatures', agreement)
 
     def get_header_name(self, model, field_name):
         if field_name == 'agreement__title':

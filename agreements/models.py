@@ -199,7 +199,7 @@ class Agreement(models.Model):
                             name="%(app_label)s_%(class)s_end_null_or_gt_start")
         ]
         permissions = [
-            ('search_signatures', 'Can search signatures associated with this agreement')
+            ('agreement_search_signatures', 'Can search signatures associated with this agreement')
         ]
 
     def get_absolute_url(self):

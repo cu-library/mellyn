@@ -7,7 +7,7 @@
   <h2>{{ department.name }}</h2>
   <p>Part of <a href="{% url 'faculties_read' department.faculty.slug %}">{{ department.faculty.name }}</a>.</p>
   <div class="actions">
-    <a class="ok" href="{% url 'departments_update' department.slug %}">Edit</a>
-    <a class="warning" href="{% url 'departments_delete' department.slug %}">Delete</a>
+    {% if perms.accounts.change_department %}<a class="ok" href="{% url 'departments_update' department.slug %}">Edit</a>{% endif %}
+    {% if perms.accounts.delete_department %}<a class="warning" href="{% url 'departments_delete' department.slug %}">Delete</a>{% endif %}
   </div>
 {% endblock %}
