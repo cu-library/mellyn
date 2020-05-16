@@ -291,7 +291,7 @@ class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which provides download stats for a resources's files"""
     context_object_name = 'resource'
     model = Resource
-    permission_required = 'agreements.view_file_access_stats'
+    permission_required = 'agreements.resource_view_file_access_stats'
     template_name = 'agreements/resource_file_stats.html'
 
     def get_context_data(self, **kwargs):
