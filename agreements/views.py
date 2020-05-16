@@ -20,6 +20,7 @@ from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin, ProcessFormView
+from django.views.generic.list import MultipleObjectMixin
 
 from csv_export.views import CSVExportView
 from django_sendfile import sendfile
@@ -99,10 +100,13 @@ class ResourceRead(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         agreements = Agreement.objects.for_resource_with_signature(self.get_object(), self.request.user)
-        context['can_edit'] = has_perm(self.request.user, 'agreements.change_resource', self.get_object())
+        context['can_edit'] = has_perm(self.request.user, 'agreements.change_resource', context['resource'])
         context['can_view_file_access_stats'] = has_perm(self.request.user,
                                                          'agreements.resource_view_file_access_stats',
-                                                         self.get_object())
+                                                         context['resource'])
+        context['can_view_licensecodes'] = has_perm(self.request.user,
+                                                    'agreements.resource_view_licensecodes',
+                                                    context['resource'])
         context['agreements'] = [a for a in agreements
                                  if (not a.hidden) or
                                  has_perm(self.request.user, 'agreements.view_agreement', a)]
@@ -150,7 +154,7 @@ class ResourcePermissions(PermissionRequiredCheckGlobalMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['global_permissions'] = GroupDescription.objects.for_model_with_permissions('resource')
         context['object_permissions'] = (GroupDescription.objects
-                                         .for_object_with_groupobjectpermissions('resource', self.get_object().id))
+                                         .for_object_with_groupobjectpermissions('resource', context['resource'].id))
         return context
 
 
@@ -164,7 +168,7 @@ class ResourcePermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object_permissions'] = (GroupDescription.objects
-                                         .for_object_with_groupobjectpermissions('resource', self.get_object().id))
+                                         .for_object_with_groupobjectpermissions('resource', context['resource'].id))
         context['groupdescriptions'] = []
         groupdescriptions = GroupDescription.objects.all().order_by('name')
         # .difference() would be better here but it causes an error.
@@ -292,38 +296,38 @@ class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['file_stats'] = FileDownloadEvent.objects.download_count_per_path_for_resource(self.get_object())
+        context['file_stats'] = FileDownloadEvent.objects.download_count_per_path_for_resource(context['resource'])
         return context
 
 
 # License Codes
 
-class ResourceLicenseCode(PermissionRequiredMixin, ListView):
-    """A view of LicenseCodes associated with a Resource"""
-    context_object_name = 'license_codes'
-    model = LicenseCode
-    ordering = 'name'
+class ResourceLicenseCode(PermissionRequiredCheckGlobalMixin, DetailView, MultipleObjectMixin):
+    """A view of license codes associated with a Resource"""
+    context_object_name = 'resource'
+    model = Resource
     paginate_by = 15
-    permission_required = 'agreements.view_licensecode'
-    template_name_suffix = '_list_for_resource'
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        self.resource = get_object_or_404(Resource, slug=self.kwargs['slug'])  # NOQA # pylint: disable=attribute-defined-outside-init
-        return qs.filter(resource=self.resource).order_by('signature', 'added')
+    permission_required = 'agreements.resource_view_licensecodes'
+    template_name = 'agreements/resource_licensecode_list.html'
 
     def get_context_data(self, **kwargs):  # pylint: disable=arguments-differ
-        context = super().get_context_data(**kwargs)
-        context['resource'] = self.resource
+        resource = self.get_object()
+        license_codes = LicenseCode.objects.filter(resource=resource).order_by('signature', 'added')
+        context = super().get_context_data(object_list=license_codes, **kwargs)
+        context['license_codes'] = context['object_list']
+        context['can_change_licensecodes'] = has_perm(self.request.user,
+                                                      'agreements.resource_change_licensecodes',
+                                                      context['resource'])
         return context
 
 
-class ResourceLicenseCodeAdd(FormMixin, DetailView, ProcessFormView):
+class ResourceLicenseCodeAdd(PermissionRequiredCheckGlobalMixin, FormMixin, DetailView, ProcessFormView):
     """A view to add more License Codes to a Resource"""
     context_object_name = 'resource'
     form_class = LicenseCodeForm
     model = Resource
-    template_name = 'agreements/licensecode_add_form.html'
+    permission_required = 'agreements.resource_change_licensecodes'
+    template_name = 'agreements/resource_licensecode_add_form.html'
 
     def get_success_url(self):
         return reverse_lazy('resources_codes', kwargs={'slug': self.kwargs['slug']})
@@ -359,7 +363,8 @@ class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
     context_object_name = 'resource'
     form_class = LicenseCodeForm
     model = Resource
-    template_name = 'agreements/licensecode_update_form.html'
+    permission_required = 'agreements.resource_change_licensecodes'
+    template_name = 'agreements/resource_licensecode_update_form.html'
 
     def get_initial(self):
         codes = ''

@@ -17,7 +17,7 @@
   {% endif %}
   {% include "pagination.html" %}
   <div class="actions">
-    <a class="ok" href="{% url 'resources_codes_add' resource.slug %}">Add new license codes</a>
-    <a class="ok" href="{% url 'resources_codes_update' resource.slug %}">Update license codes</a>
+    {% if can_change_licensecodes %}<a class="ok" href="{% url 'resources_codes_add' resource.slug %}">Add new license codes</a>{% endif %}
+    {% if can_change_licensecodes %}<a class="ok" href="{% url 'resources_codes_update' resource.slug %}">Update license codes</a>{% endif %}
   </div>
 {% endblock %}

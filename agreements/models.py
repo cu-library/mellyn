@@ -54,8 +54,8 @@ class Resource(models.Model):
     class Meta:
         permissions = [
             ('resource_view_file_access_stats', 'Can view the file access statistics associated with this resource'),
-            ('resource_view_license_codes', 'Can view the license codes associated with this resource'),
-            ('resource_change_license_codes', 'Can change the license codes associated with this resource')
+            ('resource_view_licensecodes', 'Can view the license codes associated with this resource'),
+            ('resource_change_licensecodes', 'Can change the license codes associated with this resource')
         ]
 
     def get_absolute_url(self):
