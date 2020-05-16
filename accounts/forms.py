@@ -110,7 +110,7 @@ class PermissionsChoiceField(ModelMultipleChoiceField):
     """
     def label_from_instance(self, obj):
         if obj.codename.startswith('view_'):
-                obj.name += " even if hidden"
+            obj.name += " even if hidden"
         return obj.name.replace('group description', 'group').replace(' this ', ' any ')
 
 
