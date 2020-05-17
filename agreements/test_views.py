@@ -9,10 +9,10 @@ from django.contrib.auth.models import Group, Permission
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 
 from .views import AgreementList, ResourceList
-from .models import Resource, Faculty, Department, Agreement
+from .models import Resource, Faculty, Department, Agreement, Signature, LicenseCode
 
 
 class SharedCRUDWorkflowsTestCase(TestCase):
@@ -373,3 +373,140 @@ class HiddenAgreementResourceTestCase(TestCase):
                 # It should still be hidden for other staff members
                 self.client.login(username='staff2', password='test')
                 self.object_hidden(model)
+
+
+class ResourceReadTestCase(TestCase):
+    """Tests for the ResourceRead view"""
+
+    def setUp(self):
+        """Create test data for this test case"""
+        self.test_staff_1 = get_user_model().objects.create_user(username='staff1',
+                                                                 first_name='test',
+                                                                 last_name='test',
+                                                                 email='staff1@test.com',
+                                                                 password='test',
+                                                                 is_staff=True)
+        get_user_model().objects.create_user(username='patron',
+                                             first_name='test',
+                                             last_name='test',
+                                             email='patron@test.com',
+                                             password='test')
+        self.test_group = Group.objects.create(name='test')
+        self.test_resource = Resource.objects.create(name='Test Resource WooHoo', slug='test-resource', description='')
+        self.test_agreement = Agreement.objects.create(title='Test Agreement WooHoo',
+                                                       slug='test',
+                                                       resource=self.test_resource,
+                                                       body='body',
+                                                       redirect_url='https://example.com',
+                                                       redirect_text='example-redirect')
+        test_faculty = Faculty.objects.create(name='Test', slug='test')
+        test_department = Department.objects.create(name='Test', slug='test', faculty=test_faculty)
+        test_signature = Signature.objects.create(agreement=self.test_agreement,
+                                                  signatory=self.test_staff_1,
+                                                  username=self.test_staff_1.username,
+                                                  email=self.test_staff_1.email,
+                                                  department=test_department)
+        LicenseCode.objects.create(resource=self.test_resource,
+                                   code='abc',
+                                   signature=test_signature)
+
+    def test_resource_associated_agreement_signature(self):
+        """Test that the resource read page has the associated agreement, signature, and license code"""
+        self.client.login(username='staff1', password='test')
+        response = self.client.get(reverse('resources_read', args=[self.test_resource.slug]))
+
+        # The staff member should see the associated agreement.
+        self.assertContains(response, "<h3>Test Agreement WooHoo</h3>", html=True)
+        # ... the associated signature
+        self.assertContains(response, "You signed this agreement on ")
+        # ... the associated license code
+        self.assertContains(response, "<p>License Code: abc</p>", html=True)
+
+        # Hide the agreement
+        self.test_agreement.hidden = True
+        self.test_agreement.save()
+
+        response = self.client.get(reverse('resources_read', args=[self.test_resource.slug]))
+        # The staff member should not see the associated agreement.
+        self.assertNotContains(response, "<h3>Test Agreement WooHoo</h3>", html=True)
+        # ... the associated signature
+        self.assertNotContains(response, "You signed this agreement on ")
+        # ... the associated license code
+        self.assertNotContains(response, "<p>License Code: abc</p>", html=True)
+
+        # Add staff1 to the test group.
+        self.test_group.user_set.add(self.test_staff_1)
+        # Give the group the object permission.
+        assign_perm('view_agreement', self.test_group, self.test_agreement)
+
+        response = self.client.get(reverse('resources_read', args=['test-resource']))
+        # The staff member should now see the associated agreement.
+        self.assertContains(response, "<h3>Test Agreement WooHoo (Hidden)</h3>", html=True)
+        # ... the associated signature
+        self.assertContains(response, "You signed this agreement on ")
+        # ... the associated license code
+        self.assertContains(response, "<p>License Code: abc</p>", html=True)
+
+    def test_actions_respect_permissions(self):
+        """Test that the actions which require edit permissions don't appear if you don't have those permissions"""
+
+        permissions_action_html = ('<a class="permissions" '
+                                   f"href=\"{reverse('resources_permissions', args=[self.test_resource.slug])}\""
+                                   '>Permissions</a>')
+
+        edit_action_html = ('<a class="ok" '
+                            f"href=\"{reverse('resources_update', args=[self.test_resource.slug])}\""
+                            '>Edit</a>')
+
+        file_access_stats_action_html = ('<a class="bonus" '
+                                         f"href=\"{reverse('resources_file_stats', args=[self.test_resource.slug])}\""
+                                         '>File Access Stats</a>')
+
+        licensecodes_action_html = ('<a class="bonus" '
+                                    f"href=\"{reverse('resources_codes_list', args=[self.test_resource.slug])}\""
+                                    '>License Codes</a>')
+
+        permissions_to_html = [('change_resource', (permissions_action_html, edit_action_html)),
+                               ('resource_view_file_access_stats', (file_access_stats_action_html,)),
+                               ('resource_view_licensecodes', (licensecodes_action_html,))]
+
+        def actions_visibility(elems, visible=True):
+            response = self.client.get(reverse('resources_read', args=['test-resource']))
+            for elem in elems:
+                if visible:
+                    self.assertContains(response, elem, html=True)
+                else:
+                    self.assertNotContains(response, elem, html=True)
+
+        self.test_group.user_set.add(self.test_staff_1)
+        self.client.login(username='staff1', password='test')
+
+        for permission_codename, elems in permissions_to_html:
+            with self.subTest(msg=permission_codename):
+                # The actions should not be available.
+                actions_visibility(elems, False)
+
+                # Give the user's group the global permission.
+                permission = Permission.objects.get(codename=permission_codename)
+                self.test_group.permissions.add(permission)
+
+                # The actions should be available.
+                actions_visibility(elems, True)
+
+                # Remove the permission
+                self.test_group.permissions.remove(permission)
+
+                # The actions should not be available.
+                actions_visibility(elems, False)
+
+                # Give the user's group the object permission.
+                assign_perm(permission_codename, self.test_group, self.test_resource)
+
+                # The actions should be available.
+                actions_visibility(elems, True)
+
+                # Remove the permission
+                remove_perm(permission_codename, self.test_group, self.test_resource)
+
+                # The actions should not be available.
+                actions_visibility(elems, False)
