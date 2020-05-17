@@ -310,7 +310,7 @@ class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
 # License Codes
 
 class ResourceLicenseCode(PermissionRequiredCheckGlobalMixin, DetailView, MultipleObjectMixin):
-    """A view of license codes associated with a Resource"""
+    """A view of license codes associated with a resource"""
     context_object_name = 'resource'
     model = Resource
     paginate_by = 15
@@ -329,7 +329,7 @@ class ResourceLicenseCode(PermissionRequiredCheckGlobalMixin, DetailView, Multip
 
 
 class ResourceLicenseCodeAdd(PermissionRequiredCheckGlobalMixin, FormMixin, DetailView, ProcessFormView):
-    """A view to add more License Codes to a Resource"""
+    """A view to add more license codes to a resource"""
     context_object_name = 'resource'
     form_class = LicenseCodeForm
     model = Resource
@@ -366,7 +366,7 @@ class ResourceLicenseCodeAdd(PermissionRequiredCheckGlobalMixin, FormMixin, Deta
 
 
 class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
-    """A view to update the License Codes of a Resource"""
+    """A view to update the license codes of a resource"""
     context_object_name = 'resource'
     form_class = LicenseCodeForm
     model = Resource
@@ -397,14 +397,14 @@ class ResourceLicenseCodeUpdate(ResourceLicenseCodeAdd):
 # Faculties
 
 class FacultyList(PermissionRequiredMixin, ListView):
-    """A view of all Faculties"""
+    """A view of all faculties"""
     context_object_name = 'faculties'
     model = Faculty
     permission_required = 'agreements.view_faculty'
 
 
 class FacultyRead(PermissionRequiredMixin, DetailView):
-    """A view of a Faculty"""
+    """A view of a faculty"""
     context_object_name = 'faculty'
     model = Faculty
     permission_required = 'agreements.view_faculty'
@@ -417,7 +417,7 @@ class FacultyRead(PermissionRequiredMixin, DetailView):
 
 
 class FacultyCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
-    """A view to create a Faculty"""
+    """A view to create a faculty"""
     form_class = FacultyCreateForm
     model = Faculty
     permission_required = 'agreements.add_faculty'
@@ -426,7 +426,7 @@ class FacultyCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 
 
 class FacultyUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
-    """A view to update a Faculty"""
+    """A view to update a faculty"""
     context_object_name = 'faculty'
     form_class = FacultyUpdateForm
     model = Faculty
@@ -436,7 +436,7 @@ class FacultyUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, Updat
 
 
 class FacultyDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
-    """A view to delete a Faculty"""
+    """A view to delete a faculty"""
     context_object_name = 'faculty'
     fields = '__all__'
     model = Faculty
@@ -449,14 +449,14 @@ class FacultyDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
 # Departments
 
 class DepartmentList(PermissionRequiredMixin, ListView):
-    """A view of all Departments"""
+    """A view of all departments"""
     context_object_name = 'departments'
     model = Department
     permission_required = 'agreements.view_department'
 
 
 class DepartmentRead(PermissionRequiredMixin, DetailView):
-    """A view of a Department"""
+    """A view of a department"""
     context_object_name = 'department'
     model = Department
     permission_required = 'agreements.view_department'
@@ -464,7 +464,7 @@ class DepartmentRead(PermissionRequiredMixin, DetailView):
 
 
 class DepartmentCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
-    """A view to create a Department"""
+    """A view to create a department"""
     form_class = DepartmentCreateForm
     model = Department
     permission_required = 'agreements.add_department'
@@ -473,7 +473,7 @@ class DepartmentCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView)
 
 
 class DepartmentCreateUnderFaculty(DepartmentCreate):
-    """A view to create a Department under a given Faculty"""
+    """A view to create a department under a given faculty"""
 
     def get_initial(self):
         initial = super().get_initial()
@@ -482,7 +482,7 @@ class DepartmentCreateUnderFaculty(DepartmentCreate):
 
 
 class DepartmentUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
-    """A view to update a Department"""
+    """A view to update a department"""
     context_object_name = 'department'
     form_class = DepartmentUpdateForm
     model = Department
@@ -492,7 +492,7 @@ class DepartmentUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, Up
 
 
 class DepartmentDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
-    """A view to delete a Department"""
+    """A view to delete a department"""
     context_object_name = 'department'
     fields = '__all__'
     model = Department
@@ -505,7 +505,7 @@ class DepartmentDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView)
 # Agreements
 
 class AgreementList(LoginRequiredMixin, ListView):
-    """A view of all Agreements"""
+    """A view of all agreements"""
     context_object_name = 'agreements'
     model = Agreement
     ordering = 'title'
@@ -520,7 +520,7 @@ class AgreementList(LoginRequiredMixin, ListView):
 
 
 class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailView, ProcessFormView):
-    """A view of an Agreement"""
+    """A view of an agreement"""
     context_object_name = 'agreement'
     form_class = SignatureCreateForm
     model = Agreement
@@ -580,7 +580,7 @@ class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailVi
 
 
 class AgreementCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
-    """A view to create an Agreement"""
+    """A view to create an agreement"""
     form_class = AgreementCreateForm
     model = Agreement
     permission_required = 'agreements.add_agreement'
@@ -589,7 +589,7 @@ class AgreementCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 
 
 class AgreementUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChangedMixin, UpdateView):
-    """A view to update an Agreement"""
+    """A view to update an agreement"""
     context_object_name = 'agreement'
     form_class = AgreementUpdateForm
     model = Agreement
@@ -599,7 +599,7 @@ class AgreementUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChange
 
 
 class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
-    """A view to delete an Agreement"""
+    """A view to delete an agreement"""
     context_object_name = 'agreement'
     fields = '__all__'
     model = Agreement
@@ -610,7 +610,7 @@ class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
 
 
 class AgreementPermissions(PermissionRequiredCheckGlobalMixin, DetailView):
-    """A view which reports on the permissions on this Agreement"""
+    """A view which reports on the permissions on this agreement"""
     context_object_name = 'agreement'
     model = Agreement
     permission_required = 'agreements.change_agreement'
@@ -646,7 +646,7 @@ class AgreementPermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView)
 
 class AgreementPermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRequiredCheckGlobalMixin,
                                       FormMixin, DetailView, ProcessFormView):
-    """A view which updates the per-object permissions of an Agreement for a group"""
+    """A view which updates the per-object permissions of an agreement for a group"""
     context_object_name = 'agreement'
     form_class = CustomGroupObjectPermissionsForm
     model = Agreement
@@ -708,7 +708,7 @@ class AgreementSignatureList(PermissionRequiredCheckGlobalMixin, FormMixin, Deta
 
 
 class AgreementSignatureCSV(UserPassesTestMixin, LoginRequiredMixin, CSVExportView):
-    """A view to download the Signatures associated with an agreement as a CSV file"""
+    """A view to download the signatures associated with an agreement as a CSV file"""
     fields = ('agreement__title', 'username', 'first_name',
               'last_name', 'email', 'department__name',
               'department__faculty__name', 'signed_at')
