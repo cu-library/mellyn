@@ -270,17 +270,17 @@ class HiddenAgreementResourceTestCase(TestCase):
                                                                  email='staff1@test.com',
                                                                  password='test',
                                                                  is_staff=True)
-        self.test_staff_2 = get_user_model().objects.create_user(username='staff2',
-                                                                 first_name='test',
-                                                                 last_name='test',
-                                                                 email='staff2@test.com',
-                                                                 password='test',
-                                                                 is_staff=True)
-        self.test_patron = get_user_model().objects.create_user(username='patron',
-                                                                first_name='test',
-                                                                last_name='test',
-                                                                email='patron@test.com',
-                                                                password='test')
+        get_user_model().objects.create_user(username='staff2',
+                                             first_name='test',
+                                             last_name='test',
+                                             email='staff2@test.com',
+                                             password='test',
+                                             is_staff=True)
+        get_user_model().objects.create_user(username='patron',
+                                             first_name='test',
+                                             last_name='test',
+                                             email='patron@test.com',
+                                             password='test')
         self.test_group = Group.objects.create(name='test')
         self.test_resource = Resource.objects.create(name='Test Resource WooHoo', slug='test', description='')
         self.test_agreement = Agreement.objects.create(title='Test Agreement WooHoo',
@@ -350,7 +350,7 @@ class HiddenAgreementResourceTestCase(TestCase):
                 self.client.login(username='staff2', password='test')
                 self.object_hidden(model)
 
-    def test_agreement_object_permissions(self):
+    def test_per_object_permissions(self):
         """Test that object group permissions allow a user to see a hidden object"""
         for model in self.models:
             with self.subTest(msg=model+'_test_agreement_object_permissions'):
