@@ -44,7 +44,7 @@ class IsStaffMixin(UserPassesTestMixin):
         return self.request.user.is_staff
 
 
-# Staff
+# Users
 
 class UserList(IsStaffMixin, FormMixin, ListView):
     """A view of all users"""
