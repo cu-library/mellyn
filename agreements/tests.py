@@ -11,15 +11,15 @@ from django.urls import reverse
 from .models import Resource, Faculty, Department, Agreement
 
 
-class TemplatesandViewsTestCase(TestCase):
-    """Tests for templates and views associated with Agreements, Faculties, and Departments"""
+class SharedCRUDWorkflowsTestCase(TestCase):
+    """Test CRUD workflows on resources, agreements, faculties, and departments"""
 
     model_names = [('Resource', 'Resources'), ('Faculty', 'Faculties'),
                    ('Department', 'Departments'), ('Agreement', 'Agreements'), ]
 
     @classmethod
     def setUpTestData(cls):
-        """Create a dummy agreement and user for the signatures to reference."""
+        """Create a super user for the tests to use."""
         cls.test_user = get_user_model().objects.create_superuser(username='test',
                                                                   first_name='test',
                                                                   last_name='test',
@@ -29,23 +29,15 @@ class TemplatesandViewsTestCase(TestCase):
     @staticmethod
     def create_test_models():
         """Create test models, so that update and delete views can be tested"""
-        test_resource = Resource(name='Test', slug='test', description='')
-        test_resource.full_clean()
-        test_resource.save()
-        test_faculty = Faculty(name='Test', slug='test')
-        test_faculty.full_clean()
-        test_faculty.save()
-        test_department = Department(name='Test', slug='test', faculty=test_faculty)
-        test_department.full_clean()
-        test_department.save()
-        test_agreement = Agreement(title='Test',
-                                   slug='test',
-                                   resource=test_resource,
-                                   body='body',
-                                   redirect_url='https://example.com',
-                                   redirect_text='example-redirect')
-        test_agreement.full_clean()
-        test_agreement.save()
+        test_resource = Resource.objects.create(name='Test', slug='test', description='')
+        test_faculty = Faculty.objects.create(name='Test', slug='test')
+        Department.objects.create(name='Test', slug='test', faculty=test_faculty)
+        Agreement.objects.create(title='Test',
+                                 slug='test',
+                                 resource=test_resource,
+                                 body='body',
+                                 redirect_url='https://example.com',
+                                 redirect_text='example-redirect')
 
     def test_crud_actions(self):
         """Sanity check all templates for basic CRUD actions a user can perform"""
