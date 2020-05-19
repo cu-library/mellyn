@@ -229,7 +229,7 @@ class GlobalPermissionsTestCase(TestCase):
                                  redirect_text='example-redirect')
 
     def test_global_permissions(self):
-        """Test that the create view isn't accessible unless you have the right permissions"""
+        """Only a user in a group with a particular global permission should be able to access some views"""
 
         model_names = [('resource', 'resources'), ('faculty', 'faculties'),
                        ('department', 'departments'), ('agreement', 'agreements'), ]
