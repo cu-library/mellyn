@@ -205,6 +205,78 @@ class SharedCRUDWorkflowsTestCase(TestCase):
                 check_label_suffix(response)
 
 
+class GlobalPermissionsTestCase(TestCase):
+    """Test that views which only check for global permissions are correctly protected"""
+
+    def setUp(self):
+        """Create test data for this test case"""
+        test_staff_1 = get_user_model().objects.create_user(username='staff1',
+                                                            first_name='test',
+                                                            last_name='test',
+                                                            email='patron@test.com',
+                                                            password='test',
+                                                            is_staff=True)
+        self.test_group = Group.objects.create(name='test')
+        self.test_group.user_set.add(test_staff_1)
+        test_resource = Resource.objects.create(name='Test resource', slug='test', description='')
+        test_faculty = Faculty.objects.create(name='Test faculty', slug='test')
+        Department.objects.create(name='Test department', slug='test', faculty=test_faculty)
+        Agreement.objects.create(title='Test agreement',
+                                 slug='test',
+                                 resource=test_resource,
+                                 body='body',
+                                 redirect_url='https://example.com',
+                                 redirect_text='example-redirect')
+
+    def test_global_permissions(self):
+        """Test that the create view isn't accessible unless you have the right permissions"""
+
+        model_names = [('resource', 'resources'), ('faculty', 'faculties'),
+                       ('department', 'departments'), ('agreement', 'agreements'), ]
+
+        self.client.login(username='staff1', password='test')
+
+        def check_access(action, url, perm, elem):
+            """In a subtest, check the permissions on the url"""
+            with self.subTest(msg=f'{url}-{perm}'):
+                if action in ['read', 'update', 'delete']:
+                    url_reversed = reverse(url, args=['test'])
+                else:
+                    url_reversed = reverse(url)
+                # The staff user should get a 403 if they don't have the permission
+                response = self.client.get(url_reversed)
+                self.assertEqual(response.status_code, 403)
+
+                # Give the user's group the global permission.
+                permission = Permission.objects.get(codename=perm)
+                self.test_group.permissions.add(permission)
+
+                # The staff user should now see the form.
+                response = self.client.get(url_reversed)
+                self.assertContains(response, elem, html=True)
+
+                # Remove the permission
+                self.test_group.permissions.remove(permission)
+
+                # The staff user should get a 403
+                response = self.client.get(url_reversed)
+                self.assertEqual(response.status_code, 403)
+
+        for model, plural in model_names:
+            for action, perm in [('create', 'add'), ('read', 'view'), ('update', 'change'), ('delete', 'delete')]:
+                if model in ['resource', 'agreement'] and action in ['read', 'update']:
+                    continue
+                url = f'{plural}_{action}'
+                if action == 'create':
+                    check_access(action, url, f'{perm}_{model}', f'<h2>Create a new {model}</h2>')
+                elif action == 'read':
+                    check_access(action, url, f'{perm}_{model}', f'<h2>Test {model}</h2>')
+                elif action == 'update':
+                    check_access(action, url, f'{perm}_{model}', f'<h2>Update Test {model}</h2>')
+                elif action == 'delete':
+                    check_access(action, url, f'{perm}_{model}', f'<h2>Delete Test {model}</h2>')
+
+
 class PaginationTestCase(TestCase):
     """Test pagination"""
 
