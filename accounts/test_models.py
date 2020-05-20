@@ -13,6 +13,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from guardian.shortcuts import assign_perm
+
 from .models import GroupDescription
 
 
@@ -103,3 +105,82 @@ class GroupDescriptionTestCase(TestCase):
         self.assertIn(test_permission_1, groups_with_permissions.get(name='test-two').group.permissions_on_model)
         self.assertIn(test_permission_2, groups_with_permissions.get(name='test-two').group.permissions_on_model)
         self.assertNotIn(test_permission_3, groups_with_permissions.get(name='test-one').group.permissions_on_model)
+
+    def test_for_object_with_groupobjectpermissions(self):
+        """Check that the for_object_with_groupobjectpermissions method returns the right data"""
+
+        test_group_description_2 = GroupDescription.objects.create(name='test-two',
+                                                                   slug='test-two',
+                                                                   description='body')
+
+        test_group_description_3 = GroupDescription.objects.create(name='test-three',
+                                                                   slug='test-three',
+                                                                   description='body')
+
+        group_description_content_type = ContentType.objects.get_for_model(GroupDescription)
+
+        test_permission_1 = Permission.objects.create(codename='can_test',
+                                                      name='Can Test GroupDescriptions',
+                                                      content_type=group_description_content_type)
+        test_permission_2 = Permission.objects.create(codename='can_also_test',
+                                                      name='Can Also Test GroupDescriptions',
+                                                      content_type=group_description_content_type)
+        test_permission_3 = Permission.objects.create(codename='can_also_also_test',
+                                                      name='Can Also Also Test GroupDescriptions',
+                                                      content_type=group_description_content_type)
+
+        # Assign per-object group permissions
+        # 1 has all permisions on all other groups.
+        assign_perm(test_permission_1.codename, self.test_group_description.group, self.test_group_description)
+        assign_perm(test_permission_1.codename, self.test_group_description.group, test_group_description_2)
+        assign_perm(test_permission_1.codename, self.test_group_description.group, test_group_description_3)
+        assign_perm(test_permission_2.codename, self.test_group_description.group, self.test_group_description)
+        assign_perm(test_permission_2.codename, self.test_group_description.group, test_group_description_2)
+        assign_perm(test_permission_2.codename, self.test_group_description.group, test_group_description_3)
+        assign_perm(test_permission_3.codename, self.test_group_description.group, self.test_group_description)
+        assign_perm(test_permission_3.codename, self.test_group_description.group, test_group_description_2)
+        assign_perm(test_permission_3.codename, self.test_group_description.group, test_group_description_3)
+        # 2 has only perm 2 on groups 2 and 3.
+        assign_perm(test_permission_2.codename, test_group_description_2.group, test_group_description_2)
+        assign_perm(test_permission_2.codename, test_group_description_2.group, test_group_description_3)
+        # 3 only has perm 3 on itself.
+        assign_perm(test_permission_3.codename, test_group_description_3.group, test_group_description_3)
+
+        # Assign a global permission
+        test_group_description_2.group.permissions.add(test_permission_1)
+
+        # Check for_object_with_groupobjectpermissions for test_group_description_3
+        group_descriptions_3 = (GroupDescription.objects
+                                .for_object_with_groupobjectpermissions('groupdescription',
+                                                                        test_group_description_3.id))
+        # All groups have some permission(s) on test_group_description_3
+        self.assertIn(self.test_group_description, group_descriptions_3)
+        self.assertIn(test_group_description_2, group_descriptions_3)
+        self.assertIn(test_group_description_3, group_descriptions_3)
+        # Test group 1 has all three permissions on test group 3
+        self.assertTrue(all([perm in [gop.permission for gop in
+                                      group_descriptions_3.get(name='test-one').group.groupobjectpermissions_on_object]
+                             for perm in [test_permission_1,
+                                          test_permission_2,
+                                          test_permission_3]]))
+        # Test group 2 only has permission 2 on test group 3 (which double checks that the global perm is ignored)
+        permissions_list = [gop.permission for gop in
+                            group_descriptions_3.get(name='test-two').group.groupobjectpermissions_on_object]
+        self.assertEqual(permissions_list, [test_permission_2])
+
+        # Check for_object_with_groupobjectpermissions for test_group_description_1
+        group_descriptions_1 = (GroupDescription.objects
+                                .for_object_with_groupobjectpermissions('groupdescription',
+                                                                        self.test_group_description.id))
+        # Only group 1 has permissions on itself
+        self.assertIn(self.test_group_description, group_descriptions_1)
+        self.assertNotIn(test_group_description_2, group_descriptions_1)
+        self.assertNotIn(test_group_description_3, group_descriptions_1)
+        # It has all three permissions
+        permissions_list = [gop.permission for gop in
+                            group_descriptions_1.first().group.groupobjectpermissions_on_object]
+        self.assertEqual(permissions_list, [test_permission_1, test_permission_2, test_permission_3])
+        # The GroupObjectPermissions objects all have the right object pk and content type model
+        for gop in group_descriptions_1.first().group.groupobjectpermissions_on_object:
+            self.assertEqual(int(gop.object_pk), self.test_group_description.id)  # Why is object_pk a string?
+            self.assertEqual(gop.content_type.model, 'groupdescription')
