@@ -133,9 +133,10 @@ class GroupDescription(models.Model):
         """Returns the string representation of a Group Description"""
         return self.group.name
 
-    def clean(self):
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ,signature-differs
         """Create or get the group with the provided name"""
         self.group, _ = Group.objects.get_or_create(name=self.name)
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ,signature-differs
         super().delete(*args, **kwargs)

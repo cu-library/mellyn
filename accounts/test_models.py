@@ -65,16 +65,13 @@ class GroupDescriptionTestCase(TestCase):
 
     def test_for_model_with_permissions(self):
         """Check that the for_model_with_permissions method returns the right data"""
-        test_group_description_2 = GroupDescription(name='test-two',
-                                                    slug='test-two',
-                                                    description='body')
-        test_group_description_2.full_clean()
-        test_group_description_2.save()
-        test_group_description_3 = GroupDescription(name='test-three',
-                                                    slug='test-three',
-                                                    description='body')
-        test_group_description_3.full_clean()
-        test_group_description_3.save()
+        test_group_description_2 = GroupDescription.objects.create(name='test-two',
+                                                                   slug='test-two',
+                                                                   description='body')
+
+        test_group_description_3 = GroupDescription.objects.create(name='test-three',
+                                                                   slug='test-three',
+                                                                   description='body')
 
         group_description_content_type = ContentType.objects.get_for_model(GroupDescription)
         user_content_type = ContentType.objects.get_for_model(get_user_model())
