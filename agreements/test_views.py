@@ -210,14 +210,13 @@ class GlobalPermissionsTestCase(TestCase):
 
     def setUp(self):
         """Create test data for this test case"""
-        test_staff_1 = get_user_model().objects.create_user(username='staff1',
-                                                            first_name='test',
-                                                            last_name='test',
-                                                            email='staff1@test.com',
-                                                            password='test',
-                                                            is_staff=True)
+        test_user = get_user_model().objects.create_user(username='test',
+                                                         first_name='test',
+                                                         last_name='test',
+                                                         email='test@test.com',
+                                                         password='test')
         self.test_group = Group.objects.create(name='test')
-        self.test_group.user_set.add(test_staff_1)
+        self.test_group.user_set.add(test_user)
         test_resource = Resource.objects.create(name='Test resource', slug='test', description='')
         test_faculty = Faculty.objects.create(name='Test faculty', slug='test')
         Department.objects.create(name='Test department', slug='test', faculty=test_faculty)
@@ -234,7 +233,7 @@ class GlobalPermissionsTestCase(TestCase):
         model_names = [('resource', 'resources'), ('faculty', 'faculties'),
                        ('department', 'departments'), ('agreement', 'agreements'), ]
 
-        self.client.login(username='staff1', password='test')
+        self.client.login(username='test', password='test')
 
         def check_access(action, url, perm, elem):
             """In a subtest, check the permissions on the url"""
@@ -243,7 +242,7 @@ class GlobalPermissionsTestCase(TestCase):
                     url_reversed = reverse(url, args=['test'])
                 else:
                     url_reversed = reverse(url)
-                # The staff user should get a 403 if they don't have the permission
+                # The test user should get a 403 if they don't have the permission
                 response = self.client.get(url_reversed)
                 self.assertEqual(response.status_code, 403)
 
@@ -251,14 +250,14 @@ class GlobalPermissionsTestCase(TestCase):
                 permission = Permission.objects.get(codename=perm)
                 self.test_group.permissions.add(permission)
 
-                # The staff user should now see the form.
+                # The test user should now see the form.
                 response = self.client.get(url_reversed)
                 self.assertContains(response, elem, html=True)
 
                 # Remove the permission
                 self.test_group.permissions.remove(permission)
 
-                # The staff user should get a 403
+                # The test user should get a 403
                 response = self.client.get(url_reversed)
                 self.assertEqual(response.status_code, 403)
 
@@ -283,11 +282,11 @@ class PaginationTestCase(TestCase):
 
     def setUp(self):
         """Create a test user"""
-        self.user = get_user_model().objects.create_user(username='user',
-                                                         first_name='test',
-                                                         last_name='test',
-                                                         email='admin@test.com',
-                                                         password='test')
+        self.test_user = get_user_model().objects.create_user(username='test',
+                                                              first_name='test',
+                                                              last_name='test',
+                                                              email='admin@test.com',
+                                                              password='test')
 
     def test_agreement_pagination(self):
         """Test agreement pagination"""
@@ -301,12 +300,12 @@ class PaginationTestCase(TestCase):
                                      redirect_text='example-redirect',
                                      hidden=((i % 10) == 0))  # 0, 10, 20, 30 are hidden
         # Test HTML
-        self.client.login(username='user', password='test')
+        self.client.login(username='test', password='test')
         response = self.client.get(reverse('agreements_list'))
         self.assertContains(response, '<span class="current">Page 1 of 3.</span>', html=True)
         # Test view context
         request = RequestFactory().get(reverse('agreements_list'))
-        request.user = self.user
+        request.user = self.test_user
         agreement_list = AgreementList()
         agreement_list.setup(request)
         context = agreement_list.get_context_data(object_list=agreement_list.get_queryset())
@@ -318,12 +317,12 @@ class PaginationTestCase(TestCase):
             Resource.objects.create(name=f'Test-{i}', slug=f'test-{i}', description='', hidden=((i % 10) == 0))
 
         # Test HTML
-        self.client.login(username='user', password='test')
+        self.client.login(username='test', password='test')
         response = self.client.get(reverse('resources_list'))
         self.assertContains(response, '<span class="current">Page 1 of 4.</span>', html=True)
         # Test view context
         request = RequestFactory().get(reverse('resources_list'))
-        request.user = self.user
+        request.user = self.test_user
         resource_list = ResourceList()
         resource_list.setup(request)
         context = resource_list.get_context_data(object_list=resource_list.get_queryset())
@@ -337,18 +336,16 @@ class HiddenAgreementResourceTestCase(TestCase):
 
     def setUp(self):
         """Create test data for this test case"""
-        self.test_staff_1 = get_user_model().objects.create_user(username='staff1',
-                                                                 first_name='test',
-                                                                 last_name='test',
-                                                                 email='staff1@test.com',
-                                                                 password='test',
-                                                                 is_staff=True)
-        get_user_model().objects.create_user(username='staff2',
+        self.test_user = get_user_model().objects.create_user(username='test',
+                                                              first_name='test',
+                                                              last_name='test',
+                                                              email='test@test.com',
+                                                              password='test')
+        get_user_model().objects.create_user(username='test2',
                                              first_name='test',
                                              last_name='test',
-                                             email='staff2@test.com',
-                                             password='test',
-                                             is_staff=True)
+                                             email='test2@test.com',
+                                             password='test')
         get_user_model().objects.create_user(username='patron',
                                              first_name='test',
                                              last_name='test',
@@ -405,11 +402,11 @@ class HiddenAgreementResourceTestCase(TestCase):
                 self.object_per_model[model].hidden = True
                 self.object_per_model[model].save()
 
-                # Add staff1 to the test group.
-                self.test_group.user_set.add(self.test_staff_1)
+                # Add test to the test group.
+                self.test_group.user_set.add(self.test_user)
 
                 # They shouldn't be able to see the object.
-                self.client.login(username='staff1', password='test')
+                self.client.login(username='test', password='test')
                 self.object_hidden(model)
 
                 # Give the group the global permission.
@@ -419,8 +416,8 @@ class HiddenAgreementResourceTestCase(TestCase):
                 # They should now be able to see the agreement
                 self.object_visible(model, hidden_label=True)
 
-                # It should still be hidden for other staff members
-                self.client.login(username='staff2', password='test')
+                # It should still be hidden for other users
+                self.client.login(username='test2', password='test')
                 self.object_hidden(model)
 
     def test_per_object_permissions(self):
@@ -430,11 +427,11 @@ class HiddenAgreementResourceTestCase(TestCase):
                 self.object_per_model[model].hidden = True
                 self.object_per_model[model].save()
 
-                # Add staff1 to the test group.
-                self.test_group.user_set.add(self.test_staff_1)
+                # Add test user to the test group.
+                self.test_group.user_set.add(self.test_user)
 
                 # They shouldn't be able to see the object.
-                self.client.login(username='staff1', password='test')
+                self.client.login(username='test', password='test')
                 self.object_hidden(model)
 
                 # Give the group the object permission.
@@ -443,8 +440,8 @@ class HiddenAgreementResourceTestCase(TestCase):
                 # They should now be able to see the agreement
                 self.object_visible(model, hidden_label=True)
 
-                # It should still be hidden for other staff members
-                self.client.login(username='staff2', password='test')
+                # It should still be hidden for other users
+                self.client.login(username='test2', password='test')
                 self.object_hidden(model)
 
 
@@ -457,7 +454,7 @@ class ResourceAndAgreementListTestCase(TestCase):
 
     def setUp(self):
         """Create a test user"""
-        get_user_model().objects.create_user(username='user',
+        get_user_model().objects.create_user(username='test',
                                              first_name='test',
                                              last_name='test',
                                              email='admin@test.com',
@@ -474,7 +471,7 @@ class ResourceAndAgreementListTestCase(TestCase):
                 # Before logging in, the user should be denied access
                 response = self.client.get(url)
                 self.assertRedirects(response, f"{reverse('login')}?next={url}")
-                self.client.login(username='user', password='test')
+                self.client.login(username='test', password='test')
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
                 self.client.logout()
@@ -485,12 +482,11 @@ class ResourceReadTestCase(TestCase):
 
     def setUp(self):
         """Create test data for this test case"""
-        self.test_staff_1 = get_user_model().objects.create_user(username='staff1',
-                                                                 first_name='test',
-                                                                 last_name='test',
-                                                                 email='staff1@test.com',
-                                                                 password='test',
-                                                                 is_staff=True)
+        self.test_user = get_user_model().objects.create_user(username='test',
+                                                              first_name='test',
+                                                              last_name='test',
+                                                              email='test@test.com',
+                                                              password='test')
         get_user_model().objects.create_user(username='patron',
                                              first_name='test',
                                              last_name='test',
@@ -507,9 +503,9 @@ class ResourceReadTestCase(TestCase):
         test_faculty = Faculty.objects.create(name='Test', slug='test')
         test_department = Department.objects.create(name='Test', slug='test', faculty=test_faculty)
         test_signature = Signature.objects.create(agreement=self.test_agreement,
-                                                  signatory=self.test_staff_1,
-                                                  username=self.test_staff_1.username,
-                                                  email=self.test_staff_1.email,
+                                                  signatory=self.test_user,
+                                                  username=self.test_user.username,
+                                                  email=self.test_user.email,
                                                   department=test_department)
         LicenseCode.objects.create(resource=self.test_resource,
                                    code='abc',
@@ -520,7 +516,7 @@ class ResourceReadTestCase(TestCase):
         """The view should require the user be logged in to access it"""
         response = self.client.get(self.url)
         self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
-        self.client.login(username='staff1', password='test')
+        self.client.login(username='test', password='test')
         response = self.client.get(self.url)
         self.assertContains(response, '<h2>Test Resource WooHoo</h2>', html=True)
 
@@ -530,12 +526,12 @@ class ResourceReadTestCase(TestCase):
         self.test_resource.save()
 
         # The hidden resource should not be accessible.
-        self.client.login(username='staff1', password='test')
+        self.client.login(username='test', password='test')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
-        # Add staff1 to the test group.
-        self.test_group.user_set.add(self.test_staff_1)
+        # Add test user to the test group.
+        self.test_group.user_set.add(self.test_user)
         # Give the group the object permission.
         assign_perm('view_resource', self.test_group, self.test_resource)
 
@@ -562,10 +558,10 @@ class ResourceReadTestCase(TestCase):
 
     def test_resource_associated_agreement_signature(self):
         """Test that the resource read page has the associated agreement, signature, and license code"""
-        self.client.login(username='staff1', password='test')
+        self.client.login(username='test', password='test')
         response = self.client.get(self.url)
 
-        # The staff member should see the associated agreement.
+        # The test user should see the associated agreement.
         self.assertContains(response, "<h3>Test Agreement WooHoo</h3>", html=True)
         # ... the associated signature
         self.assertContains(response, "You signed this agreement on ")
@@ -577,20 +573,20 @@ class ResourceReadTestCase(TestCase):
         self.test_agreement.save()
 
         response = self.client.get(self.url)
-        # The staff member should not see the associated agreement.
+        # The test user should not see the associated agreement.
         self.assertNotContains(response, "<h3>Test Agreement WooHoo</h3>", html=True)
         # ... the associated signature
         self.assertNotContains(response, "You signed this agreement on ")
         # ... the associated license code
         self.assertNotContains(response, "<p>License Code: abc</p>", html=True)
 
-        # Add staff1 to the test group.
-        self.test_group.user_set.add(self.test_staff_1)
+        # Add test user to the test group.
+        self.test_group.user_set.add(self.test_user)
         # Give the group the object permission.
         assign_perm('view_agreement', self.test_group, self.test_agreement)
 
         response = self.client.get(self.url)
-        # The staff member should now see the associated agreement.
+        # The test user should now see the associated agreement.
         self.assertContains(response, "<h3>Test Agreement WooHoo (Hidden)</h3>", html=True)
         # ... the associated signature
         self.assertContains(response, "You signed this agreement on ")
@@ -628,8 +624,8 @@ class ResourceReadTestCase(TestCase):
                 else:
                     self.assertNotContains(response, elem, html=True)
 
-        self.test_group.user_set.add(self.test_staff_1)
-        self.client.login(username='staff1', password='test')
+        self.test_group.user_set.add(self.test_user)
+        self.client.login(username='test', password='test')
 
         for permission_codename, elems in permissions_to_html:
             with self.subTest(msg=permission_codename):
