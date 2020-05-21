@@ -159,6 +159,11 @@ class GroupDescriptionUpdatePermissions(PermissionRequiredMixin, SuccessMessageI
     def get_success_message(self, cleaned_data):
         return self.success_message % {'name': super().get_object(None).name}
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['formname'] = f"permissions for {context['group'].name}"
+        return context
+
 
 class GroupDescriptionDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete a group description"""

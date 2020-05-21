@@ -3,5 +3,5 @@
 {% block sitetitle %}Update permissions for {{ group.name }}{% endblock %}
 
 {% block main %}
-  {% include "base_update_form.html" with name='permissions for '|add:group.name form=form csrf_token=csrf_token urlname='groupdescriptions_read' urlslug=group.groupdescription.slug %}
+  {% include "base_update_form.html" with name=formname form=form csrf_token=csrf_token urlname='groupdescriptions_read' urlslug=group.groupdescription.slug %}
 {% endblock %}
