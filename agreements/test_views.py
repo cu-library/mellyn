@@ -448,6 +448,38 @@ class HiddenAgreementResourceTestCase(TestCase):
                 self.object_hidden(model)
 
 
+class ResourceAndAgreementListTestCase(TestCase):
+    """
+    Test the agreement and resource list views.
+
+    Other test cases handle testing hidden objects and pagination.
+    """
+
+    def setUp(self):
+        """Create a test user"""
+        get_user_model().objects.create_user(username='user',
+                                             first_name='test',
+                                             last_name='test',
+                                             email='admin@test.com',
+                                             password='test')
+
+    def test_same_pagination_value(self):
+        """The two list views should paginate by the same number of objects"""
+        self.assertEqual(AgreementList().paginate_by, ResourceList().paginate_by)
+
+    def test_login_required(self):
+        """The two views should both require logging in to see them"""
+        for url in [reverse('resources_list'), reverse('agreements_list')]:
+            with self.subTest(msg=url):
+                # Before logging in, the user should be denied access
+                response = self.client.get(url)
+                self.assertRedirects(response, f"{reverse('login')}?next={url}")
+                self.client.login(username='user', password='test')
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.client.logout()
+
+
 class ResourceReadTestCase(TestCase):
     """Tests for the ResourceRead view"""
 
