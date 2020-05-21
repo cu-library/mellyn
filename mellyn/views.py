@@ -1,6 +1,6 @@
 """This module has project-level views which are not tied to any application"""
 
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 
@@ -13,7 +13,7 @@ class IsStaffMixin(UserPassesTestMixin):
         return self.request.user.is_staff
 
 
-class AdminView(IsStaffMixin, TemplateView):
+class AdminView(LoginRequiredMixin, IsStaffMixin, TemplateView):
     """A view to help admin staff access lists of Models"""
     template_name = 'admin.html'
 
