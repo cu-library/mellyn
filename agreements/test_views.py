@@ -213,7 +213,7 @@ class GlobalPermissionsTestCase(TestCase):
         test_staff_1 = get_user_model().objects.create_user(username='staff1',
                                                             first_name='test',
                                                             last_name='test',
-                                                            email='patron@test.com',
+                                                            email='staff1@test.com',
                                                             password='test',
                                                             is_staff=True)
         self.test_group = Group.objects.create(name='test')
@@ -267,14 +267,15 @@ class GlobalPermissionsTestCase(TestCase):
                 if model in ['resource', 'agreement'] and action in ['read', 'update']:
                     continue
                 url = f'{plural}_{action}'
+                perm = f'{perm}_{model}'
                 if action == 'create':
-                    check_access(action, url, f'{perm}_{model}', f'<h2>Create a new {model}</h2>')
+                    check_access(action, url, perm, f'<h2>Create a new {model}</h2>')
                 elif action == 'read':
-                    check_access(action, url, f'{perm}_{model}', f'<h2>Test {model}</h2>')
+                    check_access(action, url, perm, f'<h2>Test {model}</h2>')
                 elif action == 'update':
-                    check_access(action, url, f'{perm}_{model}', f'<h2>Update Test {model}</h2>')
+                    check_access(action, url, perm, f'<h2>Update Test {model}</h2>')
                 elif action == 'delete':
-                    check_access(action, url, f'{perm}_{model}', f'<h2>Delete Test {model}</h2>')
+                    check_access(action, url, perm, f'<h2>Delete Test {model}</h2>')
 
 
 class PaginationTestCase(TestCase):
