@@ -4,7 +4,7 @@
 
 {% block main %}
   <div class="breadcrumb"><a aria-label="Return to the list of resources" href="{% url 'resources_list' %}">&larr; Resources</a></div>
-  <h2>{{ resource.name }}</h2>
+  <h2>{{ resource.name }}</h2>{% if resource.hidden %}<p class="alert">&#9888; This resource is hidden.</p>{% endif %}
   <section class="htmlfield">{{ resource.description|safe }}</section>
   <p><a href="{% url 'resources_access' resource.slug %}">File Access</a></p>
   {% if agreements %}

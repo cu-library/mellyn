@@ -514,11 +514,56 @@ class ResourceReadTestCase(TestCase):
         LicenseCode.objects.create(resource=self.test_resource,
                                    code='abc',
                                    signature=test_signature)
+        self.url = reverse('resources_read', args=[self.test_resource.slug])
+
+    def test_login_required(self):
+        """The view should require the user be logged in to access it"""
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
+        self.client.login(username='staff1', password='test')
+        response = self.client.get(self.url)
+        self.assertContains(response, '<h2>Test Resource WooHoo</h2>', html=True)
+
+    def test_view_permissions(self):
+        """The view requires permissions to access if the resource is hidden"""
+        self.test_resource.hidden = True
+        self.test_resource.save()
+
+        # The hidden resource should not be accessible.
+        self.client.login(username='staff1', password='test')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+        # Add staff1 to the test group.
+        self.test_group.user_set.add(self.test_staff_1)
+        # Give the group the object permission.
+        assign_perm('view_resource', self.test_group, self.test_resource)
+
+        # The resource should now be accessible.
+        response = self.client.get(self.url)
+        self.assertContains(response, '<h2>Test Resource WooHoo</h2>', html=True)
+        self.assertContains(response, '<p class="alert">&#9888; This resource is hidden.</p>', html=True)
+
+        # Remove the permission
+        remove_perm('view_resource', self.test_group, self.test_resource)
+
+        # The hidden resource should not be accessible.
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+        # Give the group the global permission.
+        view_model = Permission.objects.get(codename='view_resource')
+        self.test_group.permissions.add(view_model)
+
+        # The resource should now be accessible.
+        response = self.client.get(self.url)
+        self.assertContains(response, '<h2>Test Resource WooHoo</h2>', html=True)
+        self.assertContains(response, '<p class="alert">&#9888; This resource is hidden.</p>', html=True)
 
     def test_resource_associated_agreement_signature(self):
         """Test that the resource read page has the associated agreement, signature, and license code"""
         self.client.login(username='staff1', password='test')
-        response = self.client.get(reverse('resources_read', args=[self.test_resource.slug]))
+        response = self.client.get(self.url)
 
         # The staff member should see the associated agreement.
         self.assertContains(response, "<h3>Test Agreement WooHoo</h3>", html=True)
@@ -531,7 +576,7 @@ class ResourceReadTestCase(TestCase):
         self.test_agreement.hidden = True
         self.test_agreement.save()
 
-        response = self.client.get(reverse('resources_read', args=[self.test_resource.slug]))
+        response = self.client.get(self.url)
         # The staff member should not see the associated agreement.
         self.assertNotContains(response, "<h3>Test Agreement WooHoo</h3>", html=True)
         # ... the associated signature
@@ -544,7 +589,7 @@ class ResourceReadTestCase(TestCase):
         # Give the group the object permission.
         assign_perm('view_agreement', self.test_group, self.test_agreement)
 
-        response = self.client.get(reverse('resources_read', args=['test-resource']))
+        response = self.client.get(self.url)
         # The staff member should now see the associated agreement.
         self.assertContains(response, "<h3>Test Agreement WooHoo (Hidden)</h3>", html=True)
         # ... the associated signature
@@ -576,7 +621,7 @@ class ResourceReadTestCase(TestCase):
                                ('resource_view_licensecodes', (licensecodes_action_html,))]
 
         def actions_visibility(elems, visible=True):
-            response = self.client.get(reverse('resources_read', args=['test-resource']))
+            response = self.client.get(self.url)
             for elem in elems:
                 if visible:
                     self.assertContains(response, elem, html=True)
