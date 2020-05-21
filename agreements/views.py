@@ -91,7 +91,7 @@ class ResourceList(LoginRequiredMixin, ListView):
                 has_perm(self.request.user, 'agreements.view_resource', resource)]
 
 
-class ResourceRead(UserPassesTestMixin, LoginRequiredMixin, DetailView):
+class ResourceRead(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     """A view of a resource"""
     context_object_name = 'resource'
     model = Resource
@@ -129,7 +129,8 @@ class ResourceCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     template_name_suffix = '_create_form'
 
 
-class ResourceUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChangedMixin, UpdateView):
+class ResourceUpdate(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin,
+                     SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a resource"""
     context_object_name = 'resource'
     form_class = ResourceUpdateForm
@@ -150,7 +151,7 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name_suffix = '_delete_form'
 
 
-class ResourcePermissions(PermissionRequiredCheckGlobalMixin, DetailView):
+class ResourcePermissions(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which reports on the permissions on this resource"""
     context_object_name = 'resource'
     model = Resource
@@ -165,7 +166,7 @@ class ResourcePermissions(PermissionRequiredCheckGlobalMixin, DetailView):
         return context
 
 
-class ResourcePermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView):
+class ResourcePermissionsGroups(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which lists groups"""
     context_object_name = 'resource'
     model = Resource
@@ -185,8 +186,8 @@ class ResourcePermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView):
         return context
 
 
-class ResourcePermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRequiredCheckGlobalMixin,
-                                     FormMixin, DetailView, ProcessFormView):
+class ResourcePermissionsGroupUpdate(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin,
+                                     SuccessMessageIfChangedMixin, FormMixin, DetailView, ProcessFormView):
     """A view which updates the per-object permissions of a resource for a group"""
     context_object_name = 'resource'
     form_class = CustomGroupObjectPermissionsForm
@@ -294,7 +295,7 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
         return context
 
 
-class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
+class ResourceAccessFileStats(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which provides download stats for a resources's files"""
     context_object_name = 'resource'
     model = Resource
@@ -309,7 +310,7 @@ class ResourceAccessFileStats(PermissionRequiredCheckGlobalMixin, DetailView):
 
 # License Codes
 
-class ResourceLicenseCode(PermissionRequiredCheckGlobalMixin, DetailView, MultipleObjectMixin):
+class ResourceLicenseCode(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin, DetailView, MultipleObjectMixin):
     """A view of license codes associated with a resource"""
     context_object_name = 'resource'
     model = Resource
@@ -328,7 +329,8 @@ class ResourceLicenseCode(PermissionRequiredCheckGlobalMixin, DetailView, Multip
         return context
 
 
-class ResourceLicenseCodeAdd(PermissionRequiredCheckGlobalMixin, FormMixin, DetailView, ProcessFormView):
+class ResourceLicenseCodeAdd(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin,
+                             FormMixin, DetailView, ProcessFormView):
     """A view to add more license codes to a resource"""
     context_object_name = 'resource'
     form_class = LicenseCodeForm
@@ -588,7 +590,8 @@ class AgreementCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     template_name_suffix = '_create_form'
 
 
-class AgreementUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChangedMixin, UpdateView):
+class AgreementUpdate(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin,
+                      SuccessMessageIfChangedMixin, UpdateView):
     """A view to update an agreement"""
     context_object_name = 'agreement'
     form_class = AgreementUpdateForm
@@ -598,7 +601,8 @@ class AgreementUpdate(PermissionRequiredCheckGlobalMixin, SuccessMessageIfChange
     template_name_suffix = '_update_form'
 
 
-class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+class AgreementDelete(LoginRequiredMixin, PermissionRequiredMixin,
+                      SuccessMessageMixin, DeleteView):
     """A view to delete an agreement"""
     context_object_name = 'agreement'
     fields = '__all__'
@@ -609,7 +613,7 @@ class AgreementDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name_suffix = '_delete_form'
 
 
-class AgreementPermissions(PermissionRequiredCheckGlobalMixin, DetailView):
+class AgreementPermissions(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which reports on the permissions on this agreement"""
     context_object_name = 'agreement'
     model = Agreement
@@ -624,7 +628,7 @@ class AgreementPermissions(PermissionRequiredCheckGlobalMixin, DetailView):
         return context
 
 
-class AgreementPermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView):
+class AgreementPermissionsGroups(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin, DetailView):
     """A view which lists groups"""
     context_object_name = 'agreement'
     model = Agreement
@@ -644,8 +648,8 @@ class AgreementPermissionsGroups(PermissionRequiredCheckGlobalMixin, DetailView)
         return context
 
 
-class AgreementPermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRequiredCheckGlobalMixin,
-                                      FormMixin, DetailView, ProcessFormView):
+class AgreementPermissionsGroupUpdate(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin,
+                                      SuccessMessageIfChangedMixin, FormMixin, DetailView, ProcessFormView):
     """A view which updates the per-object permissions of an agreement for a group"""
     context_object_name = 'agreement'
     form_class = CustomGroupObjectPermissionsForm
@@ -677,7 +681,8 @@ class AgreementPermissionsGroupUpdate(SuccessMessageIfChangedMixin, PermissionRe
 
 # Signatures
 
-class AgreementSignatureList(PermissionRequiredCheckGlobalMixin, FormMixin, DetailView, MultipleObjectMixin):
+class AgreementSignatureList(LoginRequiredMixin, PermissionRequiredCheckGlobalMixin,
+                             FormMixin, DetailView, MultipleObjectMixin):
     """A view to list and search through signatures of an agreement"""
     context_object_name = 'agreement'
     form_class = SignatureSearchForm
@@ -707,7 +712,7 @@ class AgreementSignatureList(PermissionRequiredCheckGlobalMixin, FormMixin, Deta
         return context
 
 
-class AgreementSignatureCSV(UserPassesTestMixin, LoginRequiredMixin, CSVExportView):
+class AgreementSignatureCSV(LoginRequiredMixin, UserPassesTestMixin, CSVExportView):
     """A view to download the signatures associated with an agreement as a CSV file"""
     fields = ('agreement__title', 'username', 'first_name',
               'last_name', 'email', 'department__name',

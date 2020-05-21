@@ -46,7 +46,7 @@ class IsStaffMixin(UserPassesTestMixin):
 
 # Users
 
-class UserList(LoginRequiredMixin, IsStaffMixin, FormMixin, ListView):
+class UserList(IsStaffMixin, FormMixin, ListView):
     """A view of all users"""
     context_object_name = 'users'
     form_class = UserSearchForm
@@ -68,7 +68,7 @@ class UserList(LoginRequiredMixin, IsStaffMixin, FormMixin, ListView):
         return initial
 
 
-class UserRead(LoginRequiredMixin, IsStaffMixin, DetailView):
+class UserRead(IsStaffMixin, DetailView):
     """A view of a user"""
     context_object_name = 'user_detail'
     model = User
@@ -76,7 +76,7 @@ class UserRead(LoginRequiredMixin, IsStaffMixin, DetailView):
     template_name = 'accounts/user_read.html'
 
 
-class UserUpdate(LoginRequiredMixin, IsStaffMixin, SuccessMessageIfChangedMixin, UpdateView):
+class UserUpdate(IsStaffMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a user"""
     context_object_name = 'user_detail'
     form_class = UserUpdateForm
@@ -103,7 +103,7 @@ class UserUpdate(LoginRequiredMixin, IsStaffMixin, SuccessMessageIfChangedMixin,
 
 # GroupDescriptions
 
-class GroupDescriptionList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class GroupDescriptionList(PermissionRequiredMixin, ListView):
     """A view of all group descriptions"""
     context_object_name = 'groupdescriptions'
     model = GroupDescription
@@ -112,7 +112,7 @@ class GroupDescriptionList(LoginRequiredMixin, PermissionRequiredMixin, ListView
     permission_required = 'accounts.view_groupdescription'
 
 
-class GroupDescriptionRead(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class GroupDescriptionRead(PermissionRequiredMixin, DetailView):
     """A view of a group description"""
     context_object_name = 'groupdescription'
     model = GroupDescription
@@ -120,7 +120,7 @@ class GroupDescriptionRead(LoginRequiredMixin, PermissionRequiredMixin, DetailVi
     template_name_suffix = '_read'
 
 
-class GroupDescriptionCreate(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+class GroupDescriptionCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     """A view to create a GroupDescription"""
     form_class = GroupDescriptionCreateForm
     model = GroupDescription
@@ -129,7 +129,7 @@ class GroupDescriptionCreate(LoginRequiredMixin, PermissionRequiredMixin, Succes
     template_name_suffix = '_create_form'
 
 
-class GroupDescriptionUpdate(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
+class GroupDescriptionUpdate(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a group description"""
     context_object_name = 'groupdescription'
     form_class = GroupDescriptionUpdateForm
@@ -139,10 +139,7 @@ class GroupDescriptionUpdate(LoginRequiredMixin, PermissionRequiredMixin, Succes
     template_name_suffix = '_update_form'
 
 
-class GroupDescriptionUpdatePermissions(LoginRequiredMixin,
-                                        PermissionRequiredMixin,
-                                        SuccessMessageIfChangedMixin,
-                                        UpdateView):
+class GroupDescriptionUpdatePermissions(PermissionRequiredMixin, SuccessMessageIfChangedMixin, UpdateView):
     """A view to update a group description"""
     context_object_name = 'group'
     form_class = GroupPermissionsForm
@@ -168,7 +165,7 @@ class GroupDescriptionUpdatePermissions(LoginRequiredMixin,
         return context
 
 
-class GroupDescriptionDelete(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+class GroupDescriptionDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     """A view to delete a group description"""
     context_object_name = 'groupdescription'
     fields = '__all__'
