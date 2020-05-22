@@ -656,3 +656,177 @@ class ResourceReadTestCase(TestCase):
 
                 # The actions should not be available.
                 actions_visibility(elems, False)
+
+
+class AgreementReadTestCase(TestCase):
+    """Tests for the AgreementRead view"""
+
+    def setUp(self):
+        """Create test data for this test case"""
+        self.test_user = get_user_model().objects.create_user(username='test',
+                                                              first_name='test',
+                                                              last_name='test',
+                                                              email='test@test.com',
+                                                              password='test',
+                                                              is_staff=True)
+        self.test_group = Group.objects.create(name='test')
+        self.test_resource = Resource.objects.create(name='Test Resource WooHoo', slug='test-resource', description='')
+        self.test_agreement = Agreement.objects.create(title='Test Agreement WooHoo',
+                                                       slug='test',
+                                                       resource=self.test_resource,
+                                                       body='body',
+                                                       redirect_url='https://example.com',
+                                                       redirect_text='example-redirect')
+        test_faculty = Faculty.objects.create(name='Test', slug='test')
+        self.test_department = Department.objects.create(name='Test', slug='test', faculty=test_faculty)
+        self.url = reverse('agreements_read', args=[self.test_agreement.slug])
+
+    def test_login_required(self):
+        """The view should require the user be logged in to access it"""
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
+        self.client.login(username='test', password='test')
+        response = self.client.get(self.url)
+        self.assertContains(response, '<h2>Test Agreement WooHoo</h2>', html=True)
+
+    def test_view_permissions(self):
+        """The view requires permissions to access if the agreement is hidden"""
+        self.test_agreement.hidden = True
+        self.test_agreement.save()
+
+        # The hidden ageement should not be accessible.
+        self.client.login(username='test', password='test')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+        # Add test user to the test group.
+        self.test_group.user_set.add(self.test_user)
+        # Give the group the object permission.
+        assign_perm('view_agreement', self.test_group, self.test_agreement)
+
+        # The ageement should now be accessible.
+        response = self.client.get(self.url)
+        self.assertContains(response, '<h2>Test Agreement WooHoo</h2>', html=True)
+        self.assertContains(response, '<p class="alert">&#9888; This agreement is hidden.</p>', html=True)
+
+        # Remove the permission
+        remove_perm('view_agreement', self.test_group, self.test_agreement)
+
+        # The hidden ageement should not be accessible.
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+        # Give the group the global permission.
+        view_model = Permission.objects.get(codename='view_agreement')
+        self.test_group.permissions.add(view_model)
+
+        # The agreement should now be accessible.
+        response = self.client.get(self.url)
+        self.assertContains(response, '<h2>Test Agreement WooHoo</h2>', html=True)
+        self.assertContains(response, '<p class="alert">&#9888; This agreement is hidden.</p>', html=True)
+
+    def test_form_submit(self):
+        """Test submitting the signature form"""
+
+        # Set up an existing signature and license codes, to test that the correct license code is assigned.
+        sig_user = get_user_model().objects.create_user(username='sig',
+                                                        first_name='test',
+                                                        last_name='test',
+                                                        email='test@test.com',
+                                                        password='test')
+        test_signature = Signature.objects.create(agreement=self.test_agreement,
+                                                  signatory=sig_user,
+                                                  username=self.test_user.username,
+                                                  email=self.test_user.email,
+                                                  department=self.test_department)
+        other_resource = Resource.objects.create(name='Some Other Resource Boo', slug='bad-resource', description='NO')
+        LicenseCode.objects.create(resource=self.test_resource,
+                                   code='abc',
+                                   signature=test_signature)
+        LicenseCode.objects.create(resource=other_resource,
+                                   code='def',
+                                   signature=None)
+        LicenseCode.objects.create(resource=self.test_resource,
+                                   code='ghi',
+                                   signature=None)
+        LicenseCode.objects.create(resource=self.test_resource,
+                                   code='jkl',
+                                   signature=None)
+
+        # Login
+        self.client.login(username='test', password='test')
+
+        # Before signing the agreement, the signature form should be available.
+        response = self.client.get(self.url)
+        self.assertContains(response, '<form class="signature" method="post">')
+
+        # Sign the agreement.
+        response = self.client.post(self.url, {'sign': 'on', 'department': str(self.test_department.id)}, follow=True)
+
+        # Redirect worked?
+        self.assertRedirects(response, self.url)
+        # The form should no longer be displayed.
+        self.assertNotContains(response, '<form class="signature" method="post">')
+        # The signature and the license code should be displayed.
+        self.assertContains(response, "You signed this agreement on ")
+        # The license code should be the oldest unused one for that resource.
+        self.assertContains(response, "<p>License Code: ghi</p>", html=True)
+
+    def test_actions_respect_permissions(self):
+        """Test that the actions which require permissions don't appear if you don't have those permissions"""
+
+        permissions_action_html = ('<a class="permissions" '
+                                   f"href=\"{reverse('agreements_permissions', args=[self.test_agreement.slug])}\""
+                                   '>Permissions</a>')
+
+        edit_action_html = ('<a class="ok" '
+                            f"href=\"{reverse('agreements_update', args=[self.test_agreement.slug])}\""
+                            '>Edit</a>')
+
+        signatures_action_html = ('<a class="bonus" '
+                                  f"href=\"{reverse('agreements_signatures_list', args=[self.test_agreement.slug])}\""
+                                  '>Search Signatures</a>')
+
+        permissions_to_html = [('change_agreement', (permissions_action_html, edit_action_html)),
+                               ('agreement_search_signatures', (signatures_action_html,))]
+
+        def actions_visibility(elems, visible=True):
+            response = self.client.get(self.url)
+            for elem in elems:
+                if visible:
+                    self.assertContains(response, elem, html=True)
+                else:
+                    self.assertNotContains(response, elem, html=True)
+
+        self.test_group.user_set.add(self.test_user)
+        self.client.login(username='test', password='test')
+
+        for permission_codename, elems in permissions_to_html:
+            with self.subTest(msg=permission_codename):
+                # The actions should not be available.
+                actions_visibility(elems, False)
+
+                # Give the user's group the global permission.
+                permission = Permission.objects.get(codename=permission_codename)
+                self.test_group.permissions.add(permission)
+
+                # The actions should be available.
+                actions_visibility(elems, True)
+
+                # Remove the permission
+                self.test_group.permissions.remove(permission)
+
+                # The actions should not be available.
+                actions_visibility(elems, False)
+
+                # Give the user's group the object permission.
+                assign_perm(permission_codename, self.test_group, self.test_agreement)
+
+                # The actions should be available.
+                actions_visibility(elems, True)
+
+                # Remove the permission
+                remove_perm(permission_codename, self.test_group, self.test_agreement)
+
+                # The actions should not be available.
+                actions_visibility(elems, False)
