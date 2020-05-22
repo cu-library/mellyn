@@ -594,7 +594,7 @@ class ResourceReadTestCase(TestCase):
         self.assertContains(response, "<p>License Code: abc</p>", html=True)
 
     def test_actions_respect_permissions(self):
-        """Test that the actions which require edit permissions don't appear if you don't have those permissions"""
+        """Test that the actions which require permissions don't appear if you don't have those permissions"""
 
         permissions_action_html = ('<a class="permissions" '
                                    f"href=\"{reverse('resources_permissions', args=[self.test_resource.slug])}\""
