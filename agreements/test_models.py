@@ -6,6 +6,7 @@ https://docs.djangoproject.com/en/3.0/topics/testing/
 
 from datetime import timedelta
 from unittest.mock import patch
+import random
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -249,6 +250,58 @@ class SignatureModelTestCase(TestCase):
                                      email=self.test_user.email,
                                      department=self.test_department)
             new_test_sig.full_clean()
+
+    def test_counts(self):
+        """count_per_department and count_per_faculty should return the right counts"""
+
+        correct_count_per_faculty = {'Test': 1}
+        correct_count_per_department = {'Test': 1}
+
+        another_agreement = Agreement.objects.create(title='another',
+                                                     slug='another',
+                                                     resource=self. test_resource,
+                                                     body='body',
+                                                     redirect_url='https://example.com',
+                                                     redirect_text='example-redirect')
+
+        for faculty_iter in range(random.randint(2, 5)):
+            faculty = Faculty.objects.create(name=f'Test faculty {faculty_iter}', slug=f'test{faculty_iter}')
+            for dept_iter in range(random.randint(2, 5)):
+                dept = Department.objects.create(name=f'Test department {faculty_iter}{dept_iter}',
+                                                 slug=f'test{faculty_iter}{dept_iter}',
+                                                 faculty=faculty)
+                for patron_iter in range(random.randint(5, 10)):
+                    user = get_user_model().objects.create_user(username=f'user{faculty_iter}{dept_iter}{patron_iter}',
+                                                                first_name=f't{faculty_iter}{dept_iter}{patron_iter}',
+                                                                last_name=f't{faculty_iter}{dept_iter}{patron_iter}',
+                                                                email=f'{faculty_iter}{dept_iter}{patron_iter}@t.com',
+                                                                password=f'{faculty_iter}{dept_iter}{patron_iter}')
+                    if random.random() > 0.5:
+                        Signature.objects.create(agreement=self.test_agreement,
+                                                 signatory=user,
+                                                 username=user.username,
+                                                 first_name=user.first_name,
+                                                 last_name=user.last_name,
+                                                 email=user.email,
+                                                 department=dept)
+                        correct_count_per_faculty[faculty.name] = correct_count_per_faculty.get(faculty.name, 0) + 1
+                        correct_count_per_department[dept.name] = correct_count_per_department.get(dept.name, 0) + 1
+                    if random.random() > 0.5:
+                        Signature.objects.create(agreement=another_agreement,
+                                                 signatory=user,
+                                                 username=user.username,
+                                                 first_name=user.first_name,
+                                                 last_name=user.last_name,
+                                                 email=user.email,
+                                                 department=dept)
+
+        count_per_faculty = Signature.objects.filter(agreement=self.test_agreement).count_per_faculty()
+        for count in count_per_faculty:
+            self.assertEqual(count['num_sigs'], correct_count_per_faculty[count['department__faculty__name']])
+
+        count_per_department = Signature.objects.filter(agreement=self.test_agreement).count_per_department()
+        for count in count_per_department:
+            self.assertEqual(count['num_sigs'], correct_count_per_department[count['department__name']])
 
 
 class FileDownloadEventTestCase(TestCase):
