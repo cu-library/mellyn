@@ -27,7 +27,7 @@ DEBUG = True
 
 APPEND_SLASH = True
 
-ALLOWED_HOSTS = ['workshop']
+ALLOWED_HOSTS = ['localhost', 'workshop']
 
 
 # Application definition
