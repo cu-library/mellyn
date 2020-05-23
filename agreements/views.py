@@ -250,6 +250,8 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
         # Access is granted, is the access path a file or a directory?
         resource_scoped_path = os.path.join(resource.slug, self.kwargs['accesspath'])
         try:
+            if '..' in resource_scoped_path:
+                raise SuspiciousFileOperation()
             self.path = default_storage.path(resource_scoped_path)  # pylint: disable=attribute-defined-outside-init
             if not os.path.exists(self.path):
                 raise Http404('File or directory not found at access path.')

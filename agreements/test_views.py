@@ -4,10 +4,17 @@ This module defines tests to run against this application.
 https://docs.djangoproject.com/en/3.0/topics/testing/
 """
 
+import os
+import os.path
+import shutil
+import tempfile
+import urllib.parse
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 
 from guardian.shortcuts import assign_perm, remove_perm
 
@@ -656,6 +663,105 @@ class ResourceReadTestCase(TestCase):
 
                 # The actions should not be available.
                 actions_visibility(elems, False)
+
+
+class ResourceAccessTestCase(TestCase):
+    """Tests for the ResourceAccess view"""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.temp_media_root = tempfile.mkdtemp(suffix='mellyn_tests')
+        test_data_dir = os.path.join(cls.temp_media_root, 'test-resource/a/b/c/d')
+        os.makedirs(test_data_dir)
+        with open(os.path.join(test_data_dir, 'testfile.txt'), 'w') as test_file:
+            test_file.writelines(['and a one\n', 'and a two\n', 'and a three!\n'])
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.temp_media_root)
+        super().tearDownClass()
+
+    def setUp(self):
+        """Create test data for this test case"""
+        self.test_user = get_user_model().objects.create_user(username='test',
+                                                              first_name='test',
+                                                              last_name='test',
+                                                              email='test@test.com',
+                                                              password='test')
+        self.test_resource = Resource.objects.create(name='Test Resource WooHoo', slug='test-resource', description='')
+        self.test_agreement = Agreement.objects.create(title='Test Agreement WooHoo',
+                                                       slug='test',
+                                                       resource=self.test_resource,
+                                                       body='body',
+                                                       redirect_url='https://example.com',
+                                                       redirect_text='example-redirect')
+        test_faculty = Faculty.objects.create(name='Test', slug='test')
+        test_department = Department.objects.create(name='Test', slug='test', faculty=test_faculty)
+        self.test_signature = Signature.objects.create(agreement=self.test_agreement,
+                                                       signatory=self.test_user,
+                                                       username=self.test_user.username,
+                                                       email=self.test_user.email,
+                                                       department=test_department)
+        self.url = reverse('resources_access', args=[self.test_resource.slug, 'a/b/c/d'])
+
+    def test_login_and_signature_required(self):
+        """The view should require the user be logged in and have signed the agreement to access it"""
+        with self.settings(MEDIA_ROOT=self.temp_media_root):
+            self.test_signature.delete()
+            response = self.client.get(self.url)
+            self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
+            self.client.login(username='test', password='test')
+            response = self.client.get(self.url)
+            self.assertRedirects(response, reverse('agreements_read', args=[self.test_agreement.slug]))
+
+    def test_404_if_agreement_hidden(self):
+        """A hidden agreement returns a 404 error"""
+        with self.settings(MEDIA_ROOT=self.temp_media_root):
+            self.test_agreement.hidden = True
+            self.test_agreement.save()
+            self.client.login(username='test', password='test')
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 404)
+
+    def test_404_if_agreement_invalid(self):
+        """An invalid agreement returns a 404 error"""
+        with self.settings(MEDIA_ROOT=self.temp_media_root):
+            self.test_agreement.end = now()
+            self.test_agreement.save()
+            self.client.login(username='test', password='test')
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 404)
+
+    def test_404_on_missing_path(self):
+        """An invalid path returns a 404 error"""
+        with self.settings(MEDIA_ROOT=self.temp_media_root):
+            self.client.login(username='test', password='test')
+            response = self.client.get(urllib.parse.urljoin(self.url, 'x/y/z'))
+            self.assertEqual(response.status_code, 404)
+
+    def test_403_on_suspicious_path(self):
+        """Basic 'weird' paths returns a 403 error"""
+        with self.settings(MEDIA_ROOT=self.temp_media_root):
+            for bad_path in ['../../../etc/passwd',
+                             '%2e%2e/%2e%2e/%2e%2e/etc/passwd',
+                             '..%c0%af..%c0%af..%c0%af/etc/passwd',
+                             '%2e%2e%c0%af%2e%2e%c0%af%2e%2e%c0%af/etc/passwd']:
+                with self.subTest(msg=bad_path):
+                    self.client.login(username='test', password='test')
+                    response = self.client.get(self.url + '/' + bad_path)
+                    self.assertEqual(response.status_code, 403)
+                    response = self.client.get(self.url + bad_path)
+                    self.assertEqual(response.status_code, 403)
+
+    def test_directory_view(self):
+        """The view should return a directory listing"""
+        with self.settings(MEDIA_ROOT=self.temp_media_root):
+            self.client.login(username='test', password='test')
+            response = self.client.get(self.url, follow=True)
+            self.assertContains(response, f'<h2>File Access for {self.test_resource.name}</h2>', html=True)
+            test_file_access_path = reverse('resources_access', args=[self.test_resource.slug, 'a/b/c/d/testfile.txt'])
+            self.assertContains(response, f'<a href="{test_file_access_path}">testfile.txt</a>', html=True)
 
 
 class AgreementReadTestCase(TestCase):
