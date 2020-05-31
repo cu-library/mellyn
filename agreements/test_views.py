@@ -673,7 +673,7 @@ class ResourceAccessTestCase(TestCase):
         super().setUpClass()
         cls.temp_media_root = tempfile.mkdtemp(suffix='mellyn_tests')
         test_data_dir = os.path.join(cls.temp_media_root, 'test-resource/a/b/c/d')
-        os.makedirs(test_data_dir)
+        os.makedirs(os.path.join(test_data_dir, 'e'))
         with open(os.path.join(test_data_dir, 'testfile.txt'), 'w') as test_file:
             test_file.writelines(['and a one\n', 'and a two\n', 'and a three!\n'])
 
@@ -762,6 +762,13 @@ class ResourceAccessTestCase(TestCase):
             self.assertContains(response, f'<h2>File Access for {self.test_resource.name}</h2>', html=True)
             test_file_access_path = reverse('resources_access', args=[self.test_resource.slug, 'a/b/c/d/testfile.txt'])
             self.assertContains(response, f'<a href="{test_file_access_path}">testfile.txt</a>', html=True)
+            test_subdir_access_path = reverse('resources_access', args=[self.test_resource.slug, 'a/b/c/d/e'])
+            self.assertContains(response, f'<a href="{test_subdir_access_path}">e</a>', html=True)
+            test_parentdir_access_path = reverse('resources_access', args=[self.test_resource.slug, 'a/b/c'])
+            self.assertContains(response,
+                                '<a aria-label="Navigate up to the parent directory" '
+                                f'href="{test_parentdir_access_path}">&uarr; Parent Directory</a>',
+                                html=True)
 
 
 class AgreementReadTestCase(TestCase):
