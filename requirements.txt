@@ -2,7 +2,7 @@ asgiref==3.2.7
 astroid==2.4.1
 bleach==3.1.5
 coverage==5.1
-Django==3.0.6
+Django==3.0.7
 django-bleach==0.6.1
 django-csv-export-view==1.1.0
 django-guardian==2.2.0
