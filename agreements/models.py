@@ -46,7 +46,7 @@ class Resource(models.Model):
                                        max_length=200,
                                        validators=[validate_email],
                                        help_text='The recipient of email warnings about low numbers of '
-                                                 'remaning unassigned license codes.')
+                                                 'remaning unassigned license codes. If empty, no emails are sent.')
     hidden = models.BooleanField(default=False,
                                  help_text='Hidden resources do not appear in the list of active resources.')
     history = HistoricalRecords()
