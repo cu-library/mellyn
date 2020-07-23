@@ -19,7 +19,7 @@ from simple_history.models import HistoricalRecords
 
 DEFAULT_ALLOWED_TAGS = ['h3', 'p', 'a', 'abbr', 'cite', 'code',
                         'small', 'em', 'strong', 'sub', 'sup',
-                        'u', 'ul', 'ol', 'li']
+                        'u', 'ul', 'ol', 'li', 'br']
 
 
 class Resource(models.Model):
