@@ -723,7 +723,7 @@ class AgreementSignatureCSV(LoginRequiredMixin, UserPassesTestMixin, CSVExportVi
 
     def test_func(self):
         agreement = get_object_or_404(
-            Agreement, slug=self.kwargs['agreementslug']
+            Agreement, slug=self.kwargs['slug']
         )
         return has_perm(self.request.user, 'agreements.agreement_search_signatures', agreement)
 
@@ -742,7 +742,7 @@ class AgreementSignatureCSV(LoginRequiredMixin, UserPassesTestMixin, CSVExportVi
     def get_queryset(self):
         qs = super().get_queryset()
         self.agreement = get_object_or_404(  # pylint: disable=attribute-defined-outside-init
-            Agreement, slug=self.kwargs['agreementslug']
+            Agreement, slug=self.kwargs['slug']
         )
         qs = qs.filter(agreement=self.agreement)
         return qs
