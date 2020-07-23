@@ -184,8 +184,8 @@ class Agreement(models.Model):
                                                             message="Enter a valid URL. "
                                                                     "It must start with 'https://'.",
                                                             code='need_https')],
-                                   help_text="URL where patrons will be redirected to "
-                                             "after signing the agreement. It must start with 'https://'.")
+                                   help_text="URL displayed to patrons after signing the agreement. "
+                                             "It is prefixed by the text 'Return to '. It must start with 'https://'.")
     redirect_text = models.CharField(max_length=300, help_text='The text of the URL redirect link.')
     hidden = models.BooleanField(default=False,
                                  help_text='Hidden agreements do not appear in the list of active agreements.')
