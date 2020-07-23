@@ -283,7 +283,8 @@ form textarea {
   min-height: 25em;
 }
 
-#id_body {
+#id_body,
+#id_description {
   font-family: 'Source Code Pro', monospace;
   font-weight: 300;
   font-size: 1em;
