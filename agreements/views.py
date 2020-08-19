@@ -147,7 +147,7 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Resource
     permission_required = 'agreements.delete_resource'
     success_message = '%(name)s was deleted successfully.'
-    success_url = reverse_lazy('resource_list')
+    success_url = reverse_lazy('resources_list')
     template_name_suffix = '_delete_form'
 
 
