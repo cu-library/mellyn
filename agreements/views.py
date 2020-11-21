@@ -260,8 +260,8 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
                                                                                         self.kwargs['accesspath'],
                                                                                         request.session.session_key)
                 return sendfile(request, self.path)
-        except SuspiciousFileOperation as e:
-            raise PermissionDenied('SuspiciousFileOperation on file access.') from e
+        except SuspiciousFileOperation as suspicious_file_operation_error:
+            raise PermissionDenied('SuspiciousFileOperation on file access.') from suspicious_file_operation_error
 
         # Redirect if the file listing doesn't end in a slash
         if self.kwargs['accesspath'] != '' and self.kwargs['accesspath'][-1] != '/':
