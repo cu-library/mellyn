@@ -30,9 +30,9 @@ jobs:
         python manage.py test
     - name: Run pylint and flake8
       run: |
-        pylint --load-plugins pylint_django agreements
-        pylint --load-plugins pylint_django accounts
-        pylint --load-plugins pylint_django mellyn
+        pylint --load-plugins --django-settings-module=mellyn.settings pylint_django agreements
+        pylint --load-plugins --django-settings-module=mellyn.settings pylint_django accounts
+        pylint --load-plugins --django-settings-module=mellyn.settings pylint_django mellyn
         flake8 agreements
         flake8 accounts
         flake8 mellyn
