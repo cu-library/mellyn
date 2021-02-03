@@ -15,7 +15,7 @@ pylint --load-plugins pylint_django mellyn
 flake8 mellyn
 
 echo ""
-echo "Template checks"
+echo "Checking templates for inconsistent spacing in tags"
 grep -r '{%[^ ]' templates/
 grep -r '[^ ]%}' templates/
 grep -r '{{[^ ]' templates/
