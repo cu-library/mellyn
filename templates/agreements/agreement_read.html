@@ -6,7 +6,7 @@
   <div class="breadcrumb"><a aria-label="Return to the list of agreements" href="{% url 'agreements_list' %}">&larr; Agreements</a></div>
   <h2>{{ agreement.title }}</h2>{% if agreement.hidden %}<p class="alert">&#9888; This agreement is hidden.</p>{% endif %}
   <p class="created">This agreement was created on <span class="human-date" title="{{ agreement.created|date:"Y-m-d" }}">{{ agreement.created|date:"l, F jS, Y" }}</span>.</p>
-  <p class="valid">It is valid from <span class="human-date" title="{{ agreement.start|date:"Y-m-d" }}">{{ agreement.start|date:"l, F jS, Y" }}{% if agreement.end %} until <span class="human-date" title="{{ agreement.end|date:"Y-m-d" }}">{{ agreement.end|date:"l, F jS, Y" }}{% endif %}.</p>
+  <p class="valid">It is valid from <span class="human-date" title="{{ agreement.start|date:"Y-m-d" }}">{{ agreement.start|date:"l, F jS, Y" }}</span>{% if agreement.end %} until <span class="human-date" title="{{ agreement.end|date:"Y-m-d" }}">{{ agreement.end|date:"l, F jS, Y" }}{% endif %}.</p>
   <p class="resource">Provides access to <a href="{% url 'resources_read' agreement.resource.slug %}">{{ agreement.resource.name }}</a></p>
   <section class="htmlfield">{{ agreement.body|safe }}</section>
   {% if associated_signature %}
