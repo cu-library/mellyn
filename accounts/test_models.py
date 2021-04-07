@@ -158,11 +158,11 @@ class GroupDescriptionTestCase(TestCase):
         self.assertIn(test_group_description_2, group_descriptions_3)
         self.assertIn(test_group_description_3, group_descriptions_3)
         # Test group 1 has all three permissions on test group 3
-        self.assertTrue(all([perm in [gop.permission for gop in
-                                      group_descriptions_3.get(name='test-one').group.groupobjectpermissions_on_object]
-                             for perm in [test_permission_1,
-                                          test_permission_2,
-                                          test_permission_3]]))
+        self.assertTrue(all(perm in [gop.permission for gop in
+                                     group_descriptions_3.get(name='test-one').group.groupobjectpermissions_on_object]
+                            for perm in [test_permission_1,
+                                         test_permission_2,
+                                         test_permission_3]))
         # Test group 2 only has permission 2 on test group 3 (which double checks that the global perm is ignored)
         permissions_list = [gop.permission for gop in
                             group_descriptions_3.get(name='test-two').group.groupobjectpermissions_on_object]
