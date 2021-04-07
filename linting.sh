@@ -1,17 +1,17 @@
 #! /usr/bin/env bash
 
 echo "Agreements"
-pylint --load-plugins pylint_django agreements
+pylint --load-plugins pylint_django --django-settings-module=mellyn.settings agreements
 flake8 agreements
 
 echo ""
 echo "Accounts"
-pylint --load-plugins pylint_django accounts
+pylint --load-plugins pylint_django --django-settings-module=mellyn.settings accounts
 flake8 accounts
 
 echo ""
 echo "Mellyn"
-pylint --load-plugins pylint_django mellyn
+pylint --load-plugins pylint_django --django-settings-module=mellyn.settings mellyn
 flake8 mellyn
 
 echo ""
