@@ -91,6 +91,8 @@ LOGIN_REDIRECT_URL = 'agreements_list'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'index'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
