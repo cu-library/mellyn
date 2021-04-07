@@ -5,13 +5,13 @@
 {% block main %}
   <div class="breadcrumb"><a aria-label="Return to the list of agreements" href="{% url 'agreements_list' %}">&larr; Agreements</a></div>
   <h2>{{ agreement.title }}</h2>{% if agreement.hidden %}<p class="alert">&#9888; This agreement is hidden.</p>{% endif %}
-  <p class="created">Created {{ agreement.created|date:"Y-m-d" }}</p>
-  <p class="valid">Valid from {{ agreement.start|date:"Y-m-d" }}{% if agreement.end %} until {{ agreement.end|date:"Y-m-d" }}{% endif %}</p>
+  <p class="created">This agreement was created on <span class="human-date" title="{{ agreement.created|date:"Y-m-d" }}">{{ agreement.created|date:"l, F jS, Y" }}</span>.</p>
+  <p class="valid">It is valid from <span class="human-date" title="{{ agreement.start|date:"Y-m-d" }}">{{ agreement.start|date:"l, F jS, Y" }}{% if agreement.end %} until <span class="human-date" title="{{ agreement.end|date:"Y-m-d" }}">{{ agreement.end|date:"l, F jS, Y" }}{% endif %}.</p>
   <p class="resource">Provides access to <a href="{% url 'resources_read' agreement.resource.slug %}">{{ agreement.resource.name }}</a></p>
   <section class="htmlfield">{{ agreement.body|safe }}</section>
   {% if associated_signature %}
   <div class="signature">
-    <p>You signed this agreement on {{ associated_signature.signed_at|date:"Y-m-d" }}.</p>
+    <p>You signed this agreement on <span class="human-date" title="{{ associated_signature.signed_at|date:"Y-m-d" }}">{{ associated_signature.signed_at|date:"l, F jS, Y" }}</span>.</p>
     {% if associated_signature.license_code %}<p>License Code: {{ associated_signature.license_code.code }}</p>{% endif %}
     <p>Return to <a href="{{ agreement.redirect_url }}">{{ agreement.redirect_text }}</a></p>
   </div>

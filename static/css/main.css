@@ -518,3 +518,7 @@ body > footer a:hover {
 #privacynotice {
   font-size: 90%;
 }
+
+.human-date {
+  font-weight: 500;
+}
