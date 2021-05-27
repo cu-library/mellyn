@@ -5,6 +5,9 @@
 {% block main %}
   <div class="breadcrumb"><a aria-label="Return to the resource associated with these file access statistics" href="{% url 'resources_read' resource.slug %}">&larr; {{ resource.name }}</a></div>
   <h2>File Access Statistics for {{ resource.name }}</h2>
+  {% if total %}
+    <p>{{ total }} total download events recorded.</p>
+  {% endif %}
   {% if file_stats %}
   <ul>
     {% for file_stat in file_stats %}

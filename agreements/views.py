@@ -306,6 +306,7 @@ class ResourceAccessFileStats(LoginRequiredMixin, PermissionRequiredCheckGlobalM
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['total'] = FileDownloadEvent.objects.download_count_for_resource(context['resource'])
         context['file_stats'] = FileDownloadEvent.objects.download_count_per_path_for_resource(context['resource'])
         return context
 

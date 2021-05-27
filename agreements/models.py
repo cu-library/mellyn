@@ -317,6 +317,15 @@ class FileDownloadEventQuerySet(QuerySet):
                 .annotate(downloads=Count('path'))
                 .order_by('-downloads'))
 
+    def download_count_for_resource(self, resource):
+        """Count the number of download events for a resource"""
+        if resource is None:
+            raise TypeError('resource cannot be none')
+
+        return (self
+                .filter(resource=resource)
+                .count())
+
 
 class FileDownloadEvent(models.Model):
     """Store information about each file download request"""

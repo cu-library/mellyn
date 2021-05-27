@@ -312,6 +312,9 @@ class FileDownloadEventTestCase(TestCase):
         self.test_resource = Resource(name='Test', slug='test', description='')
         self.test_resource.full_clean()
         self.test_resource.save()
+        self.test_resource_two = Resource(name='Test Two', slug='testtwo', description='')
+        self.test_resource_two.full_clean()
+        self.test_resource_two.save()
 
     def test_get_or_create_if_no_duplicates_past_5_minutes(self):
         """Check that get_or_create_if_no_duplicates_past_5_minutes doesn't create objects when it shouldn't."""
@@ -339,3 +342,19 @@ class FileDownloadEventTestCase(TestCase):
         self.assertEqual({'path': 'test3', 'downloads': 3}, test_file_stats[2])
         self.assertEqual({'path': 'test2', 'downloads': 2}, test_file_stats[3])
         self.assertEqual({'path': 'test1', 'downloads': 1}, test_file_stats[4])
+
+    def test_download_count_per_resource(self):
+        """Does the download_count_per_resource count the right number of download events in total?"""
+
+        for path, count in [('test1', 1), ('test2', 2), ('test3', 3), ('test40', 5), ('testten', 8)]:
+            for i in range(count):
+                FileDownloadEvent.objects.create(resource=self.test_resource, path=path, session_key=f'{path}{i}')
+
+        for path, count in [('test1', 1), ('test2', 1), ('test3', 2), ('test40', 3), ('testten', 5)]:
+            for i in range(count):
+                FileDownloadEvent.objects.create(resource=self.test_resource_two, path=path, session_key=f'{path}{i}')
+
+        test_resource_one_total = FileDownloadEvent.objects.download_count_for_resource(self.test_resource)
+        self.assertEqual(test_resource_one_total, 19)
+        test_resource_two_total = FileDownloadEvent.objects.download_count_for_resource(self.test_resource_two)
+        self.assertEqual(test_resource_two_total, 12)
