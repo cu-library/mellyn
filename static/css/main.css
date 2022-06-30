@@ -235,7 +235,7 @@ ul.messages li.error {
 }
 
 div.breadcrumb {
-  margin: 16px 0 32px 0;
+  margin: 16px 0 32px;
 }
 
 form div {
@@ -252,9 +252,9 @@ form label {
   margin-bottom: 8px;
 }
 
-form input[type=text],
-form input[type=url],
-form input[type=password],
+form input[type='text'],
+form input[type='url'],
+form input[type='password'],
 form select {
   font-size: 1.1em;
   padding: 8px;
@@ -262,9 +262,9 @@ form select {
 }
 
 @media (max-width: 560px) {
-  form input[type=text],
-  form input[type=url],
-  form input[type=password],
+  form input[type='text'],
+  form input[type='url'],
+  form input[type='password'],
   form select {
     min-width: unset;
     width: 100%;
@@ -312,7 +312,7 @@ form textarea {
   margin-right: 8px;
 }
 
-form input[type=checkbox] {
+form input[type='checkbox'] {
   transform: scale(1.2);
 }
 
@@ -322,19 +322,19 @@ form div.errors textarea {
 }
 
 form ul.errorlist {
-  margin: 8px 0 0 0;
+  margin: 8px 0 0;
   font-size: 0.9em;
   font-weight: 350;
   color: var(--error-text-form);
 }
 
 form ul.errorlist.nonfield {
-  margin: 8px 0 16px 0;
+  margin: 8px 0 16px;
 }
 
 form p.help {
   font-size: 0.9em;
-  margin: 8px 0 0 0;
+  margin: 8px 0 0;
   font-weight: 350;
 }
 
@@ -348,7 +348,7 @@ form div.input_button_wrapper {
   margin-bottom: 0;
 }
 
-form div.input_button_wrapper input[type=submit] {
+form div.input_button_wrapper input[type='submit'] {
   border-radius: 4px;
   text-decoration: none;
   border: none;
@@ -358,7 +358,7 @@ form div.input_button_wrapper input[type=submit] {
   margin-left: 8px;
 }
 
-form div.input_button_wrapper input[type=submit]:hover {
+form div.input_button_wrapper input[type='submit']:hover {
   background-color: var(--ok-button-hover-background);
   transition-property: background-color;
   transition-duration: 0.1s;
@@ -366,7 +366,7 @@ form div.input_button_wrapper input[type=submit]:hover {
 
 .actions {
   width: 100%;
-  margin: 3px 0 32px 0;
+  margin: 3px 0 32px;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -374,7 +374,7 @@ form div.input_button_wrapper input[type=submit]:hover {
 }
 
 .actions a,
-.actions input[type=submit] {
+.actions input[type='submit'] {
   padding: 16px 32px;
   border-radius: 4px;
   text-decoration: none;
@@ -383,7 +383,7 @@ form div.input_button_wrapper input[type=submit]:hover {
 }
 
 .actions a:not(:last-child),
-.actions input[type=submit]:not(:last-child) {
+.actions input[type='submit']:not(:last-child) {
   margin-right: 16px;
 }
 
@@ -395,24 +395,24 @@ form div.input_button_wrapper input[type=submit]:hover {
   }
 
   .actions a,
-  .actions input[type=submit] {
+  .actions input[type='submit'] {
     text-align: center;
   }
 
   .actions a:not(:last-child),
-  .actions input[type="submit"]:not(:last-child) {
+  .actions input[type='submit']:not(:last-child) {
     margin-right: 0;
     margin-bottom: 16px;
   }
 }
 
 .actions a.ok,
-.actions input[type=submit] {
+.actions input[type='submit'] {
   background-color: var(--ok-button-background);
 }
 
 .actions a.ok:hover,
-.actions input[type=submit]:hover {
+.actions input[type='submit']:hover {
   background-color: var(--ok-button-hover-background);
   transition-property: background-color;
   transition-duration: 0.1s;
@@ -475,7 +475,7 @@ p.resource {
 }
 
 section.htmlfield {
-  margin: 32px 0 32px 0;
+  margin: 32px 0;
 }
 
 #sign_wrapper {
@@ -488,7 +488,7 @@ section.htmlfield {
 }
 
 div.pagination {
-  margin: 32px 0 32px 0;
+  margin: 32px 0;
 }
 
 body > footer {

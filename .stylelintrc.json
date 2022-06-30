@@ -1,6 +1,20 @@
 {
   "extends": "stylelint-config-standard",
   "rules": {
-    "no-descending-specificity": null
+    "no-descending-specificity": null,
+    "font-family-name-quotes": "always-unless-keyword",
+    "string-quotes": "single",
+    "selector-id-pattern": [
+      "^([a-z][a-z0-9]*)((-|_)[a-z0-9]+)*$",
+      {
+        "message": "Expected id selector to be kebab-case or snake_case"
+      }
+    ],
+    "selector-class-pattern": [
+      "^([a-z][a-z0-9]*)((-|_)[a-z0-9]+)*$",
+      {
+        "message": "Expected class selector to be kebab-case or snake_case"
+      }
+    ]
   }
 }
