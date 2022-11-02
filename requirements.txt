@@ -25,7 +25,7 @@ pip-review==1.2.0
 platformdirs==2.5.2
 pycodestyle==2.9.1
 pyflakes==2.5.0
-pylint==2.15.5
+pylint==2.15.4
 pylint-django==2.5.3
 pylint-plugin-utils==0.7
 pyparsing==3.0.9

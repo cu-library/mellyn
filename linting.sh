@@ -1,7 +1,5 @@
 #! /usr/bin/env bash
 
-export PYTHONPATH=$PYTHONPATH:$PWD
-
 echo "Agreements"
 pylint --load-plugins pylint_django --django-settings-module=mellyn.settings agreements
 flake8 agreements
