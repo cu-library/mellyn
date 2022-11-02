@@ -674,7 +674,7 @@ class ResourceAccessTestCase(TestCase):
         cls.temp_media_root = tempfile.mkdtemp(suffix='mellyn_tests')
         test_data_dir = os.path.join(cls.temp_media_root, 'test-resource/a/b/c/d')
         os.makedirs(os.path.join(test_data_dir, 'e'))
-        with open(os.path.join(test_data_dir, 'testfile.txt'), 'w') as test_file:
+        with open(os.path.join(test_data_dir, 'testfile.txt'), 'w', encoding='utf-8') as test_file:
             test_file.writelines(['and a one\n', 'and a two\n', 'and a three!\n'])
 
     @classmethod
