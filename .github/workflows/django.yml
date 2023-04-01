@@ -25,11 +25,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip check
     - name: Run Tests
       run: |
         python manage.py test
     - name: Run pylint and flake8
       run: |
+        pylint --load-plugins pylint_django --django-settings-module=mellyn.settings agreements
+        pylint --load-plugins pylint_django --django-settings-module=mellyn.settings accounts
+        pylint --load-plugins pylint_django --django-settings-module=mellyn.settings mellyn
         flake8 agreements
         flake8 accounts
         flake8 mellyn
@@ -38,8 +42,9 @@ jobs:
       with:
         node-version: '18.x'
     - name: Install dependencies
-      run: npm -g install jshint stylelint stylelint-config-standard
+      run: npm install
     - name: Run jshunt and stylelint
       run: |
-        jshint static/js/main.js
-        stylelint static/css/main.css
+        npx jshint static/js/main.js
+        npx stylelint static/css/main.css
+        npx prettier --single-quote --check static/css/main.css

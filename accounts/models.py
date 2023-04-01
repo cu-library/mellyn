@@ -29,7 +29,7 @@ class UserQuerySet(QuerySet):
         if query is None:
             raise TypeError('query cannot be none')
         return self.filter(
-            Q(username__icontains=query) |
+            Q(username__icontains=query) |   # pylint: disable=unsupported-binary-operation
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query) |
             Q(email__icontains=query)

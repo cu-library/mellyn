@@ -305,7 +305,7 @@ class PaginationTestCase(TestCase):
                                      body='body',
                                      redirect_url='https://example.com',
                                      redirect_text='example-redirect',
-                                     hidden=((i % 10) == 0))  # 0, 10, 20, 30 are hidden
+                                     hidden=(i % 10) == 0)  # 0, 10, 20, 30 are hidden
         # Test HTML
         self.client.login(username='test', password='test')
         response = self.client.get(reverse('agreements_list'))
@@ -321,7 +321,7 @@ class PaginationTestCase(TestCase):
     def test_resource_pagination(self):
         """Test resource pagination"""
         for i in range(67):
-            Resource.objects.create(name=f'Test-{i}', slug=f'test-{i}', description='', hidden=((i % 10) == 0))
+            Resource.objects.create(name=f'Test-{i}', slug=f'test-{i}', description='', hidden=(i % 10) == 0)
 
         # Test HTML
         self.client.login(username='test', password='test')

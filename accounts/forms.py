@@ -126,7 +126,7 @@ class GroupPermissionsForm(ModelFormSetLabelSuffix):
                                                  Q(content_type__model='groupdescription')
                                              )
                                              .exclude(
-                                                 Q(content_type__model__icontains='historical') |
+                                                 Q(content_type__model__icontains='historical') |  # pylint: disable=unsupported-binary-operation # noqa: # noqa: E501
                                                  Q(content_type__model='licensecode') |
                                                  Q(content_type__model='filedownloadevent') |
                                                  Q(content_type__model='signature')

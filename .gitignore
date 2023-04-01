@@ -2,3 +2,5 @@
 db.sqlite3
 collected_static_files
 __pycache__/
+venv/
+node_modules/
