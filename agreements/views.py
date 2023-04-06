@@ -13,7 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
 from django.core.files.storage import default_storage
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -551,10 +551,13 @@ class AgreementRead(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailVi
         signature.email = self.request.user.email
         try:
             signature.full_clean()
-        except ValidationError:
+            signature.save()
+        # There is a race condition here. full_clean() can succeed,
+        # and then save() can raise an IntegrityError based on the unique
+        # constraint on agreement and signatory. Catch both errors.
+        except (ValidationError, IntegrityError):
             messages.error(self.request, 'Agreement already signed.')
             return redirect(self.get_object())
-        signature.save()
         with transaction.atomic():
             license_code = (LicenseCode.objects
                             .select_for_update(skip_locked=True)
