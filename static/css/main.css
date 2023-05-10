@@ -17,6 +17,7 @@ code {
 :root {
   --skip-link-background: #222;
   --carleton-red: #bf112b;
+  --carleton-link: #105F83;
   --error-text-form: #b40000;
   --ok-button-background: #c5dcff;
   --ok-button-hover-background: #a9cbfe;
@@ -26,13 +27,13 @@ code {
   --bonus-button-hover-background: #ffb8f4;
   --permissions-button-background: #c5ffc9;
   --permissions-button-hover-background: #baffb8;
-  --debug-message-background: #fafafa;
+  --debug-message-background: #e6f7ff;
   --info-message-background: #f5fdff;
-  --success-message-background: #f5fff6;
-  --warning-message-background: #fffaf2;
-  --error-message-background: #ffefef;
+  --success-message-background: #fafff5;
+  --warning-message-background: #fffaf1;
+  --error-message-background: #f9e6e9;
   --footer-background: #222;
-  --footer-text: #bababa;
+  --footer-text: #dfdfdf;
   --footer-link: #ededed;
 }
 
@@ -70,7 +71,7 @@ a {
 }
 
 p {
-  line-height: 1.5;
+  line-height: 1.8;
   margin: 16px 0;
 }
 
@@ -199,6 +200,14 @@ body > header > nav a:hover {
   margin: 0 auto;
   padding: 0 20px;
   width: 100%;
+}
+
+main a {
+  color: var(--carleton-link);
+}
+
+main a:hover {
+  color: var(--carleton-red);
 }
 
 ul.messages {
@@ -380,6 +389,11 @@ form div.input_button_wrapper input[type='submit']:hover {
   text-decoration: none;
   border: none;
   cursor: pointer;
+  color: inherit;
+}
+
+.actions a:hover {
+  color: inherit;
 }
 
 .actions a:not(:last-child),
