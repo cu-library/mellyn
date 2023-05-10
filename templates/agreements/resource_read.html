@@ -12,7 +12,7 @@
     {% for agreement in agreements %}
     <li {% if agreement.hidden %}class="hidden"{% endif %}>
       <a href="{% url 'agreements_read' agreement.slug %}"><h3>{{ agreement.title }}{% if agreement.hidden %} (Hidden){% endif %}</h3></a>
-      <div class="agreementcreated">Created <span class="human-date" title="{{ agreement.created|date:"Y-m-d" }}">{{ agreement.created|date:"l, F jS, Y" }}</span>.</div>
+      <div class="created">Created <span class="human-date" title="{{ agreement.created|date:"Y-m-d" }}">{{ agreement.created|date:"l, F jS, Y" }}</span>.</div>
       <p class="valid">Valid from <span class="human-date" title="{{ agreement.start|date:"Y-m-d" }}">{{ agreement.start|date:"l, F jS, Y" }}</span>{% if agreement.end %} until <span class="human-date" title="{{ agreement.end|date:"Y-m-d" }}">{{ agreement.end|date:"l, F jS, Y" }}</span>{% endif %}.</p>
       {% if agreement.associated_signature %}
       <div class="signature">
