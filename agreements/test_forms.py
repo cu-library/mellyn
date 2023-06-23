@@ -33,3 +33,9 @@ class AgreementBaseFormTestCase(TestCase):
                              'end': None}
         form.clean()
         self.assertNotIn('"End" date and time is before "Start" date and time.', form.non_field_errors())
+
+        # If end doesn't pass validation, it isn't added to cleaned_data.
+        form = AgreementBaseForm()
+        form.cleaned_data = {'start': datetime(1999, 12, 31, tzinfo=timezone.utc)}
+        form.clean()
+        self.assertNotIn('"End" date and time is before "Start" date and time.', form.non_field_errors())

@@ -125,7 +125,7 @@ class AgreementBaseForm(ModelFormSetLabelSuffix):
 
     def clean(self):
         super().clean()
-        if self.cleaned_data['end'] is not None:
+        if self.cleaned_data.get('end', None) is not None:
             if self.cleaned_data['start'] > self.cleaned_data['end']:
                 self.add_error(None,
                                ValidationError(
