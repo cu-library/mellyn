@@ -4,7 +4,7 @@ bleach==5.0.1
 coverage==6.5.0
 coverage-badge==1.1.0
 dill==0.3.6
-Django==3.2.19
+Django==3.2.20
 django-bleach==3.0.1
 django-csv-export-view==1.1.0
 django-guardian==2.4.0
