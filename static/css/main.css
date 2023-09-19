@@ -165,7 +165,7 @@ body > header > nav a:hover {
   transition-duration: 0.1s;
 }
 
-@media (max-width: 560px) {
+@media (width <= 560px) {
   body > header {
     flex-direction: column;
     align-items: stretch;
@@ -264,7 +264,7 @@ form select {
   min-width: 400px;
 }
 
-@media (max-width: 560px) {
+@media (width <= 560px) {
   form input[type='text'],
   form input[type='url'],
   form input[type='password'],
@@ -395,7 +395,7 @@ form div.input_button_wrapper input[type='submit']:hover {
   margin-right: 16px;
 }
 
-@media (max-width: 560px) {
+@media (width <= 560px) {
   .actions {
     flex-direction: column;
     align-items: stretch;
