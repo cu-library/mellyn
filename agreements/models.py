@@ -37,7 +37,7 @@ class Resource(models.Model):
                               strip_tags=False,
                               strip_comments=True,
                               help_text=f'An HTML description of the resource. '
-                                        f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
+                                        f'The following tags are allowed: {", ".join(DEFAULT_ALLOWED_TAGS)}.')
     low_codes_threshold = models.PositiveSmallIntegerField(default=51,
                                                            help_text='If the number of unassigned license codes '
                                                                      'associated with this resource falls below this '
@@ -176,7 +176,7 @@ class Agreement(models.Model):
                        strip_tags=False,
                        strip_comments=True,
                        help_text='HTML content of the agreement. '
-                                 f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}. '
+                                 f'The following tags are allowed: {", ".join(DEFAULT_ALLOWED_TAGS)}. '
                                  'Changing this field after the agreement has been signed '
                                  'by patrons is strongly discouraged.')
 

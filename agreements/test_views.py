@@ -118,7 +118,7 @@ class SharedCRUDWorkflowsTestCase(TestCase):
                                               f'href="{reverse(lowercase_plural+"_read", args=["test"])}">Cancel</a>',
                                     html=True)
                 self.assertContains(response, '<input type="submit" value="Save">', html=True)
-                self.assertContains(response, '<input type="text" name="slug" value="test" disabled id="id_slug">',
+                self.assertContains(response, '<input type="text" name="slug" value="test" disabled aria-describedby="id_slug_helptext" id="id_slug">',
                                     html=True)
 
             # Visit the delete view.

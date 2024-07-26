@@ -120,7 +120,7 @@ class GroupDescription(models.Model):
                               strip_tags=False,
                               strip_comments=True,
                               help_text=f'An HTML description of the group. '
-                                        f'The following tags are allowed: { ", ".join(DEFAULT_ALLOWED_TAGS)}.')
+                                        f'The following tags are allowed: {", ".join(DEFAULT_ALLOWED_TAGS)}.')
     history = HistoricalRecords()
 
     objects = GroupDescriptionQuerySet.as_manager()
