@@ -21,6 +21,11 @@ class AdminTestCase(TestCase):
                                                               password='test',
                                                               is_staff=False)
 
+    def test_health_view(self):
+        """Test the health view"""
+        response = self.client.get(reverse('health'))
+        self.assertContains(response, 'OK')
+
     def test_index_view(self):
         """Test that the index view works as expected"""
 

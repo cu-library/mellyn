@@ -22,5 +22,6 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('', include('agreements.urls')),
     path('', include('accounts.urls')),
     path('admin/', views.AdminView.as_view(), name='admin'),
+    path('health', views.health, name='health'),
     path('', views.index, name='index'),
 ]
