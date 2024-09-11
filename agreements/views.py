@@ -8,13 +8,14 @@ from pathlib import Path
 import operator
 import os
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError, SuspiciousFileOperation, PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import transaction, IntegrityError
-from django.http import Http404
+from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.timezone import now
@@ -26,6 +27,7 @@ from csv_export.views import CSVExportView
 from django_sendfile import sendfile
 from guardian.mixins import PermissionRequiredMixin as GuardianPermissionRequiredMixin
 import humanize
+import requests
 
 from accounts.models import GroupDescription
 from accounts.forms import CustomGroupObjectPermissionsForm
@@ -247,18 +249,85 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
             request.session['access_attempt'] = (resource.slug, self.kwargs['accesspath'])
             return redirect(associated_agreement)
 
-        # Access is granted, is the access path a file or a directory?
+        # Access is granted.
         resource_scoped_path = os.path.join(resource.slug, self.kwargs['accesspath'])
         try:
             if '..' in resource_scoped_path:
                 raise SuspiciousFileOperation()
+        except SuspiciousFileOperation as suspicious_file_operation_error:
+            raise PermissionDenied('SuspiciousFileOperation on file access.') from suspicious_file_operation_error
+        # Are we using an upstream server?
+        upstream = getattr(settings, 'UPSTREAM', '')
+        if upstream != '':
+            return self.upstream_file_access(upstream, resource, resource_scoped_path,
+                                             request, *args, **kwargs)
+        return self.local_file_access(resource, resource_scoped_path,
+                                      request, *args, **kwargs)
+
+    def upstream_file_access(self, upstream, resource, resource_scoped_path, request, *args, **kwargs):
+        """Handle streaming the file from upstream, with possible JSON directory listings"""
+        try:
+            client_headers = {}
+            if 'If-None-Match' in request.headers:
+                client_headers['If-None-Match'] = request.headers['If-None-Match']
+            if 'Range' in request.headers:
+                client_headers['Range'] = request.headers['Range']
+            # Why the callback? So we're more certain that this doesn't happen to be static JSON.
+            upstream_response = requests.get(f'{upstream}/{resource_scoped_path}?callback=dir',
+                                             stream=True, headers=client_headers, timeout=60)
+            upstream_response.raise_for_status()
+            if upstream_response.headers.get('Content-Type', '') == 'application/javascript':
+                # This might be a directory listing.
+                body = upstream_response.iter_lines()
+                if (next(body, b'').decode('utf-8') == "/* callback */" and
+                        next(body, b'').decode('utf-8') == 'dir(['):
+                    if self.kwargs['accesspath'] != '' and self.kwargs['accesspath'][-1] != '/':
+                        return redirect(reverse_lazy('resources_access',
+                                                     args=[resource.slug, self.kwargs['accesspath']+'/']))
+                    directory_listing = requests.get(f'{upstream}/{resource_scoped_path}', timeout=60)
+                    self.upstream_directory_listing = directory_listing.json()  # pylint: disable=attribute-defined-outside-init  # noqa: E501
+                    # Render a file listing to the user.
+                    return super().get(request, *args, **kwargs)
+
+                # Not a directory listing, reset the request.
+                upstream_response = requests.get(f'{upstream}/{resource_scoped_path}?callback=dir',
+                                                 stream=True, headers=client_headers, timeout=60)
+                upstream_response.raise_for_status()
+            FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(
+                    resource,
+                    self.kwargs['accesspath'],
+                    request.session.session_key
+            )
+            response = StreamingHttpResponse(upstream_response.iter_content(chunk_size=4096))
+            if 'Date' in upstream_response.headers:
+                response['Date'] = upstream_response.headers['Date']
+            if 'Content-Type' in upstream_response.headers:
+                response['Content-Type'] = upstream_response.headers['Content-Type']
+            if 'Content-Length' in upstream_response.headers:
+                response['Content-Length'] = upstream_response.headers['Content-Length']
+            if 'Last-Modified' in upstream_response.headers:
+                response['Last-Modified'] = upstream_response.headers['Last-Modified']
+            if 'ETag' in upstream_response.headers:
+                response['ETag'] = upstream_response.headers['ETag']
+            if 'Accept-Ranges' in upstream_response.headers:
+                response['Accept-Ranges'] = upstream_response.headers['Accept-Ranges']
+            return response
+        except requests.exceptions.RequestException as request_exception:
+            raise Http404('File or directory not found at access path.') from request_exception
+
+    def local_file_access(self, resource, resource_scoped_path, request, *args, **kwargs):
+        """Handle sending the file from a local directory"""
+        # Is the access path a file or a directory?
+        try:
             self.path = default_storage.path(resource_scoped_path)  # pylint: disable=attribute-defined-outside-init
             if not os.path.exists(self.path):
                 raise Http404('File or directory not found at access path.')
             if os.path.isfile(self.path):
-                FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(resource,
-                                                                                        self.kwargs['accesspath'],
-                                                                                        request.session.session_key)
+                FileDownloadEvent.objects.get_or_create_if_no_duplicates_past_5_minutes(
+                        resource,
+                        self.kwargs['accesspath'],
+                        request.session.session_key
+                )
                 return sendfile(request, self.path)
         except SuspiciousFileOperation as suspicious_file_operation_error:
             raise PermissionDenied('SuspiciousFileOperation on file access.') from suspicious_file_operation_error
@@ -274,21 +343,34 @@ class ResourceAccess(LoginRequiredMixin, DetailView):
         context['accesspath'] = self.kwargs['accesspath']
         context['directories'] = []
         context['files'] = []
-        for entry in os.scandir(self.path):
-            if entry.is_dir():
-                directory = {}
-                directory['name'] = entry.name
-                directory['accesspath'] = os.path.join(self.kwargs['accesspath'], entry.name)
-                context['directories'].append(directory)
-            else:
-                file = {}
-                file['name'] = entry.name
-                file['accesspath'] = os.path.join(self.kwargs['accesspath'], entry.name)
-                file['size'] = humanize.naturalsize(entry.stat().st_size, binary=True)
-                context['files'].append(file)
+        if hasattr(self, 'upstream_directory_listing'):
+            for entry in self.upstream_directory_listing:
+                if entry.get('type', '') == 'directory':
+                    directory = {}
+                    directory['name'] = entry['name']
+                    directory['accesspath'] = os.path.join(self.kwargs['accesspath'], entry['name'])
+                    context['directories'].append(directory)
+                elif entry.get('type', '') == 'file':
+                    file = {}
+                    file['name'] = entry['name']
+                    file['accesspath'] = os.path.join(self.kwargs['accesspath'], entry['name'])
+                    file['size'] = humanize.naturalsize(entry['size'], binary=True)
+                    context['files'].append(file)
+        else:
+            for entry in os.scandir(self.path):
+                if entry.is_dir():
+                    directory = {}
+                    directory['name'] = entry.name
+                    directory['accesspath'] = os.path.join(self.kwargs['accesspath'], entry.name)
+                    context['directories'].append(directory)
+                else:
+                    file = {}
+                    file['name'] = entry.name
+                    file['accesspath'] = os.path.join(self.kwargs['accesspath'], entry.name)
+                    file['size'] = humanize.naturalsize(entry.stat().st_size, binary=True)
+                    context['files'].append(file)
         context['directories'].sort(key=operator.itemgetter('name'))
         context['files'].sort(key=operator.itemgetter('name'))
-
         if self.kwargs['accesspath'] != '':
             parentdir = str(Path(self.kwargs['accesspath']).parent)
             if parentdir == '.':
