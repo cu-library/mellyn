@@ -43,7 +43,7 @@ tomli==2.0.1
 tomlkit==0.13.0
 typed_ast==1.5.5
 typing_extensions==4.12.2
-urllib3==2.2.2
+urllib3==2.5.0
 webencodings==0.5.1
 wrapt==1.16.0
 zipp==3.19.2
