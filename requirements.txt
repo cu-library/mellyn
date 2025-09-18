@@ -37,7 +37,7 @@ requests==2.32.5
 setuptools==80.9.0
 six==1.17.0
 sqlparse==0.5.3
-tinycss2==1.4.0
+tinycss2==1.2.0
 toml==0.10.2
 tomli==2.2.1
 tomlkit==0.13.3
