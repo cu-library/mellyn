@@ -595,7 +595,7 @@ class AgreementList(LoginRequiredMixin, ListView):
     """A view of all agreements"""
     context_object_name = 'agreements'
     model = Agreement
-    ordering = 'title'
+    ordering = ['hidden', 'title']
     paginate_by = 15
     template_name = 'agreements/agreement_list.html'
 
