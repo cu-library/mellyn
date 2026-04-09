@@ -23,8 +23,8 @@ grep -r '[^ ]}}' templates/
 grep -r ' | ' templates/
 
 echo ""
-echo "JSHint on static/js/main.js"
-npx jshint static/js/main.js
+echo "ESLint on static/js/main.js"
+npx eslint static/js/main.js
 
 echo ""
 echo "stylelint on static/css/main.css"

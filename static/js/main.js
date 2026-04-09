@@ -1,18 +1,16 @@
-/*jshint esversion: 6 */
-
 // Automatically populate the slug fields in create forms.
 (function autoSlug(){
     'use strict';
 
     const titleInput = document.querySelector('form.create #id_title');
     if(titleInput){
-        titleInput.addEventListener('input', function (e){
+        titleInput.addEventListener('input', function (e){ // eslint-disable-line no-unused-vars
             document.getElementById('id_slug').value = window.URLify(this.value);
         });
     }
     const nameInput = document.querySelector('form.create #id_name');
     if(nameInput){
-        nameInput.addEventListener('input', function (e){
+        nameInput.addEventListener('input', function (e){ // eslint-disable-line no-unused-vars
             document.getElementById('id_slug').value = window.URLify(this.value);
         });
     }
@@ -63,7 +61,7 @@
     'use strict';
 
     function addValidationEventListener(element){
-        element.addEventListener('input', function (e){
+        element.addEventListener('input', function (e){ // eslint-disable-line no-unused-vars
             const INVALID_MESSAGE_ID = `id_${this.id}_error_message_invalid_html`;
             const parser = new DOMParser();
             // allowedTags is extracted from the model and passed through the view.
