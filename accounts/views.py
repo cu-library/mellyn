@@ -172,7 +172,7 @@ class GroupDescriptionDelete(PermissionRequiredMixin, SuccessMessageMixin, Delet
     model = GroupDescription
     permission_required = 'accounts.delete_groupdescription'
     success_message = '%(name)s was deleted successfully.'
-    success_url = reverse_lazy('group_descriptions_list')
+    success_url = reverse_lazy('groupdescriptions_list')
     template_name_suffix = '_delete_form'
 
 
