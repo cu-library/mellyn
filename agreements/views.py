@@ -148,7 +148,7 @@ class ResourceDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     fields = '__all__'
     model = Resource
     permission_required = 'agreements.delete_resource'
-    success_message = '%(name)s was deleted successfully.'
+    success_message = 'Resource was deleted successfully.'
     success_url = reverse_lazy('resources_list')
     template_name_suffix = '_delete_form'
 
@@ -528,7 +528,7 @@ class FacultyDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     fields = '__all__'
     model = Faculty
     permission_required = 'agreements.delete_faculty'
-    success_message = '%(name)s was deleted successfully.'
+    success_message = 'Faculty was deleted successfully.'
     success_url = reverse_lazy('faculties_list')
     template_name_suffix = '_delete_form'
 
@@ -584,7 +584,7 @@ class DepartmentDelete(PermissionRequiredMixin, SuccessMessageMixin, DeleteView)
     fields = '__all__'
     model = Department
     permission_required = 'agreements.delete_department'
-    success_message = '%(name)s was deleted successfully.'
+    success_message = 'Department was deleted successfully.'
     success_url = reverse_lazy('departments_list')
     template_name_suffix = '_delete_form'
 
@@ -696,7 +696,7 @@ class AgreementDelete(LoginRequiredMixin, PermissionRequiredMixin,
     fields = '__all__'
     model = Agreement
     permission_required = 'agreements.delete_agreement'
-    success_message = '%(title)s was deleted successfully.'
+    success_message = 'Agreement was deleted successfully.'
     success_url = reverse_lazy('agreements_list')
     template_name_suffix = '_delete_form'
 
