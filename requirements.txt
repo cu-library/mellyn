@@ -1,7 +1,7 @@
 asgiref==3.9.1
 astroid==3.3.11
 bleach==5.0.1
-certifi==2025.8.3
+certifi==2026.10.19
 charset-normalizer==3.4.3
 coverage==7.10.6
 coverage-badge==1.1.2
