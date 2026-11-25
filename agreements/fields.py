@@ -55,7 +55,7 @@ class SplitLineField(CharField):
 
     def to_python(self, value):
         """Return a list from the value, split on newlines"""
-        value = super().to_python(value)
+        value = super().to_python(value)  # pylint: disable=no-member
         if not value:
             return []
         # Split the values on newline, remove surrounding whitespace, and filter out empty lines.
@@ -63,7 +63,7 @@ class SplitLineField(CharField):
 
     def validate(self, value):
         """Ensure every line in the input is unique"""
-        super().validate(value)
+        super().validate(value)  # pylint: disable=no-member
         seen = []
         for line in value:
             if line in seen:
